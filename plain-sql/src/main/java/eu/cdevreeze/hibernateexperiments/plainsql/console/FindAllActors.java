@@ -36,7 +36,7 @@ public class FindAllActors {
 
             List<Actor> actors = actorService.findAll();
 
-            actors.forEach(System.out::println);
+            actors.forEach(IO::println);
         }
     }
 }

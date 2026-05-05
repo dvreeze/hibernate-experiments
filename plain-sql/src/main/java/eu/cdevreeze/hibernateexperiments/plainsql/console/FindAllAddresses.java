@@ -36,7 +36,7 @@ public class FindAllAddresses {
 
             List<Address> addresses = addressService.findAll();
 
-            addresses.forEach(System.out::println);
+            addresses.forEach(IO::println);
         }
     }
 }

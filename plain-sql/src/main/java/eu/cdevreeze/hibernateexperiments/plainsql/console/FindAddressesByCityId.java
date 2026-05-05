@@ -39,7 +39,7 @@ public class FindAddressesByCityId {
 
             List<Address> addresses = addressService.findByCityId(cityId);
 
-            addresses.forEach(System.out::println);
+            addresses.forEach(IO::println);
         }
     }
 }

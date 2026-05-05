@@ -39,7 +39,7 @@ public class FindActorById {
 
             Optional<Actor> actorOption = actorService.findById(actorId);
 
-            actorOption.ifPresent(System.out::println);
+            actorOption.ifPresent(IO::println);
         }
     }
 }

@@ -36,7 +36,7 @@ public class FindAllCountries {
 
             List<Country> countries = addressService.findAllCountries();
 
-            countries.forEach(System.out::println);
+            countries.forEach(IO::println);
         }
     }
 }

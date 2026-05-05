@@ -39,7 +39,7 @@ public class FindActorsByFilmId {
 
             List<Actor> actors = actorService.findByFilmId(filmId);
 
-            actors.forEach(System.out::println);
+            actors.forEach(IO::println);
         }
     }
 }

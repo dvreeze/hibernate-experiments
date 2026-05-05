@@ -39,7 +39,7 @@ public class FindAddressById {
 
             Optional<Address> addressOption = addressService.findById(addressId);
 
-            addressOption.ifPresent(System.out::println);
+            addressOption.ifPresent(IO::println);
         }
     }
 }
