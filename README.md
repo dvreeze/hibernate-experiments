@@ -30,7 +30,7 @@ considers its use of the legacy `Date`/`Calendar` classes deprecated.
 
 Much of my programming experience has been influenced strongly by:
 * Internalizing many best practices mentioned in the book [Effective Java, 3rd Edition](https://thorben-janssen.com/review-effective-java-3rd-edition/), by Joshua Bloch
-* Many years of [https://www.scala-lang.org/](https://www.scala-lang.org/) programming
+* Many years of [Scala](https://www.scala-lang.org/) programming
 
 Languages like Scala and [Kotlin](https://kotlinlang.org/) certainly have had a big influence on the
 evolution of the Java language. Take for example the move from *JavaBeans* to *Java records* in more
