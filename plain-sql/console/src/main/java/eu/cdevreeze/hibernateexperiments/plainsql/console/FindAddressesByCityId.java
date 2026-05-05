@@ -20,7 +20,7 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Address;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteAddressService;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.factory.AddressServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
@@ -35,7 +35,7 @@ public class FindAddressesByCityId {
         long cityId = Long.parseLong(args[0]);
 
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            AddressService addressService = new ConcreteAddressService(emf);
+            AddressService addressService = AddressServiceFactory.create(emf);
 
             List<Address> addresses = addressService.findByCityId(cityId);
 

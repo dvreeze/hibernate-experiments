@@ -18,28 +18,28 @@ package eu.cdevreeze.hibernateexperiments.plainsql.console;
 
 import module java.base;
 import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Address;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.City;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteAddressService;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.factory.AddressServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Program finding the address with a given ID, if any.
+ * Program finding all cities of a given country (given as country ID).
  *
  * @author Chris de Vreeze
  */
-public class FindAddressById {
+public class FindCitiesByCountryId {
 
     static void main(String... args) {
         Objects.checkIndex(0, args.length);
-        long addressId = Long.parseLong(args[0]);
+        long countryId = Long.parseLong(args[0]);
 
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            AddressService addressService = new ConcreteAddressService(emf);
+            AddressService addressService = AddressServiceFactory.create(emf);
 
-            Optional<Address> addressOption = addressService.findById(addressId);
+            List<City> cities = addressService.findCitiesByCountryId(countryId);
 
-            addressOption.ifPresent(IO::println);
+            cities.forEach(IO::println);
         }
     }
 }

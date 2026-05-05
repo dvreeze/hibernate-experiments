@@ -20,26 +20,23 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.ActorService;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteActorService;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.factory.ActorServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Program finding the actor with a given ID, if any.
+ * Program finding all actors in the database.
  *
  * @author Chris de Vreeze
  */
-public class FindActorById {
+public class FindAllActors {
 
     static void main(String... args) {
-        Objects.checkIndex(0, args.length);
-        long actorId = Long.parseLong(args[0]);
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            ActorService actorService = new ConcreteActorService(emf);
+            ActorService actorService = ActorServiceFactory.create(emf);
 
-            Optional<Actor> actorOption = actorService.findById(actorId);
+            List<Actor> actors = actorService.findAll();
 
-            actorOption.ifPresent(IO::println);
+            actors.forEach(IO::println);
         }
     }
 }

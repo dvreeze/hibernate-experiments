@@ -18,25 +18,28 @@ package eu.cdevreeze.hibernateexperiments.plainsql.console;
 
 import module java.base;
 import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Country;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteAddressService;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.ActorService;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.factory.ActorServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Program finding all countries in the database.
+ * Program finding the actor with a given ID, if any.
  *
  * @author Chris de Vreeze
  */
-public class FindAllCountries {
+public class FindActorById {
 
     static void main(String... args) {
+        Objects.checkIndex(0, args.length);
+        long actorId = Long.parseLong(args[0]);
+
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            AddressService addressService = new ConcreteAddressService(emf);
+            ActorService actorService = ActorServiceFactory.create(emf);
 
-            List<Country> countries = addressService.findAllCountries();
+            Optional<Actor> actorOption = actorService.findById(actorId);
 
-            countries.forEach(IO::println);
+            actorOption.ifPresent(IO::println);
         }
     }
 }

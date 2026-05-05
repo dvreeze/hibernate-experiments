@@ -18,28 +18,25 @@ package eu.cdevreeze.hibernateexperiments.plainsql.console;
 
 import module java.base;
 import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.ActorService;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteActorService;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Address;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.factory.AddressServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Program finding all actors of a given film (given as film ID).
+ * Program finding all addresses in the database.
  *
  * @author Chris de Vreeze
  */
-public class FindActorsByFilmId {
+public class FindAllAddresses {
 
     static void main(String... args) {
-        Objects.checkIndex(0, args.length);
-        long filmId = Long.parseLong(args[0]);
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            ActorService actorService = new ConcreteActorService(emf);
+            AddressService addressService = AddressServiceFactory.create(emf);
 
-            List<Actor> actors = actorService.findByFilmId(filmId);
+            List<Address> addresses = addressService.findAll();
 
-            actors.forEach(IO::println);
+            addresses.forEach(IO::println);
         }
     }
 }

@@ -73,6 +73,11 @@ JPA 4.0 seems to finally rectify this.
 Summarized: this project is not just about experimenting with a modern Hibernate ORM, but also about
 how to combine that with functional programming techniques.
 
+Furthermore, this project uses [Java Modules](https://dev.java/learn/modules/) in order to mimic
+a modular approach in large code bases, to guard against certain cases of
+[bit rot](https://infodation.com/en/blogs/bit-rot-the-silent-killer-of-software-systems) due to
+poor management of internal application dependencies.
+
 ## Prerequisites
 
 To run code in this project (console programs or unit tests), first make sure to have a locally running
@@ -97,6 +102,11 @@ JPQL/Criteria API, or the use of `EntityAgent` versus `EntityManager`.
 
 The subprojects include [ArchUnit](https://www.archunit.org/) unit tests, to check architectural
 "decisions" that the (sub)project should adhere to.
+
+The subprojects are themselves Maven multi-module projects, with one module being a Java Module
+exposing the service layer API and the other one consuming it. Although overkill in this case,
+it shows how in a larger code base service layer implementation details can be hidden from code
+consuming the service layer.
 
 ## Running the console programs and unit tests
 

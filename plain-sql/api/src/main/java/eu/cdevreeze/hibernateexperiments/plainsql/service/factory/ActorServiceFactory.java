@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.console;
+package eu.cdevreeze.hibernateexperiments.plainsql.service.factory;
 
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.ActorService;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteActorService;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Program finding all actors in the database.
+ * Factory of {@link ActorService} objects.
  *
  * @author Chris de Vreeze
  */
-public class FindAllActors {
+public final class ActorServiceFactory {
 
-    static void main(String... args) {
-        try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            ActorService actorService = new ConcreteActorService(emf);
+    private ActorServiceFactory() {
+        // Non-instantiable
+    }
 
-            List<Actor> actors = actorService.findAll();
-
-            actors.forEach(IO::println);
-        }
+    public static ActorService create(EntityManagerFactory emf) {
+        return new ConcreteActorService(emf);
     }
 }
