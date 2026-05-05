@@ -12,7 +12,7 @@ and [JPA 4.0 M2](https://in.relation.to/2026/04/23/JPA-4-M2/).
 
 ## A few notes about competing design forces
 
-As a Java programmer it has taken my quite some time before getting some appreciation for the Hibernate
+As a Java programmer it has taken me quite some time before getting some appreciation for the Hibernate
 ORM (and the JPA standard). In all fairness, it has also taken me quite some time before getting a basic
 understanding of how the Hibernate ORM can be used effectively. Maybe I had seen too many projects
 where I was far from the only programmer who did not sufficiently grasp this powerful ORM.
