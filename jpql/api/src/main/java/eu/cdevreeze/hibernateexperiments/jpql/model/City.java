@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.model;
 
 import module java.base;
 

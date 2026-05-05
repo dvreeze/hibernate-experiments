@@ -20,7 +20,7 @@ import module java.base;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Immutable address {@link java.lang.Record}.
+ * Immutable address {@link Record}.
  *
  * @author Chris de Vreeze
  */

@@ -23,7 +23,7 @@ import eu.cdevreeze.hibernateexperiments.plainsql.model.City;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Country;
 
 /**
- * Abstract {@link eu.cdevreeze.hibernateexperiments.plainsql.model.Address} service API.
+ * Abstract {@link Address}-related service API.
  *
  * @author Chris de Vreeze
  */

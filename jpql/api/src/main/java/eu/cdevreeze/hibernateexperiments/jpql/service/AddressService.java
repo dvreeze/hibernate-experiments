@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.service;
+package eu.cdevreeze.hibernateexperiments.jpql.service;
 
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
+import eu.cdevreeze.hibernateexperiments.jpql.model.City;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Country;
 
 /**
- * Abstract {@link Actor}-related service API.
+ * Abstract {@link Address}-related service API.
  *
  * @author Chris de Vreeze
  */
-public interface ActorService {
+public interface AddressService {
 
-    Optional<Actor> findById(long id);
+    Optional<Address> findById(long id);
 
-    ImmutableList<Actor> findByFilmId(long filmId);
+    ImmutableList<Address> findByCityId(long cityId);
 
-    ImmutableList<Actor> findAll();
+    ImmutableList<Address> findByCountryId(long countryId);
+
+    // In reality this would return too many results
+    ImmutableList<Address> findAll();
+
+    ImmutableList<City> findCitiesByCountryId(long countryId);
+
+    ImmutableList<Country> findAllCountries();
 }

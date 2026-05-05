@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * Transactional service layer, as purely abstract API. This abstract API is entirely technology-agnostic,
+ * thus allowing for quite different implementations. The methods in this API take and return immutable
+ * objects, in particular immutable model objects. Being abstract interfaces, these service layer
+ * contracts are also very easy to mock.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
-}
+@NullMarked
+package eu.cdevreeze.hibernateexperiments.jpql.service;
+
+import org.jspecify.annotations.NullMarked;

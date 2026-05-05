@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * JPA {@link jakarta.persistence.Entity} classes. They are internal implementation details of
+ * the service layer.
+ * <p>
+ * Note the {@link org.jspecify.annotations.NullUnmarked} annotation, since nullability is everywhere in JPA entities.
+ * In JPA entities, optionality of entity fields is expressed using JPA annotations.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
-}
+@NullUnmarked
+package eu.cdevreeze.hibernateexperiments.jpql.entity;
+
+import org.jspecify.annotations.NullUnmarked;

@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.console;
 
+import module eu.cdevreeze.hibernateexperiments.jpql.api;
 import module java.base;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Immutable city {@link Record}.
+ * Program finding all countries in the database.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
+public class FindAllCountries {
+
+    static void main(String... args) {
+        try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
+            AddressService addressService = AddressServiceFactory.create(emf);
+
+            List<Country> countries = addressService.findAllCountries();
+
+            countries.forEach(IO::println);
+        }
+    }
 }

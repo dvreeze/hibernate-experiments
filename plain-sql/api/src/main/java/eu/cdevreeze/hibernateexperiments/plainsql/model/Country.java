@@ -19,7 +19,7 @@ package eu.cdevreeze.hibernateexperiments.plainsql.model;
 import module java.base;
 
 /**
- * Immutable country {@link java.lang.Record}.
+ * Immutable country {@link Record}.
  *
  * @author Chris de Vreeze
  */

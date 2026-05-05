@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.console;
 
+import module eu.cdevreeze.hibernateexperiments.jpql.api;
 import module java.base;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Immutable city {@link Record}.
+ * Program finding all actors in the database.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
+public class FindAllActors {
+
+    static void main(String... args) {
+        try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
+            ActorService actorService = ActorServiceFactory.create(emf);
+
+            List<Actor> actors = actorService.findAll();
+
+            actors.forEach(IO::println);
+        }
+    }
 }

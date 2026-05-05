@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * Transactional service layer factory, hiding service layer implementation details except for the
+ * use of JPA.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
-}
+@NullMarked
+package eu.cdevreeze.hibernateexperiments.jpql.service.factory;
+
+import org.jspecify.annotations.NullMarked;

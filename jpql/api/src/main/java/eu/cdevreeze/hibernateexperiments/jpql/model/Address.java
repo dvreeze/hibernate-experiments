@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.model;
 
 import module java.base;
+import org.jspecify.annotations.Nullable;
 
 /**
- * Immutable city {@link Record}.
+ * Immutable address {@link Record}.
  *
  * @author Chris de Vreeze
  */
-public record City(
+public record Address(
         long id,
-        String city,
-        Country country,
+        String address1,
+        @Nullable String address2,
+        String district,
+        City city,
+        @Nullable String postalCode,
+        String phone,
         Instant lastUpdate
 ) {
+
+    public Optional<String> address2Option() {
+        return Optional.ofNullable(address2);
+    }
+
+    public Optional<String> postalCodeOption() {
+        return Optional.ofNullable(postalCode);
+    }
 }

@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.service;
 
 import module java.base;
+import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 
 /**
- * Immutable city {@link Record}.
+ * Abstract {@link Actor}-related service API.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
+public interface ActorService {
+
+    Optional<Actor> findById(long id);
+
+    ImmutableList<Actor> findByFilmId(long filmId);
+
+    ImmutableList<Actor> findAll();
 }

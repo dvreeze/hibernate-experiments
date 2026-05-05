@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.service.factory;
 
 import module java.base;
+import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
+import eu.cdevreeze.hibernateexperiments.jpql.service.impl.ConcreteAddressService;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Immutable city {@link Record}.
+ * Factory of {@link AddressService} objects.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
+public final class AddressServiceFactory {
+
+    private AddressServiceFactory() {
+        // Non-instantiable
+    }
+
+    public static AddressService create(EntityManagerFactory emf) {
+        return new ConcreteAddressService(emf);
+    }
 }

@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * Immutable data model. This immutable data model is thread-safe, and trivial to reason about,
+ * since each such object can have only one single state. This model is also technology-agnostic.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
-}
+@NullMarked
+package eu.cdevreeze.hibernateexperiments.jpql.model;
+
+import org.jspecify.annotations.NullMarked;

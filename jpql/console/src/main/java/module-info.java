@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * Module descriptor of the console programs using the corresponding service layer API.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
+module eu.cdevreeze.hibernateexperiments.jpql.console {
+    requires eu.cdevreeze.hibernateexperiments.jpql.api;
+    requires jakarta.persistence;
+    requires org.jspecify;
+
+    exports eu.cdevreeze.hibernateexperiments.jpql.console;
 }

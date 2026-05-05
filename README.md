@@ -132,8 +132,14 @@ $MAVEN_HOME/bin/mvn clean verify
 
 The subprojects in this project are:
 * plain-sql
+* jpql
 
 Subproject *plain-sql* explores the use of native SQL queries in JPA 4.0. Compared to previous
 versions of JPA, its support for type-safe native SQL querying has advanced quite a lot. Also,
 this subproject uses JPA 4.0's `EntityAgent` rather than `EntityManager`, since the former suffices
 for native SQL querying.
+
+Subproject *jpql* explores the use of JPQL queries without any persistence context. That is, it uses
+an `EntityAgent` instead of `EntityManager`. Compared to subproject *plain-sql*, we need JPA entities
+and related bookkeeping (in JPA bootstrapping and Java Module descriptors), but get a more friendly
+and less verbose (JPQL-based) querying experience in return.

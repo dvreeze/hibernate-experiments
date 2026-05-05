@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * Concrete implementations of {@link eu.cdevreeze.hibernateexperiments.jpql.service} layer service APIs.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
-}
+@NullMarked
+package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
+
+import org.jspecify.annotations.NullMarked;

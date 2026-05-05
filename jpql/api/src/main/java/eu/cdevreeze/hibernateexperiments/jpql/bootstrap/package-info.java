@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
-
-import module java.base;
-
 /**
- * Immutable city {@link Record}.
+ * Bootstrapping of {@link jakarta.persistence.Persistence}.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
-        Instant lastUpdate
-) {
-}
+@NullMarked
+package eu.cdevreeze.hibernateexperiments.jpql.bootstrap;
+
+import org.jspecify.annotations.NullMarked;

@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.model;
+package eu.cdevreeze.hibernateexperiments.jpql.model;
 
 import module java.base;
 
 /**
- * Immutable city {@link Record}.
+ * Immutable film category {@link Record}.
  *
  * @author Chris de Vreeze
  */
-public record City(
-        long id,
-        String city,
-        Country country,
+public record FilmCategory(
+        long filmId,
+        long categoryId,
         Instant lastUpdate
 ) {
 }
