@@ -16,14 +16,11 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 
+import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.ActorService;
-import jakarta.persistence.EntityAgent;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.sql.ConstructorMapping;
-import jakarta.persistence.sql.ResultSetMapping;
 
 import static jakarta.persistence.sql.ResultSetMapping.column;
 import static jakarta.persistence.sql.ResultSetMapping.constructor;

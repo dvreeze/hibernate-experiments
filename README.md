@@ -73,10 +73,17 @@ JPA 4.0 seems to finally rectify this.
 Summarized: this project is not just about experimenting with a modern Hibernate ORM, but also about
 how to combine that with functional programming techniques.
 
-Furthermore, this project uses [Java Modules](https://dev.java/learn/modules/) in order to mimic
-a modular approach in large code bases, to guard against certain cases of
+## Using Java Modules
+
+Besides experimenting with Hibernate 8 and FP practices, this project uses [Java Modules](https://dev.java/learn/modules/) in order
+to mimic a modular approach in large code bases, to guard against certain cases of
 [bit rot](https://infodation.com/en/blogs/bit-rot-the-silent-killer-of-software-systems) due to
 poor management of internal application dependencies.
+
+In a nutshell, some benefits of the Java Module system in application code are:
+* Java *packages* are first class citizens, and their interdependencies and encapsulation are made explicit through *Java module descriptors*
+* At runtime, the Java module path can be seen as a very "disciplined class path", free from conflicts
+* Java Modules can help in creating small executables, shipping with "minimal Java runtimes" (created with [jlink](https://www.baeldung.com/jlink))
 
 ## Prerequisites
 
@@ -121,4 +128,12 @@ run this Maven command as follows (provided "MAVEN_HOME" has been set correctly 
 $MAVEN_HOME/bin/mvn clean verify
 ```
 
+## Overview of subprojects
 
+The subprojects in this project are:
+* plain-sql
+
+Subproject *plain-sql* explores the use of native SQL queries in JPA 4.0. Compared to previous
+versions of JPA, its support for type-safe native SQL querying has advanced quite a lot. Also,
+this subproject uses JPA 4.0's `EntityAgent` rather than `EntityManager`, since the former suffices
+for native SQL querying.

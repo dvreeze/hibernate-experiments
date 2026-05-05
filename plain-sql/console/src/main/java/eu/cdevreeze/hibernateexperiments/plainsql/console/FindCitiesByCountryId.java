@@ -16,11 +16,8 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.console;
 
+import module eu.cdevreeze.hibernateexperiments.plainsql.api;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.plainsql.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.City;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.factory.AddressServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
