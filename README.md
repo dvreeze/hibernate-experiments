@@ -41,6 +41,11 @@ application developer. In particular:
 * A more *functional* programming style (when not taking this to extremes) leads to code that is *easier to reason about*
 * Investing in the creation of a domain model as *immutable classes* makes the code almost follow automatically
   * And this code tends to be quite clear and low in bugs
+  * An excellent (early) example of such an API is the [java.time API](https://docs.oracle.com/en/java/javase/25/docs/api///java.base/java/time/package-summary.html)
+  * Of course, the [java.util.stream API](https://docs.oracle.com/en/java/javase/25/docs/api///java.base/java/util/stream/package-summary.html) underlies many more modern "FP" Java APIs
+  * Even recently introduced low level APIs exemplify modern Java, exploiting *immutability* combined with the flexibility of *Java interfaces*; e.g.
+    * [Foreign Function and Memory API](https://docs.oracle.com/en/java/javase/25/docs/api///java.base/java/lang/foreign/package-summary.html)
+    * [Java Class File API](https://docs.oracle.com/en/java/javase/25/docs/api///java.base/java/lang/classfile/package-summary.html)
 
 Ok, so I appreciate my experiences with the book Effective Java and the Scala language, but where does this
 leave highly mutable *JPA entities*? Also, Hibernate's/JPA's *first level cache* is quite the opposite of
