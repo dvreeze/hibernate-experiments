@@ -18,35 +18,35 @@ package eu.cdevreeze.hibernateexperiments.jpql.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.jpql.model.City;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 import jakarta.persistence.Entity;
 
 /**
- * City JPA {@link Entity}.
+ * Actor JPA {@link Entity}.
  *
  * @author Chris de Vreeze
  */
-@Entity(name = "City")
-@Table(name = "City")
-public class CityEntity {
+@Entity(name = "Actor")
+@Table(name = "Actor")
+public class ActorEntity {
 
     // Note that the entity class is not Serializable
     // Note the absence of overridden equals and hashCode
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "city_id_seq")
-    @SequenceGenerator(name = "city_id_seq", sequenceName = "city_city_id_seq", allocationSize = 1)
-    @Column(name = "city_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "actor_id_seq")
+    @SequenceGenerator(name = "actor_id_seq", sequenceName = "actor_actor_id_seq", allocationSize = 1)
+    @Column(name = "actor_id")
     private Long id;
 
     @Basic(optional = false)
-    private String city;
+    @Column(name = "first_name")
+    private String firstName;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "country_id", nullable = false)
-    private CountryEntity country;
+    @Basic(optional = false)
+    @Column(name = "last_name")
+    private String lastName;
 
-    // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
@@ -59,20 +59,20 @@ public class CityEntity {
         this.id = id;
     }
 
-    public String getCity() {
-        return city;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public CountryEntity getCountry() {
-        return country;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setCountry(CountryEntity country) {
-        this.country = country;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Instant getLastUpdate() {
@@ -83,11 +83,11 @@ public class CityEntity {
         this.lastUpdate = lastUpdate;
     }
 
-    public City toModelObject() {
-        return new City(
+    public Actor toModelObject() {
+        return new Actor(
                 Objects.requireNonNull(id),
-                Objects.requireNonNull(city),
-                Objects.requireNonNull(country).toModelObject(),
+                Objects.requireNonNull(firstName),
+                Objects.requireNonNull(lastName),
                 Objects.requireNonNull(lastUpdate)
         );
     }

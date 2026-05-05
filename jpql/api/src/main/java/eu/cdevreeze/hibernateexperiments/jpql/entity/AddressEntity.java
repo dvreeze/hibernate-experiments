@@ -17,11 +17,9 @@
 package eu.cdevreeze.hibernateexperiments.jpql.entity;
 
 import module jakarta.persistence;
+import module java.base;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
 import jakarta.persistence.Entity;
-
-import java.time.Instant;
-import java.util.Objects;
 
 /**
  * Address JPA {@link Entity}.

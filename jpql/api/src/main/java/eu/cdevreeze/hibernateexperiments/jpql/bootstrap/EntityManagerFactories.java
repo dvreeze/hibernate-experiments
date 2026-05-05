@@ -16,9 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.bootstrap;
 
-import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import jakarta.persistence.*;
 
 /**
@@ -44,6 +42,12 @@ public class EntityManagerFactories {
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)
+                .managedClass(ActorEntity.class)
+                .managedClass(CategoryEntity.class)
+                .managedClass(FilmEntity.class)
+                .managedClass(FilmActorEntity.class)
+                .managedClass(FilmCategoryEntity.class)
+                .managedClass(LanguageEntity.class)
                 .createEntityManagerFactory();
     }
 }

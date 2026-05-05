@@ -18,35 +18,30 @@ package eu.cdevreeze.hibernateexperiments.jpql.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.jpql.model.City;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Language;
 import jakarta.persistence.Entity;
 
 /**
- * City JPA {@link Entity}.
+ * Language JPA {@link Entity}.
  *
  * @author Chris de Vreeze
  */
-@Entity(name = "City")
-@Table(name = "City")
-public class CityEntity {
+@Entity(name = "Language")
+@Table(name = "Language")
+public class LanguageEntity {
 
     // Note that the entity class is not Serializable
     // Note the absence of overridden equals and hashCode
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "city_id_seq")
-    @SequenceGenerator(name = "city_id_seq", sequenceName = "city_city_id_seq", allocationSize = 1)
-    @Column(name = "city_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_id_seq")
+    @SequenceGenerator(name = "language_id_seq", sequenceName = "language_language_id_seq", allocationSize = 1)
+    @Column(name = "language_id")
     private Long id;
 
     @Basic(optional = false)
-    private String city;
+    private String name;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "country_id", nullable = false)
-    private CountryEntity country;
-
-    // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
@@ -59,20 +54,12 @@ public class CityEntity {
         this.id = id;
     }
 
-    public String getCity() {
-        return city;
+    public String getName() {
+        return name;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public CountryEntity getCountry() {
-        return country;
-    }
-
-    public void setCountry(CountryEntity country) {
-        this.country = country;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Instant getLastUpdate() {
@@ -83,11 +70,10 @@ public class CityEntity {
         this.lastUpdate = lastUpdate;
     }
 
-    public City toModelObject() {
-        return new City(
+    public Language toModelObject() {
+        return new Language(
                 Objects.requireNonNull(id),
-                Objects.requireNonNull(city),
-                Objects.requireNonNull(country).toModelObject(),
+                Objects.requireNonNull(name),
                 Objects.requireNonNull(lastUpdate)
         );
     }

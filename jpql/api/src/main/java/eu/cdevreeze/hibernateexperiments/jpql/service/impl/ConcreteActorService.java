@@ -19,11 +19,9 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.ActorEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
-
-import static jakarta.persistence.sql.ResultSetMapping.column;
-import static jakarta.persistence.sql.ResultSetMapping.constructor;
 
 /**
  * Concrete {@link ActorService} implementation.
@@ -44,17 +42,14 @@ public final class ConcreteActorService implements ActorService {
     public Optional<Actor> findById(long id) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String sqlString = """
-                    select act.actor_id, act.first_name, act.last_name, act.last_update as act_last_update
-                      from actor act
-                     where act.actor_id = ?1;
-                    """;
+            String qlString = "select act from Actor act where act.id = ?1";
 
-            ResultSetMapping<Actor> rsMapping = getActorResultSetMapping();
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph(entityAgent);
 
-            return entityAgent.createNativeQuery(sqlString, rsMapping)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
+                    .map(ActorEntity::toModelObject)
                     .findFirst();
         });
     }
@@ -63,18 +58,21 @@ public final class ConcreteActorService implements ActorService {
     public ImmutableList<Actor> findByFilmId(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String sqlString = """
-                    select act.actor_id, act.first_name, act.last_name, act.last_update as act_last_update
-                      from actor act
-                     inner join film_actor fa on fa.actor_id = act.actor_id
-                     where fa.film_id = ?1;
+            // This shows that JPQL is essentially an elegant object-oriented SQL dialect
+            // This is even the case without path expressions to navigate between associations
+            String qlString = """
+                    select act
+                      from Actor act
+                     inner join FilmActor fa on fa.actorId = act.id
+                     where fa.filmId = ?1
                     """;
 
-            ResultSetMapping<Actor> rsMapping = getActorResultSetMapping();
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph(entityAgent);
 
-            return entityAgent.createNativeQuery(sqlString, rsMapping)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, filmId)
                     .getResultStream()
+                    .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -83,26 +81,18 @@ public final class ConcreteActorService implements ActorService {
     public ImmutableList<Actor> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String sqlString = """
-                    select act.actor_id, act.first_name, act.last_name, act.last_update as act_last_update
-                      from actor act;
-                    """;
+            String qlString = "select act from Actor act";
 
-            ResultSetMapping<Actor> rsMapping = getActorResultSetMapping();
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph(entityAgent);
 
-            return entityAgent.createNativeQuery(sqlString, rsMapping)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
+                    .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
-    private static ConstructorMapping<Actor> getActorResultSetMapping() {
-        return constructor(
-                Actor.class,
-                column("actor_id", Long.class),
-                column("first_name", String.class),
-                column("last_name", String.class),
-                column("act_last_update", Instant.class)
-        );
+    private static EntityGraph<ActorEntity> getActorEntityGraph(EntityAgent entityAgent) {
+        return entityAgent.createEntityGraph(ActorEntity.class);
     }
 }

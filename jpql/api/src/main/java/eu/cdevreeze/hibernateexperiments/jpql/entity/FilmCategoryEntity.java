@@ -18,61 +18,49 @@ package eu.cdevreeze.hibernateexperiments.jpql.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.jpql.model.City;
+import eu.cdevreeze.hibernateexperiments.jpql.model.FilmCategory;
 import jakarta.persistence.Entity;
 
 /**
- * City JPA {@link Entity}.
+ * Film-category JPA {@link Entity}.
  *
  * @author Chris de Vreeze
  */
-@Entity(name = "City")
-@Table(name = "City")
-public class CityEntity {
+@Entity(name = "FilmCategory")
+@Table(name = "Film_Category")
+@IdClass(FilmCategoryKey.class)
+public class FilmCategoryEntity {
 
     // Note that the entity class is not Serializable
     // Note the absence of overridden equals and hashCode
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "city_id_seq")
-    @SequenceGenerator(name = "city_id_seq", sequenceName = "city_city_id_seq", allocationSize = 1)
-    @Column(name = "city_id")
-    private Long id;
+    @Column(name = "film_id")
+    private Long filmId;
 
-    @Basic(optional = false)
-    private String city;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "country_id", nullable = false)
-    private CountryEntity country;
+    @Id
+    @Column(name = "category_id")
+    private Long categoryId;
 
     // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Long getId() {
-        return id;
+    public Long getFilmId() {
+        return filmId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setFilmId(Long filmId) {
+        this.filmId = filmId;
     }
 
-    public String getCity() {
-        return city;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public CountryEntity getCountry() {
-        return country;
-    }
-
-    public void setCountry(CountryEntity country) {
-        this.country = country;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public Instant getLastUpdate() {
@@ -83,11 +71,10 @@ public class CityEntity {
         this.lastUpdate = lastUpdate;
     }
 
-    public City toModelObject() {
-        return new City(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(city),
-                Objects.requireNonNull(country).toModelObject(),
+    public FilmCategory toModelObject() {
+        return new FilmCategory(
+                Objects.requireNonNull(filmId),
+                Objects.requireNonNull(categoryId),
                 Objects.requireNonNull(lastUpdate)
         );
     }
