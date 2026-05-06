@@ -145,23 +145,24 @@ public final class ConcreteAddressService implements AddressService {
     }
 
     private EntityGraph<AddressEntity> getAddressEntityGraph(EntityHandler entityHandler) {
-        EntityGraph<AddressEntity> entityGraph = entityHandler.createEntityGraph(AddressEntity.class);
+        EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
 
-        entityGraph.addAttributeNode(AddressEntity_.CITY);
+        entityGraph.addAttributeNode(AddressEntity_.city);
 
         // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
-        entityGraph.addSubgraph(AddressEntity_.CITY, CityEntity.class);
+        Subgraph<CityEntity> citySubgraph = entityGraph.addSubgraph(AddressEntity_.city);
+        citySubgraph.addAttributeNode(CityEntity_.country);
 
         return entityGraph;
     }
 
     private EntityGraph<CityEntity> getCityEntityGraph(EntityHandler entityHandler) {
-        EntityGraph<CityEntity> entityGraph = entityHandler.createEntityGraph(CityEntity.class);
-        entityGraph.addAttributeNode(CityEntity_.COUNTRY);
+        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
+        entityGraph.addAttributeNode(CityEntity_.country);
         return entityGraph;
     }
 
     private EntityGraph<CountryEntity> getCountryEntityGraph(EntityHandler entityHandler) {
-        return entityHandler.createEntityGraph(CountryEntity.class);
+        return CountryEntity_.class_.createEntityGraph();
     }
 }

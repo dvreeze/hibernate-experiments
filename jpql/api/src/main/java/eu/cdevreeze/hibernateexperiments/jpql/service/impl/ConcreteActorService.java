@@ -20,6 +20,7 @@ import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.ActorEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.ActorEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
 
@@ -97,6 +98,6 @@ public final class ConcreteActorService implements ActorService {
     }
 
     private static EntityGraph<ActorEntity> getActorEntityGraph(EntityAgent entityAgent) {
-        return entityAgent.createEntityGraph(ActorEntity.class);
+        return ActorEntity_.class_.createEntityGraph();
     }
 }
