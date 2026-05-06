@@ -73,6 +73,9 @@ JPA 4.0 seems to finally rectify this.
 Summarized: this project is not just about experimenting with a modern Hibernate ORM, but also about
 how to combine that with functional programming techniques.
 
+Most of these subprojects do not lean heavily on Java annotations, in order to have a better feel
+for what is happening at runtime.
+
 ## Using Java Modules
 
 Besides experimenting with Hibernate 8 and FP practices, this project uses [Java Modules](https://dev.java/learn/modules/) in order
@@ -128,11 +131,49 @@ run this Maven command as follows (provided "MAVEN_HOME" has been set correctly 
 $MAVEN_HOME/bin/mvn clean verify
 ```
 
+## Runtime behavior analysis using the debugger
+
+Sometimes we would like to know in more detail what is happening at runtime, e.g. what the actual transactional
+boundaries are. One way to find out is by using the debugger, and set breakpoints at locations where
+an `EntityManager` or `EntityAgent` is present, and analyze Java expressions at those breakpoints such as:
+
+```
+entityManager.unwrap(org.hibernate.Session.class)
+    .unwrap(org.hibernate.internal.SessionImpl.class)
+    .getTransaction()
+```
+
+or:
+
+```
+entityAgent.unwrap(org.hibernate.StatelessSession.class)
+    .unwrap(org.hibernate.internal.StatelessSessionImpl.class)
+    .getTransaction()
+```
+
+Shorter:
+
+```
+entityManager.unwrap(org.hibernate.internal.SessionImpl.class).getTransaction()
+```
+
+or:
+
+```
+entityAgent.unwrap(org.hibernate.internal.StatelessSessionImpl.class).getTransaction()
+```
+
+Expressions such as these can be very handy in debugging sessions where Hibernate behavior is analyzed.
+Note that in practice `EntityManager` or `EntityAgent` instances are proxy objects instead of Hibernate
+`Session` or `StatelessSession` objects. In order to get these Hibernate objects, the `unwrap` calls
+above are used. Just casting to Hibernate objects would not work in those cases.
+
 ## Overview of subprojects
 
 The subprojects in this project are:
 * plain-sql
 * jpql
+* criteria
 
 Subproject *plain-sql* explores the use of native SQL queries in JPA 4.0. Compared to previous
 versions of JPA, its support for type-safe native SQL querying has advanced quite a lot. Also,
@@ -143,3 +184,6 @@ Subproject *jpql* explores the use of JPQL queries without any persistence conte
 an `EntityAgent` instead of `EntityManager`. Compared to subproject *plain-sql*, we need JPA entities
 and related bookkeeping (in JPA bootstrapping and Java Module descriptors), but get a more friendly
 and less verbose (JPQL-based) querying experience in return.
+
+Subproject *criteria* is like *jpql*, but it uses Criteria queries rather than JPQL query strings,
+to get even more compile-time type-safety.

@@ -41,6 +41,7 @@
     <modules>
         <module>plain-sql</module>
         <module>jpql</module>
+        <module>criteria</module>
     </modules>
 
     <dependencyManagement>
