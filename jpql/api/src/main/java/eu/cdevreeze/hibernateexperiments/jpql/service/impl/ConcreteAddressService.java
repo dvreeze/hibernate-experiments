@@ -32,6 +32,10 @@ import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
  */
 public final class ConcreteAddressService implements AddressService {
 
+    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
+    // Yet it is not in the (current) JPA 4.0 API documentation.
+    // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
+
     private final EntityManagerFactory emf;
 
     public ConcreteAddressService(EntityManagerFactory emf) {
@@ -48,7 +52,8 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
+                    .setEntityGraph(entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -66,7 +71,8 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
+                    .setEntityGraph(entityGraph)
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -84,7 +90,8 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
+                    .setEntityGraph(entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -102,7 +109,8 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -113,13 +121,14 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select c from City c where c.couontry.id = ?1";
+            String qlString = "select c from City c where c.country.id = ?1";
 
             EntityGraph<CityEntity> entityGraph = getCityEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, CityEntity.class)
+                    .setEntityGraph(entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -137,7 +146,8 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, CountryEntity.class)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

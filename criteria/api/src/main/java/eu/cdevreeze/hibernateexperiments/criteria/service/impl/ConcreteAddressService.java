@@ -19,11 +19,9 @@ package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.AddressEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.CityEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CountryEntity;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.CountryEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Address;
 import eu.cdevreeze.hibernateexperiments.criteria.model.City;
@@ -37,7 +35,9 @@ import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
  */
 public final class ConcreteAddressService implements AddressService {
 
-    // TODO Use Criteria API
+    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
+    // Yet it is not in the (current) JPA 4.0 API documentation.
+    // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
 
     private final EntityManagerFactory emf;
 
@@ -49,14 +49,19 @@ public final class ConcreteAddressService implements AddressService {
     public Optional<Address> findById(long id) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select ad from Address ad where ad.id = ?1";
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+
+            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            cq.where(cb.equal(address.get(AddressEntity_.id), id));
+            cq.select(address);
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
-                    .setParameter(1, id)
+            return entityAgent.createQuery(cq)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
@@ -67,14 +72,19 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select ad from Address ad where ad.city.id = ?1";
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+
+            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.id), cityId));
+            cq.select(address);
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
-                    .setParameter(1, cityId)
+            return entityAgent.createQuery(cq)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -85,14 +95,19 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select ad from Address ad where ad.city.country.id = ?1";
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+
+            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.country).get(CountryEntity_.id), countryId));
+            cq.select(address);
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
-                    .setParameter(1, countryId)
+            return entityAgent.createQuery(cq)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -103,13 +118,18 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select ad from Address ad";
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+
+            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            cq.select(address);
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(cq)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -120,14 +140,19 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select c from City c where c.couontry.id = ?1";
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<CityEntity> cq = cb.createQuery(CityEntity.class);
+
+            Root<CityEntity> city = cq.from(CityEntity.class);
+            cq.where(cb.equal(city.get(CityEntity_.country).get(CountryEntity_.id), countryId));
+            cq.select(city);
 
             EntityGraph<CityEntity> entityGraph = getCityEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
-                    .setParameter(1, countryId)
+            return entityAgent.createQuery(cq)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -138,13 +163,18 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select c from Country";
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<CountryEntity> cq = cb.createQuery(CountryEntity.class);
+
+            Root<CountryEntity> country = cq.from(CountryEntity.class);
+            cq.select(country);
 
             EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph(entityAgent);
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(cq)
+                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
