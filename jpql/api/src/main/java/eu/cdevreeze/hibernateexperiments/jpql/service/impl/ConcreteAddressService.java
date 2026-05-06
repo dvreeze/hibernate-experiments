@@ -48,7 +48,6 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
@@ -67,7 +66,6 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, cityId)
                     .getResultStream()
@@ -86,7 +84,6 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -105,7 +102,6 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -123,7 +119,6 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -142,7 +137,6 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)

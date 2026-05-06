@@ -48,7 +48,6 @@ public final class ConcreteActorService implements ActorService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
@@ -74,7 +73,6 @@ public final class ConcreteActorService implements ActorService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, filmId)
                     .getResultStream()
@@ -93,7 +91,6 @@ public final class ConcreteActorService implements ActorService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // Moreover, we use an EntityAgent, not an EntityManager
             return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
