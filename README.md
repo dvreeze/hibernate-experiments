@@ -113,10 +113,11 @@ JPQL/Criteria API, or the use of `EntityAgent` versus `EntityManager`.
 The subprojects include [ArchUnit](https://www.archunit.org/) unit tests, to check architectural
 "decisions" that the (sub)project should adhere to.
 
-The subprojects are themselves Maven multi-module projects, with one module being a Java Module
-exposing the service layer API and the other one consuming it. Although overkill in this case,
-it shows how in a larger code base service layer implementation details can be hidden from code
-consuming the service layer.
+The subprojects are themselves Maven multi-module projects, each containing 3 modules that are also Java
+Modules, namely one with an immutable data model, one with a service layer, and one consuming the
+(data and) service layer. Although overkill in this case, it shows how in a larger code base service layer
+implementation details can be hidden from code consuming the service layer, and how it can be prevented
+that data classes perform any (potentially expensive) business logic.
 
 ## Running the console programs and unit tests
 

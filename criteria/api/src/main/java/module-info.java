@@ -25,11 +25,11 @@ module eu.cdevreeze.hibernateexperiments.criteria.api {
     requires com.google.common;
     requires org.jspecify;
     requires jakarta.persistence;
+    requires transitive eu.cdevreeze.hibernateexperiments.criteria.model;
     // Needed for opening up the JPA entities to Hibernate for reflection (step 1)
     requires org.hibernate.orm.core;
 
     exports eu.cdevreeze.hibernateexperiments.criteria.bootstrap;
-    exports eu.cdevreeze.hibernateexperiments.criteria.model;
     exports eu.cdevreeze.hibernateexperiments.criteria.service;
     exports eu.cdevreeze.hibernateexperiments.criteria.service.factory;
 

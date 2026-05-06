@@ -15,19 +15,13 @@
  */
 
 /**
- * Module descriptor of the service layer API. The service layer API and immutable model are exported
- * (along with the JPA bootstrapping code). Other than JPA bootstrapping, implementation details are
- * not exported to any other modules.
+ * Module descriptor of the immutable data model.
  *
  * @author Chris de Vreeze
  */
-module eu.cdevreeze.hibernateexperiments.plainsql.api {
+module eu.cdevreeze.hibernateexperiments.criteria.model {
     requires com.google.common;
-    requires jakarta.persistence;
     requires org.jspecify;
-    requires transitive eu.cdevreeze.hibernateexperiments.plainsql.model;
 
-    exports eu.cdevreeze.hibernateexperiments.plainsql.bootstrap;
-    exports eu.cdevreeze.hibernateexperiments.plainsql.service;
-    exports eu.cdevreeze.hibernateexperiments.plainsql.service.factory;
+    exports eu.cdevreeze.hibernateexperiments.criteria.model;
 }

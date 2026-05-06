@@ -25,11 +25,11 @@ module eu.cdevreeze.hibernateexperiments.jpql.api {
     requires com.google.common;
     requires org.jspecify;
     requires jakarta.persistence;
+    requires transitive eu.cdevreeze.hibernateexperiments.jpql.model;
     // Needed for opening up the JPA entities to Hibernate for reflection (step 1)
     requires org.hibernate.orm.core;
 
     exports eu.cdevreeze.hibernateexperiments.jpql.bootstrap;
-    exports eu.cdevreeze.hibernateexperiments.jpql.model;
     exports eu.cdevreeze.hibernateexperiments.jpql.service;
     exports eu.cdevreeze.hibernateexperiments.jpql.service.factory;
 

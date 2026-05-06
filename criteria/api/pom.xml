@@ -15,6 +15,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>eu.cdevreeze.hibernate-experiments</groupId>
+            <artifactId>criteria-model</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
         </dependency>
