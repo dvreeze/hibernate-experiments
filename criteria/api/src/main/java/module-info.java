@@ -26,13 +26,14 @@ module eu.cdevreeze.hibernateexperiments.criteria.api {
     requires org.jspecify;
     requires jakarta.persistence;
     requires transitive eu.cdevreeze.hibernateexperiments.criteria.model;
-    // Needed for opening up the JPA entities to Hibernate for reflection (step 1)
+    // Making explicit that Hibernate ORM is used as JPA implementation
+    // Otherwise it would make no sense to open the entity package to Hibernate for reflection
     requires org.hibernate.orm.core;
 
     exports eu.cdevreeze.hibernateexperiments.criteria.bootstrap;
     exports eu.cdevreeze.hibernateexperiments.criteria.service;
     exports eu.cdevreeze.hibernateexperiments.criteria.service.factory;
 
-    // Needed for opening up the JPA entities to Hibernate for reflection (step 2)
+    // Needed for opening up the JPA entities to Hibernate for reflection
     opens eu.cdevreeze.hibernateexperiments.criteria.entity to org.hibernate.orm.core;
 }

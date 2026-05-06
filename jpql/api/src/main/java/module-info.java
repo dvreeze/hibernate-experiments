@@ -26,13 +26,14 @@ module eu.cdevreeze.hibernateexperiments.jpql.api {
     requires org.jspecify;
     requires jakarta.persistence;
     requires transitive eu.cdevreeze.hibernateexperiments.jpql.model;
-    // Needed for opening up the JPA entities to Hibernate for reflection (step 1)
+    // Making explicit that Hibernate ORM is used as JPA implementation
+    // Otherwise it would make no sense to open the entity package to Hibernate for reflection
     requires org.hibernate.orm.core;
 
     exports eu.cdevreeze.hibernateexperiments.jpql.bootstrap;
     exports eu.cdevreeze.hibernateexperiments.jpql.service;
     exports eu.cdevreeze.hibernateexperiments.jpql.service.factory;
 
-    // Needed for opening up the JPA entities to Hibernate for reflection (step 2)
+    // Needed for opening up the JPA entities to Hibernate for reflection
     opens eu.cdevreeze.hibernateexperiments.jpql.entity to org.hibernate.orm.core;
 }
