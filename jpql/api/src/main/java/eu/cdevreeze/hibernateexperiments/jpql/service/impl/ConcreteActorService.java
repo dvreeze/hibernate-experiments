@@ -30,8 +30,6 @@ import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
  */
 public final class ConcreteActorService implements ActorService {
 
-    // TODO Rework in order to use JPQL queries
-
     private final EntityManagerFactory emf;
 
     public ConcreteActorService(EntityManagerFactory emf) {
