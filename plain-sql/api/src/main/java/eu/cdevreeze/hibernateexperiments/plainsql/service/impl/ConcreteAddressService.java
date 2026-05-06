@@ -16,12 +16,10 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 
+import module eu.cdevreeze.hibernateexperiments.plainsql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Address;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.City;
-import eu.cdevreeze.hibernateexperiments.plainsql.model.Country;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
 
 import static jakarta.persistence.sql.ResultSetMapping.column;

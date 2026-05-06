@@ -16,13 +16,11 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
+import module eu.cdevreeze.hibernateexperiments.jpql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
-import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
-import eu.cdevreeze.hibernateexperiments.jpql.model.City;
-import eu.cdevreeze.hibernateexperiments.jpql.model.Country;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 
 /**
@@ -48,7 +46,7 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -67,7 +65,7 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -86,7 +84,7 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.city.country.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -105,7 +103,7 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -123,7 +121,7 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from City c where c.country.id = ?1";
 
-            EntityGraph<CityEntity> entityGraph = getCityEntityGraph(entityAgent);
+            EntityGraph<CityEntity> entityGraph = getCityEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -142,7 +140,7 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from Country";
 
-            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph(entityAgent);
+            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -154,7 +152,7 @@ public final class ConcreteAddressService implements AddressService {
         });
     }
 
-    private EntityGraph<AddressEntity> getAddressEntityGraph(EntityHandler entityHandler) {
+    private EntityGraph<AddressEntity> getAddressEntityGraph() {
         EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
 
         entityGraph.addAttributeNode(AddressEntity_.city);
@@ -166,13 +164,13 @@ public final class ConcreteAddressService implements AddressService {
         return entityGraph;
     }
 
-    private EntityGraph<CityEntity> getCityEntityGraph(EntityHandler entityHandler) {
+    private EntityGraph<CityEntity> getCityEntityGraph() {
         EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
         entityGraph.addAttributeNode(CityEntity_.country);
         return entityGraph;
     }
 
-    private EntityGraph<CountryEntity> getCountryEntityGraph(EntityHandler entityHandler) {
+    private EntityGraph<CountryEntity> getCountryEntityGraph() {
         return CountryEntity_.class_.createEntityGraph();
     }
 }

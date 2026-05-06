@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 
+import module eu.cdevreeze.hibernateexperiments.criteria.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
@@ -23,7 +24,6 @@ import eu.cdevreeze.hibernateexperiments.criteria.entity.ActorEntity;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.ActorEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Actor;
 import eu.cdevreeze.hibernateexperiments.criteria.service.ActorService;
 
 /**
@@ -54,7 +54,7 @@ public final class ConcreteActorService implements ActorService {
             cq.where(cb.equal(actor.get(ActorEntity_.id), id));
             cq.select(actor);
 
-            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph(entityAgent);
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -82,7 +82,7 @@ public final class ConcreteActorService implements ActorService {
             cq.where(cb.equal(filmActor.get(FilmActorEntity_.filmId), filmId));
             cq.select(actor);
 
-            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph(entityAgent);
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -104,7 +104,7 @@ public final class ConcreteActorService implements ActorService {
             Root<ActorEntity> actor = cq.from(ActorEntity.class);
             cq.select(actor);
 
-            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph(entityAgent);
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -116,7 +116,7 @@ public final class ConcreteActorService implements ActorService {
         });
     }
 
-    private static EntityGraph<ActorEntity> getActorEntityGraph(EntityAgent entityAgent) {
+    private static EntityGraph<ActorEntity> getActorEntityGraph() {
         return ActorEntity_.class_.createEntityGraph();
     }
 }

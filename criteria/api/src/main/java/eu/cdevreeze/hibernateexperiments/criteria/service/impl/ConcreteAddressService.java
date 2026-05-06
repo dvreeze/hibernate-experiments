@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 
+import module eu.cdevreeze.hibernateexperiments.criteria.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
@@ -23,9 +24,6 @@ import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.AddressEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.CityEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.CountryEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Address;
-import eu.cdevreeze.hibernateexperiments.criteria.model.City;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Country;
 import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
 
 /**
@@ -56,7 +54,7 @@ public final class ConcreteAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.id), id));
             cq.select(address);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -79,7 +77,7 @@ public final class ConcreteAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.id), cityId));
             cq.select(address);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -102,7 +100,7 @@ public final class ConcreteAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.country).get(CountryEntity_.id), countryId));
             cq.select(address);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -124,7 +122,7 @@ public final class ConcreteAddressService implements AddressService {
             Root<AddressEntity> address = cq.from(AddressEntity.class);
             cq.select(address);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph(entityAgent);
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -147,7 +145,7 @@ public final class ConcreteAddressService implements AddressService {
             cq.where(cb.equal(city.get(CityEntity_.country).get(CountryEntity_.id), countryId));
             cq.select(city);
 
-            EntityGraph<CityEntity> entityGraph = getCityEntityGraph(entityAgent);
+            EntityGraph<CityEntity> entityGraph = getCityEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -169,7 +167,7 @@ public final class ConcreteAddressService implements AddressService {
             Root<CountryEntity> country = cq.from(CountryEntity.class);
             cq.select(country);
 
-            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph(entityAgent);
+            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -181,7 +179,7 @@ public final class ConcreteAddressService implements AddressService {
         });
     }
 
-    private EntityGraph<AddressEntity> getAddressEntityGraph(EntityHandler entityHandler) {
+    private EntityGraph<AddressEntity> getAddressEntityGraph() {
         EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
 
         entityGraph.addAttributeNode(AddressEntity_.city);
@@ -193,13 +191,13 @@ public final class ConcreteAddressService implements AddressService {
         return entityGraph;
     }
 
-    private EntityGraph<CityEntity> getCityEntityGraph(EntityHandler entityHandler) {
+    private EntityGraph<CityEntity> getCityEntityGraph() {
         EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
         entityGraph.addAttributeNode(CityEntity_.country);
         return entityGraph;
     }
 
-    private EntityGraph<CountryEntity> getCountryEntityGraph(EntityHandler entityHandler) {
+    private EntityGraph<CountryEntity> getCountryEntityGraph() {
         return CountryEntity_.class_.createEntityGraph();
     }
 }
