@@ -20,9 +20,7 @@ import module eu.cdevreeze.hibernateexperiments.jpql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 
 /**
