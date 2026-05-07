@@ -97,9 +97,10 @@ Java Modules know nothing about Maven coordinates and artifact versions, whereas
 Java packages. So Java Modules and Maven offer different perspectives on dependencies. Moreover, Java Modules
 are a Java language feature, understood by the Java compiler (as well as the Java runtime and tooling).
 
-The Java ecosystem is still not as module-friendly as desired. See [Java Modules](https://dev.java/learn/modules/) for much more
-information about how to use them in practice and how to deal with common issues that might arise.
-Speaking of which,  the book [Java 9 Modularity](https://javamodularity.com/) is a real gem in that regard.
+The Java ecosystem is still not as module-friendly as desired. See [Java Modules](https://dev.java/learn/modules/) and
+[Module System Woes](https://github.com/nipafx/module-system-woes) for much more information about
+how to use them in practice and how to deal with common issues that might arise.
+Speaking of which, the book [Java 9 Modularity](https://javamodularity.com/) is a real gem in that regard.
 There are many possible hybrid scenarios, in which we can at least partially benefit from the use of modules.
 
 ## Prerequisites
