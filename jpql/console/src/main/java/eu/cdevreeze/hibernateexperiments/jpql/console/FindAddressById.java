@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.console;
 
-import module eu.cdevreeze.hibernateexperiments.jpql.api;
+import module eu.cdevreeze.hibernateexperiments.jpql.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
 

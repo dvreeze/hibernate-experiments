@@ -20,15 +20,18 @@ import module eu.cdevreeze.hibernateexperiments.jpql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CountryEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 
 /**
- * Concrete {@link AddressService} implementation.
+ * The same as {@link ConcreteAddressService}, except for the absence of {@link EntityGraph}'s.
+ * This minor code change alone makes the number of generated SQL queries explode!
  *
  * @author Chris de Vreeze
  */
-public final class ConcreteAddressService implements AddressService {
+public final class InefficientAddressService implements AddressService {
 
     // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
     // Yet it is not in the (current) JPA 4.0 API documentation.
@@ -36,7 +39,7 @@ public final class ConcreteAddressService implements AddressService {
 
     private final EntityManagerFactory emf;
 
-    public ConcreteAddressService(EntityManagerFactory emf) {
+    public InefficientAddressService(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -46,12 +49,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -65,12 +65,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -84,12 +81,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.city.country.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -103,12 +97,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -121,12 +112,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from City c where c.country.id = ?1";
 
-            EntityGraph<CityEntity> entityGraph = getCityEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, CityEntity.class)
-                    .setEntityGraph(entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -140,37 +128,12 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from Country";
 
-            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, CountryEntity.class)
-                    .setEntityGraph(entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
-    }
-
-    private EntityGraph<AddressEntity> getAddressEntityGraph() {
-        EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
-
-        entityGraph.addAttributeNode(AddressEntity_.city);
-
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
-        Subgraph<CityEntity> citySubgraph = entityGraph.addSubgraph(AddressEntity_.city);
-        citySubgraph.addAttributeNode(CityEntity_.country);
-
-        return entityGraph;
-    }
-
-    private EntityGraph<CityEntity> getCityEntityGraph() {
-        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
-        entityGraph.addAttributeNode(CityEntity_.country);
-        return entityGraph;
-    }
-
-    private EntityGraph<CountryEntity> getCountryEntityGraph() {
-        return CountryEntity_.class_.createEntityGraph();
     }
 }

@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>eu.cdevreeze.hibernate-experiments</groupId>
-            <artifactId>jpql-api</artifactId>
+            <artifactId>jpql-service</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

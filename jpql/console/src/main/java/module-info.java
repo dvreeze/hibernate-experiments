@@ -20,7 +20,7 @@
  * @author Chris de Vreeze
  */
 module eu.cdevreeze.hibernateexperiments.jpql.console {
-    requires eu.cdevreeze.hibernateexperiments.jpql.api;
+    requires eu.cdevreeze.hibernateexperiments.jpql.service;
     requires jakarta.persistence;
     requires org.jspecify;
 
