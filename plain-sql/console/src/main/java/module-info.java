@@ -20,7 +20,7 @@
  * @author Chris de Vreeze
  */
 module eu.cdevreeze.hibernateexperiments.plainsql.console {
-    requires eu.cdevreeze.hibernateexperiments.plainsql.api;
+    requires eu.cdevreeze.hibernateexperiments.plainsql.service;
     requires jakarta.persistence;
     requires org.jspecify;
 

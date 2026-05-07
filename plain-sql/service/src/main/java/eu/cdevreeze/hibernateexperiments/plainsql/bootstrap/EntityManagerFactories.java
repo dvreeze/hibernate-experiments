@@ -19,7 +19,7 @@ package eu.cdevreeze.hibernateexperiments.plainsql.bootstrap;
 import jakarta.persistence.*;
 
 /**
- * Factory of {@link jakarta.persistence.EntityManagerFactory} instances.
+ * Factory of {@link EntityManagerFactory} instances.
  *
  * @author Chris de Vreeze
  */

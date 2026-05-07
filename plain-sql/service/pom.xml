@@ -10,13 +10,17 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>plain-sql-console</artifactId>
+    <artifactId>plain-sql-service</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>eu.cdevreeze.hibernate-experiments</groupId>
-            <artifactId>plain-sql-service</artifactId>
+            <artifactId>plain-sql-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -29,6 +33,24 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Make ArchUnit work with JUnit 6 -->
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

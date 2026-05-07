@@ -22,14 +22,14 @@
             </dependency>
             <dependency>
                 <groupId>eu.cdevreeze.hibernate-experiments</groupId>
-                <artifactId>plain-sql-api</artifactId>
+                <artifactId>plain-sql-service</artifactId>
                 <version>0.1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>api</module>
+        <module>service</module>
         <module>console</module>
         <module>model</module>
     </modules>

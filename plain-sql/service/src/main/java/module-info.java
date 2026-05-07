@@ -21,7 +21,7 @@
  *
  * @author Chris de Vreeze
  */
-module eu.cdevreeze.hibernateexperiments.plainsql.api {
+module eu.cdevreeze.hibernateexperiments.plainsql.service {
     requires com.google.common;
     requires jakarta.persistence;
     requires org.jspecify;

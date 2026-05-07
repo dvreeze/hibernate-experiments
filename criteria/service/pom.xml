@@ -5,18 +5,18 @@
 
     <parent>
         <groupId>eu.cdevreeze.hibernate-experiments</groupId>
-        <artifactId>plain-sql</artifactId>
+        <artifactId>criteria</artifactId>
         <version>0.1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>plain-sql-api</artifactId>
+    <artifactId>criteria-service</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>eu.cdevreeze.hibernate-experiments</groupId>
-            <artifactId>plain-sql-model</artifactId>
+            <artifactId>criteria-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
@@ -60,6 +60,25 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.15.0</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.hibernate.orm</groupId>
+                            <artifactId>hibernate-processor</artifactId>
+                            <version>8.0.0.Alpha1</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <!-- This setting is required for the hibernate-processor dependencies to
+                         also be managed by <dependencyManagement> rules, if any.
+                         More information is available in Maven compiler plugin documentation:
+                         https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#annotationProcessorPathsUseDepMgmt -->
+                    <annotationProcessorPathsUseDepMgmt>true</annotationProcessorPathsUseDepMgmt>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
