@@ -84,9 +84,23 @@ to mimic a modular approach in large code bases, to guard against certain cases 
 poor management of internal application dependencies.
 
 In a nutshell, some benefits of the Java Module system in application code are:
-* Java *packages* are first class citizens, and their interdependencies and encapsulation are made explicit through *Java module descriptors*
-* At runtime, the Java module path can be seen as a very "disciplined class path", free from conflicts
+* Java *packages* are *first class citizens*, and their interdependencies and encapsulation are made explicit through *Java module descriptors*
+* At runtime, the Java module path can roughly be seen as a very "disciplined class path", free from conflicts
 * Java Modules can help in creating small executables, shipping with "minimal Java runtimes" (created with [jlink](https://www.baeldung.com/jlink))
+
+Java Modules have a positive effect on the Java ecosystem. Recall the mess with Java XML library dependencies
+in the past, and compare that to a disciplined use (whether directly or indirectly) of the `java.xml`
+module that is part of umbrella module `java.se`.
+
+Note that Java Modules and Maven dependencies are not the same, but they need to be kept in sync.
+Java Modules know nothing about Maven coordinates and artifact versions, whereas Maven knows nothing about
+Java packages. So Java Modules and Maven offer different perspectives on dependencies. Moreover, Java Modules
+are a Java language feature, understood by the Java compiler (as well as the Java runtime and tooling).
+
+The Java ecosystem is still not as module-friendly as desired. See [Java Modules](https://dev.java/learn/modules/) for much more
+information about how to use them in practice and how to deal with common issues that might arise.
+Speaking of which,  the book [Java 9 Modularity](https://javamodularity.com/) is a real gem in that regard.
+There are many possible hybrid scenarios, in which we can at least partially benefit from the use of modules.
 
 ## Prerequisites
 
