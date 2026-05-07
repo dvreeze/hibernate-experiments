@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>eu.cdevreeze.hibernate-experiments</groupId>
-            <artifactId>criteria-api</artifactId>
+            <artifactId>criteria-service</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

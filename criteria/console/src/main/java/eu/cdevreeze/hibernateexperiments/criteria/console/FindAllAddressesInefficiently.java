@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.criteria.console;
 
-import module eu.cdevreeze.hibernateexperiments.criteria.api;
+import module eu.cdevreeze.hibernateexperiments.criteria.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
 

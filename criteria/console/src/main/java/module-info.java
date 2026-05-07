@@ -20,7 +20,7 @@
  * @author Chris de Vreeze
  */
 module eu.cdevreeze.hibernateexperiments.criteria.console {
-    requires eu.cdevreeze.hibernateexperiments.criteria.api;
+    requires eu.cdevreeze.hibernateexperiments.criteria.service;
     requires jakarta.persistence;
     requires org.jspecify;
 

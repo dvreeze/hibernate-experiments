@@ -21,13 +21,10 @@ import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.AddressEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CityEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CountryEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
 
 /**
- * The same as {@link ConcreteAddressService}, except for the absence of {@link jakarta.persistence.EntityGraph}'s.
+ * The same as {@link ConcreteAddressService}, except for the absence of {@link EntityGraph}'s.
  * This minor code change alone makes the number of generated SQL queries explode!
  *
  * @author Chris de Vreeze

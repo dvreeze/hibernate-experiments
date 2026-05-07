@@ -21,7 +21,7 @@
  *
  * @author Chris de Vreeze
  */
-module eu.cdevreeze.hibernateexperiments.criteria.api {
+module eu.cdevreeze.hibernateexperiments.criteria.service {
     requires com.google.common;
     requires org.jspecify;
     requires jakarta.persistence;
