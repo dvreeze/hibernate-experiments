@@ -25,6 +25,8 @@ module eu.cdevreeze.hibernateexperiments.plainsql.service {
     requires com.google.common;
     requires jakarta.persistence;
     requires org.jspecify;
+    requires tools.jackson.databind;
+    // requires tools.jackson.datatype.guava;
     requires transitive eu.cdevreeze.hibernateexperiments.plainsql.model;
 
     exports eu.cdevreeze.hibernateexperiments.plainsql.bootstrap;

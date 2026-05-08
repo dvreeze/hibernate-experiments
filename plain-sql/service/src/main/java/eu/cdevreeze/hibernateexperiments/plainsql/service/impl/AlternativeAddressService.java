@@ -21,6 +21,7 @@ import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
+import tools.jackson.databind.json.JsonMapper;
 
 import static jakarta.persistence.sql.ResultSetMapping.column;
 import static jakarta.persistence.sql.ResultSetMapping.constructor;
@@ -35,6 +36,10 @@ public final class AlternativeAddressService implements AddressService {
     // TODO
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
+
+    // Guava Jackson Module not needed here
+    private final JsonMapper jsonMapper = JsonMapper.builder()
+            .build();
 
     private final EntityManagerFactory emf;
 
@@ -167,18 +172,20 @@ public final class AlternativeAddressService implements AddressService {
                               from country
                              where country_id = ?1
                         )
-                    select ci.city_id, ci.city,
-                           cty.country_id, cty.country, cty.co_last_update,
-                           ci.last_update as ci_last_update
+                    select json_object(
+                               'id': ci.city_id,
+                               'city': ci.city,
+                               'country': json_object('id': cty.country_id, 'country': cty.country, 'lastUpdate': cty.co_last_update),
+                               'lastUpdate': ci.last_update
+                           )
                       from city ci
                      inner join cty on (ci.country_id = cty.country_id)
                     """;
 
-            ResultSetMapping<City> rsMapping = getCityResultSetMapping();
-
-            return entityAgent.createNativeQuery(sqlString, rsMapping)
+            return entityAgent.createNativeQuery(sqlString, String.class)
                     .setParameter(1, countryId)
                     .getResultStream()
+                    .map(v -> jsonMapper.readValue(v, City.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -187,12 +194,12 @@ public final class AlternativeAddressService implements AddressService {
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String sqlString = "select country_id, country, last_update as co_last_update from country";
+            String sqlString =
+                    "select json_object('id': country_id, 'country': country, 'lastUpdate': last_update) from country";
 
-            ResultSetMapping<Country> rsMapping = getCountryResultSetMapping();
-
-            return entityAgent.createNativeQuery(sqlString, rsMapping)
+            return entityAgent.createNativeQuery(sqlString, String.class)
                     .getResultStream()
+                    .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
