@@ -29,6 +29,7 @@ module eu.cdevreeze.hibernateexperiments.criteria.service {
     // Making explicit that Hibernate ORM is used as JPA implementation
     // Otherwise it would make no sense to open the entity package to Hibernate for reflection
     requires org.hibernate.orm.core;
+    requires tools.jackson.databind;
 
     exports eu.cdevreeze.hibernateexperiments.criteria.bootstrap;
     exports eu.cdevreeze.hibernateexperiments.criteria.service;
