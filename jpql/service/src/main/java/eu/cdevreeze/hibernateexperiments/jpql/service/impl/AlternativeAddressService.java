@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
+package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
-import module eu.cdevreeze.hibernateexperiments.plainsql.model;
+import module eu.cdevreeze.hibernateexperiments.jpql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
+import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -49,42 +49,40 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            String sqlString = """
+            String qlString = """
                     with
-                        addr as (
-                            select ad.address_id, ad.address, ad.address2, ad.district,
-                                   ci.city_id, ci.city,
-                                   co.country_id, co.country, co.last_update as co_last_update,
-                                   ci.last_update as ci_last_update,
-                                   ad.postal_code, ad.phone, ad.last_update as ad_last_update
-                              from address ad
-                             inner join city ci on (ad.city_id = ci.city_id)
-                             inner join country co on (ci.country_id = co.country_id)
-                             where ad.address_id = ?1
+                        Addr as (
+                            select ad.id as adId, ad.address as address, ad.address2 as address2, ad.district as district,
+                                   ci.id as ciId, ci.city as city,
+                                   co.id as coId, co.country as country, co.lastUpdate as coLastUpdate,
+                                   ci.lastUpdate as ciLastUpdate,
+                                   ad.postalCode as postalCode, ad.phone as phone, ad.lastUpdate as adLastUpdate
+                              from Address ad inner join ad.city ci inner join ci.country co
+                             where ad.id = ?1
                         )
                     select json_object(
-                               'id': addr.address_id,
+                               'id': addr.adId,
                                'address1': addr.address,
                                'address2': addr.address2,
                                'district': addr.district,
                                'city': json_object(
-                                   'id': addr.city_id,
+                                   'id': addr.ciId,
                                    'city': addr.city,
                                    'country': json_object(
-                                       'id': addr.country_id,
+                                       'id': addr.coId,
                                        'country': addr.country,
-                                       'lastUpdate': addr.co_last_update
+                                       'lastUpdate': addr.coLastUpdate
                                    ),
-                                   'lastUpdate': addr.ci_last_update
+                                   'lastUpdate': addr.ciLastUpdate
                                ),
-                               'postalCode': addr.postal_code,
+                               'postalCode': addr.postalCode,
                                'phone': addr.phone,
-                               'lastUpdate': addr.ad_last_update
+                               'lastUpdate': addr.adLastUpdate
                            )
-                      from addr
+                      from Addr addr
                     """;
 
-            return entityAgent.createNativeQuery(sqlString, String.class)
+            return entityAgent.createQuery(qlString, String.class)
                     .setParameter(1, id)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
@@ -98,42 +96,40 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            String sqlString = """
+            String qlString = """
                     with
-                        addr as (
-                            select ad.address_id, ad.address, ad.address2, ad.district,
-                                   ci.city_id, ci.city,
-                                   co.country_id, co.country, co.last_update as co_last_update,
-                                   ci.last_update as ci_last_update,
-                                   ad.postal_code, ad.phone, ad.last_update as ad_last_update
-                              from address ad
-                             inner join city ci on (ad.city_id = ci.city_id)
-                             inner join country co on (ci.country_id = co.country_id)
-                             where ci.city_id = ?1
+                        Addr as (
+                            select ad.id as adId, ad.address as address, ad.address2 as address2, ad.district as district,
+                                   ci.id as ciId, ci.city as city,
+                                   co.id as coId, co.country as country, co.lastUpdate as coLastUpdate,
+                                   ci.lastUpdate as ciLastUpdate,
+                                   ad.postalCode as postalCode, ad.phone as phone, ad.lastUpdate as adLastUpdate
+                              from Address ad inner join ad.city ci inner join ci.country co
+                             where ci.id = ?1
                         )
                     select json_object(
-                               'id': addr.address_id,
+                               'id': addr.adId,
                                'address1': addr.address,
                                'address2': addr.address2,
                                'district': addr.district,
                                'city': json_object(
-                                   'id': addr.city_id,
+                                   'id': addr.ciId,
                                    'city': addr.city,
                                    'country': json_object(
-                                       'id': addr.country_id,
+                                       'id': addr.coId,
                                        'country': addr.country,
-                                       'lastUpdate': addr.co_last_update
+                                       'lastUpdate': addr.coLastUpdate
                                    ),
-                                   'lastUpdate': addr.ci_last_update
+                                   'lastUpdate': addr.ciLastUpdate
                                ),
-                               'postalCode': addr.postal_code,
+                               'postalCode': addr.postalCode,
                                'phone': addr.phone,
-                               'lastUpdate': addr.ad_last_update
+                               'lastUpdate': addr.adLastUpdate
                            )
-                      from addr
+                      from Addr addr
                     """;
 
-            return entityAgent.createNativeQuery(sqlString, String.class)
+            return entityAgent.createQuery(qlString, String.class)
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
@@ -147,42 +143,40 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            String sqlString = """
+            String qlString = """
                     with
-                        addr as (
-                            select ad.address_id, ad.address, ad.address2, ad.district,
-                                   ci.city_id, ci.city,
-                                   co.country_id, co.country, co.last_update as co_last_update,
-                                   ci.last_update as ci_last_update,
-                                   ad.postal_code, ad.phone, ad.last_update as ad_last_update
-                              from address ad
-                             inner join city ci on (ad.city_id = ci.city_id)
-                             inner join country co on (ci.country_id = co.country_id)
-                             where co.country_id = ?1
+                        Addr as (
+                            select ad.id as adId, ad.address as address, ad.address2 as address2, ad.district as district,
+                                   ci.id as ciId, ci.city as city,
+                                   co.id as coId, co.country as country, co.lastUpdate as coLastUpdate,
+                                   ci.lastUpdate as ciLastUpdate,
+                                   ad.postalCode as postalCode, ad.phone as phone, ad.lastUpdate as adLastUpdate
+                              from Address ad inner join ad.city ci inner join ci.country co
+                             where co.id = ?1
                         )
                     select json_object(
-                               'id': addr.address_id,
+                               'id': addr.adId,
                                'address1': addr.address,
                                'address2': addr.address2,
                                'district': addr.district,
                                'city': json_object(
-                                   'id': addr.city_id,
+                                   'id': addr.ciId,
                                    'city': addr.city,
                                    'country': json_object(
-                                       'id': addr.country_id,
+                                       'id': addr.coId,
                                        'country': addr.country,
-                                       'lastUpdate': addr.co_last_update
+                                       'lastUpdate': addr.coLastUpdate
                                    ),
-                                   'lastUpdate': addr.ci_last_update
+                                   'lastUpdate': addr.ciLastUpdate
                                ),
-                               'postalCode': addr.postal_code,
+                               'postalCode': addr.postalCode,
                                'phone': addr.phone,
-                               'lastUpdate': addr.ad_last_update
+                               'lastUpdate': addr.adLastUpdate
                            )
-                      from addr
+                      from Addr addr
                     """;
 
-            return entityAgent.createNativeQuery(sqlString, String.class)
+            return entityAgent.createQuery(qlString, String.class)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
@@ -196,41 +190,39 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            String sqlString = """
+            String qlString = """
                     with
-                        addr as (
-                            select ad.address_id, ad.address, ad.address2, ad.district,
-                                   ci.city_id, ci.city,
-                                   co.country_id, co.country, co.last_update as co_last_update,
-                                   ci.last_update as ci_last_update,
-                                   ad.postal_code, ad.phone, ad.last_update as ad_last_update
-                              from address ad
-                             inner join city ci on (ad.city_id = ci.city_id)
-                             inner join country co on (ci.country_id = co.country_id)
+                        Addr as (
+                            select ad.id as adId, ad.address as address, ad.address2 as address2, ad.district as district,
+                                   ci.id as ciId, ci.city as city,
+                                   co.id as coId, co.country as country, co.lastUpdate as coLastUpdate,
+                                   ci.lastUpdate as ciLastUpdate,
+                                   ad.postalCode as postalCode, ad.phone as phone, ad.lastUpdate as adLastUpdate
+                              from Address ad inner join ad.city ci inner join ci.country co
                         )
                     select json_object(
-                               'id': addr.address_id,
+                               'id': addr.adId,
                                'address1': addr.address,
                                'address2': addr.address2,
                                'district': addr.district,
                                'city': json_object(
-                                   'id': addr.city_id,
+                                   'id': addr.ciId,
                                    'city': addr.city,
                                    'country': json_object(
-                                       'id': addr.country_id,
+                                       'id': addr.coId,
                                        'country': addr.country,
-                                       'lastUpdate': addr.co_last_update
+                                       'lastUpdate': addr.coLastUpdate
                                    ),
-                                   'lastUpdate': addr.ci_last_update
+                                   'lastUpdate': addr.ciLastUpdate
                                ),
-                               'postalCode': addr.postal_code,
+                               'postalCode': addr.postalCode,
                                'phone': addr.phone,
-                               'lastUpdate': addr.ad_last_update
+                               'lastUpdate': addr.adLastUpdate
                            )
-                      from addr
+                      from Addr addr
                     """;
 
-            return entityAgent.createNativeQuery(sqlString, String.class)
+            return entityAgent.createQuery(qlString, String.class)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
@@ -243,24 +235,24 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            String sqlString = """
+            String qlString = """
                     with
-                        cty as materialized (
-                            select country_id, country, last_update as co_last_update
-                              from country
-                             where country_id = ?1
+                        Cty as materialized (
+                            select id as countryId, country as countryName, lastUpdate as lastUpdateTime
+                              from Country
+                             where id = ?1
                         )
                     select json_object(
-                               'id': ci.city_id,
+                               'id': ci.id,
                                'city': ci.city,
-                               'country': json_object('id': cty.country_id, 'country': cty.country, 'lastUpdate': cty.co_last_update),
-                               'lastUpdate': ci.last_update
+                               'country': json_object('id': cty.countryId, 'country': cty.countryName, 'lastUpdate': cty.lastUpdateTime),
+                               'lastUpdate': ci.lastUpdate
                            )
-                      from city ci
-                     inner join cty on (ci.country_id = cty.country_id)
+                      from City ci
+                     inner join Cty cty on (ci.country.id = cty.countryId)
                     """;
 
-            return entityAgent.createNativeQuery(sqlString, String.class)
+            return entityAgent.createQuery(qlString, String.class)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, City.class))
@@ -274,17 +266,17 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            String sqlString = """
+            String qlString = """
                     with
-                        cty as (
-                            select country_id, country, last_update
-                              from country
+                        Cty as (
+                            select id as countryId, country as countryName, lastUpdate as lastUpdateTime
+                              from Country
                         )
-                    select json_object('id': cty.country_id, 'country': cty.country, 'lastUpdate': cty.last_update)
-                      from cty
+                    select json_object('id': countryId, 'country': countryName, 'lastUpdate': lastUpdateTime)
+                      from Cty
                     """;
 
-            return entityAgent.createNativeQuery(sqlString, String.class)
+            return entityAgent.createQuery(qlString, String.class)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());

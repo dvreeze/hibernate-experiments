@@ -138,7 +138,7 @@ public final class ConcreteAddressService implements AddressService {
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String qlString = "select c from Country";
+            String qlString = "select c from Country c";
 
             EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
 
