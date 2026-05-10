@@ -48,97 +48,101 @@ public final class AlternativeAddressService implements AddressService {
         this.emf = emf;
     }
 
-    // TODO
     @Override
     public Optional<Address> findById(long id) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
+            // Think of the CTE itself as just another table, whether materialized or not
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
+            JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaJoin<AddressEntity, CityEntity> city = address.join(AddressEntity_.city, JoinType.INNER);
+            JpaJoin<CityEntity, CountryEntity> country = city.join(CityEntity_.country, JoinType.INNER);
             cq.where(cb.equal(address.get(AddressEntity_.id), id));
-            cq.select(address);
+            JpaCriteriaQuery<Tuple> tupleQuery =
+                    createAddressTupleSelectClause(cb, cq, address, city, country);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
+            JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+            return entityAgent.createQuery(resultQuery)
                     .getResultStream()
-                    .map(AddressEntity::toModelObject)
+                    .map(v -> jsonMapper.readValue(v, Address.class))
                     .findFirst();
         });
     }
 
-    // TODO
     @Override
     public ImmutableList<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
+            // Think of the CTE itself as just another table, whether materialized or not
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
+            JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaJoin<AddressEntity, CityEntity> city = address.join(AddressEntity_.city, JoinType.INNER);
+            JpaJoin<CityEntity, CountryEntity> country = city.join(CityEntity_.country, JoinType.INNER);
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.id), cityId));
-            cq.select(address);
+            JpaCriteriaQuery<Tuple> tupleQuery =
+                    createAddressTupleSelectClause(cb, cq, address, city, country);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
+            JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+            return entityAgent.createQuery(resultQuery)
                     .getResultStream()
-                    .map(AddressEntity::toModelObject)
+                    .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
-    // TODO
     @Override
     public ImmutableList<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
+            // Think of the CTE itself as just another table, whether materialized or not
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
+            JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaJoin<AddressEntity, CityEntity> city = address.join(AddressEntity_.city, JoinType.INNER);
+            JpaJoin<CityEntity, CountryEntity> country = city.join(CityEntity_.country, JoinType.INNER);
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.country).get(CountryEntity_.id), countryId));
-            cq.select(address);
+            JpaCriteriaQuery<Tuple> tupleQuery =
+                    createAddressTupleSelectClause(cb, cq, address, city, country);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
+            JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+            return entityAgent.createQuery(resultQuery)
                     .getResultStream()
-                    .map(AddressEntity::toModelObject)
+                    .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
-    // TODO
     @Override
     public ImmutableList<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
+            // Think of the CTE itself as just another table, whether materialized or not
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
-            cq.select(address);
+            JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
+            JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
+            JpaJoin<AddressEntity, CityEntity> city = address.join(AddressEntity_.city, JoinType.INNER);
+            JpaJoin<CityEntity, CountryEntity> country = city.join(CityEntity_.country, JoinType.INNER);
+            JpaCriteriaQuery<Tuple> tupleQuery =
+                    createAddressTupleSelectClause(cb, cq, address, city, country);
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
+            JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+            return entityAgent.createQuery(resultQuery)
                     .getResultStream()
-                    .map(AddressEntity::toModelObject)
+                    .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -147,6 +151,8 @@ public final class AlternativeAddressService implements AddressService {
     public ImmutableList<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
+            // Think of the CTE itself as just another table, whether materialized or not
             HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cteCq = cb.createQuery(Tuple.class);
@@ -193,6 +199,8 @@ public final class AlternativeAddressService implements AddressService {
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
+            // Think of the CTE itself as just another table, whether materialized or not
             HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cteCq = cb.createQuery(Tuple.class);
@@ -223,15 +231,63 @@ public final class AlternativeAddressService implements AddressService {
         });
     }
 
-    private EntityGraph<AddressEntity> getAddressEntityGraph() {
-        EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
+    private JpaCriteriaQuery<Tuple> createAddressTupleSelectClause(
+            HibernateCriteriaBuilder cb,
+            JpaCriteriaQuery<Tuple> cq,
+            JpaRoot<AddressEntity> address,
+            JpaJoin<AddressEntity, CityEntity> addressCity,
+            JpaJoin<CityEntity, CountryEntity> cityCountry
+    ) {
+        cq.select(cb.tuple(
+                address.get(AddressEntity_.id).alias("addressId"),
+                address.get(AddressEntity_.address).alias("address"),
+                address.get(AddressEntity_.address2).alias("address2"),
+                address.get(AddressEntity_.district).alias("district"),
+                addressCity.get(CityEntity_.id).alias("cityId"),
+                addressCity.get(CityEntity_.city).alias("city"),
+                cityCountry.get(CountryEntity_.id).alias("countryId"),
+                cityCountry.get(CountryEntity_.country).alias("country"),
+                cityCountry.get(CountryEntity_.lastUpdate).alias("countryLastUpdate"),
+                addressCity.get(CityEntity_.lastUpdate).alias("cityLastUpdate"),
+                address.get(AddressEntity_.postalCode).alias("postalCode"),
+                address.get(AddressEntity_.phone).alias("phone"),
+                address.get(AddressEntity_.lastUpdate).alias("addressLastUpdate")
+        ));
+        return cq;
+    }
 
-        entityGraph.addAttributeNode(AddressEntity_.city);
-
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
-        Subgraph<CityEntity> citySubgraph = entityGraph.addSubgraph(AddressEntity_.city);
-        citySubgraph.addAttributeNode(CityEntity_.country);
-
-        return entityGraph;
+    private JpaCriteriaQuery<String> createAddressResultQuery(HibernateCriteriaBuilder cb, JpaCriteriaQuery<Tuple> cteQuery) {
+        JpaCriteriaQuery<String> cq = cb.createQuery(String.class);
+        JpaCteCriteria<Tuple> cteCriteria = cq.with("Addr", cteQuery);
+        JpaRoot<Tuple> tupleFromCte = cq.from(cteCriteria);
+        cq.select(
+                cb.jsonObject(
+                        Map.of(
+                                "id", tupleFromCte.get("addressId"),
+                                "address1", tupleFromCte.get("address"),
+                                "address2", tupleFromCte.get("address2"),
+                                "district", tupleFromCte.get("district"),
+                                "city",
+                                cb.jsonObject(
+                                        Map.of(
+                                                "id", tupleFromCte.get("cityId"),
+                                                "city", tupleFromCte.get("city"),
+                                                "country", cb.jsonObject(
+                                                        Map.of(
+                                                                "id", tupleFromCte.get("countryId"),
+                                                                "country", tupleFromCte.get("country"),
+                                                                "lastUpdate", tupleFromCte.get("countryLastUpdate")
+                                                        )
+                                                ),
+                                                "lastUpdate", tupleFromCte.get("cityLastUpdate")
+                                        )
+                                ),
+                                "postalCode", tupleFromCte.get("postalCode"),
+                                "phone", tupleFromCte.get("phone"),
+                                "lastUpdate", tupleFromCte.get("addressLastUpdate")
+                        )
+                )
+        );
+        return cq;
     }
 }
