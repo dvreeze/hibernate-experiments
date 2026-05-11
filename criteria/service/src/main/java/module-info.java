@@ -30,6 +30,7 @@ module eu.cdevreeze.hibernateexperiments.criteria.service {
     // Otherwise it would make no sense to open the entity package to Hibernate for reflection
     requires org.hibernate.orm.core;
     requires tools.jackson.databind;
+    requires tools.jackson.datatype.guava;
 
     exports eu.cdevreeze.hibernateexperiments.criteria.bootstrap;
     exports eu.cdevreeze.hibernateexperiments.criteria.service;

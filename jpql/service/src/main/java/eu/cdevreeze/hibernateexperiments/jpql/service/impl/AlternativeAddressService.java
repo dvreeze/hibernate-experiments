@@ -22,6 +22,7 @@ import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Alternative {@link AddressService} implementation that uses CTEs (and JSON result sets) internally.
@@ -33,8 +34,8 @@ public final class AlternativeAddressService implements AddressService {
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
 
-    // Guava Jackson Module not needed here
     private final JsonMapper jsonMapper = JsonMapper.builder()
+            .addModule(new GuavaModule())
             .build();
 
     private final EntityManagerFactory emf;

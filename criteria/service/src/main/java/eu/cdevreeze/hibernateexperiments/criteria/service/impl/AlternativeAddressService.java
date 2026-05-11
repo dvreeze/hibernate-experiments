@@ -25,6 +25,7 @@ import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
 import jakarta.persistence.criteria.JoinType;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 import java.util.Map;
 
@@ -38,8 +39,8 @@ public final class AlternativeAddressService implements AddressService {
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
 
-    // Guava Jackson Module not needed here
     private final JsonMapper jsonMapper = JsonMapper.builder()
+            .addModule(new GuavaModule())
             .build();
 
     private final EntityManagerFactory emf;
