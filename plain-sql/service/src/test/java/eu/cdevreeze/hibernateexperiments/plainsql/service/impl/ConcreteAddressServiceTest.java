@@ -18,6 +18,7 @@ package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Address;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.City;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Country;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.AfterAll;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test of {@link ConcreteAddressService}.
@@ -74,6 +76,32 @@ class ConcreteAddressServiceTest {
                 Set.of("Moscow", "Jaroslavl"),
                 addresses.stream().map(Address::city).map(City::city).collect(Collectors.toSet())
         );
+        assertEquals(
+                Set.of("23616", "73431"),
+                addresses.stream().map(Address::postalCode).collect(Collectors.toSet())
+        );
+    }
+
+    @Test
+    void testFindCitiesByCountry() {
+        AddressService addressService = new ConcreteAddressService(emf);
+
+        long countryId = 80L;
+        List<City> cities = addressService.findCitiesByCountryId(countryId);
+
+        assertEquals(
+                Set.of("Moscow", "Jaroslavl", "Ivanovo"),
+                cities.stream().map(City::city).collect(Collectors.toSet())
+        );
+    }
+
+    @Test
+    void testFindAllCountries() {
+        AddressService addressService = new ConcreteAddressService(emf);
+
+        List<Country> countries = addressService.findAllCountries();
+
+        assertTrue(countries.stream().anyMatch(c -> c.country().equals("Russian Federation")));
     }
 
     private static EntityManagerFactory createEntityManagerFactory(String jdbcUrl, String username, String password) {
@@ -92,50 +120,54 @@ class ConcreteAddressServiceTest {
 
     private static void fillInitialTestData(EntityManagerFactory emf) {
         emf.runInTransaction(EntityAgent.class, eh -> {
-            String insertCountrySql = "insert into country (country) values (?1)";
+            String insertCountrySql = "insert into country (country_id, country) values (?1, ?2)";
+            Long countryId = 80L;
             String countryName = "Russian Federation";
             eh.createNativeStatement(insertCountrySql)
-                    .setParameter(1, countryName)
+                    .setParameter(1, countryId)
+                    .setParameter(2, countryName)
                     .execute();
-            Long countryId = eh.createNativeQuery("select country_id from country where country = ?1", Long.class)
-                    .setParameter(1, countryName)
-                    .getSingleResult();
 
-            String insertCitySql = "insert into city (city, country_id) values (?1, ?2)";
+            String insertCitySql = "insert into city (city_id, city, country_id) values (?1, ?2, ?3)";
             eh.createNativeStatement(insertCitySql)
-                    .setParameter(1, "Moscow")
-                    .setParameter(2, countryId)
+                    .setParameter(1, 225)
+                    .setParameter(2, "Ivanovo")
+                    .setParameter(3, countryId)
                     .execute();
             eh.createNativeStatement(insertCitySql)
-                    .setParameter(1, "Jaroslavl")
-                    .setParameter(2, countryId)
+                    .setParameter(1, 235)
+                    .setParameter(2, "Jaroslavl")
+                    .setParameter(3, countryId)
                     .execute();
             eh.createNativeStatement(insertCitySql)
-                    .setParameter(1, "Ivanovo")
-                    .setParameter(2, countryId)
+                    .setParameter(1, 343)
+                    .setParameter(2, "Moscow")
+                    .setParameter(3, countryId)
                     .execute();
 
             String insertAddressSql =
                     """
-                            insert into address (address, address2, district, city_id, postal_code, phone)
-                            select ?1, ?2, ?3, city_id, ?4, ?5
+                            insert into address (address_id, address, address2, district, city_id, postal_code, phone)
+                            select ?1, ?2, ?3, ?4, city_id, ?5, ?6
                               from city
-                             where city = ?6""";
+                             where city = ?7""";
             eh.createNativeStatement(insertAddressSql)
-                    .setParameter(1, "46 Pjatigorsk Lane")
-                    .setParameter(2, null)
-                    .setParameter(3, "Moscow (City)")
-                    .setParameter(4, "23616")
-                    .setParameter(5, "262076994845")
-                    .setParameter(6, "Moscow")
+                    .setParameter(1, 50)
+                    .setParameter(2, "46 Pjatigorsk Lane")
+                    .setParameter(3, null)
+                    .setParameter(4, "Moscow (City)")
+                    .setParameter(5, "23616")
+                    .setParameter(6, "262076994845")
+                    .setParameter(7, "Moscow")
                     .execute();
             eh.createNativeStatement(insertAddressSql)
-                    .setParameter(1, "810 Palghat (Palakkad) Boulevard")
-                    .setParameter(2, null)
-                    .setParameter(3, "Jaroslavl")
-                    .setParameter(4, "73431")
-                    .setParameter(5, "516331171356")
-                    .setParameter(6, "Jaroslavl")
+                    .setParameter(1, 226)
+                    .setParameter(2, "810 Palghat (Palakkad) Boulevard")
+                    .setParameter(3, null)
+                    .setParameter(4, "Jaroslavl")
+                    .setParameter(5, "73431")
+                    .setParameter(6, "516331171356")
+                    .setParameter(7, "Jaroslavl")
                     .execute();
         });
     }
