@@ -37,7 +37,7 @@ public class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_id_seq")
     @SequenceGenerator(name = "category_id_seq", sequenceName = "category_category_id_seq", allocationSize = 1)
     @Column(name = "category_id")
-    private Long id;
+    private Integer id;
 
     @Basic(optional = false)
     private String name;
@@ -46,11 +46,11 @@ public class CategoryEntity {
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

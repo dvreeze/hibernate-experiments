@@ -37,7 +37,7 @@ public class ActorEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "actor_id_seq")
     @SequenceGenerator(name = "actor_id_seq", sequenceName = "actor_actor_id_seq", allocationSize = 1)
     @Column(name = "actor_id")
-    private Long id;
+    private Integer id;
 
     @Basic(optional = false)
     @Column(name = "first_name")
@@ -51,11 +51,11 @@ public class ActorEntity {
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

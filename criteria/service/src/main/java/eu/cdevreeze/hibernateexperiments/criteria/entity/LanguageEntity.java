@@ -37,20 +37,21 @@ public class LanguageEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_id_seq")
     @SequenceGenerator(name = "language_id_seq", sequenceName = "language_language_id_seq", allocationSize = 1)
     @Column(name = "language_id")
-    private Long id;
+    private Integer id;
 
     @Basic(optional = false)
+    @Column(columnDefinition = "bpchar")
     private String name;
 
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

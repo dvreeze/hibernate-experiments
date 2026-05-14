@@ -21,5 +21,5 @@ package eu.cdevreeze.hibernateexperiments.jpql.entity;
  *
  * @author Chris de Vreeze
  */
-public record FilmActorKey(Long actorId, Long filmId) {
+public record FilmActorKey(Integer actorId, Integer filmId) {
 }

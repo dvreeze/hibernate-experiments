@@ -36,30 +36,30 @@ public class FilmCategoryEntity {
 
     @Id
     @Column(name = "film_id")
-    private Long filmId;
+    private Integer filmId;
 
     @Id
     @Column(name = "category_id")
-    private Long categoryId;
+    private Integer categoryId;
 
     // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Long getFilmId() {
+    public Integer getFilmId() {
         return filmId;
     }
 
-    public void setFilmId(Long filmId) {
+    public void setFilmId(Integer filmId) {
         this.filmId = filmId;
     }
 
-    public Long getCategoryId() {
+    public Integer getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 

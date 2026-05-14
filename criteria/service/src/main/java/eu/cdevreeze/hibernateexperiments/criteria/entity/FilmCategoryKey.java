@@ -21,5 +21,5 @@ package eu.cdevreeze.hibernateexperiments.criteria.entity;
  *
  * @author Chris de Vreeze
  */
-public record FilmCategoryKey(Long filmId, Long categoryId) {
+public record FilmCategoryKey(Integer filmId, Integer categoryId) {
 }
