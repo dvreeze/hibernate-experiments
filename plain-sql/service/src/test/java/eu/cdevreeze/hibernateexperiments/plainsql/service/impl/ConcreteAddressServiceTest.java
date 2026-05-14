@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ConcreteAddressServiceTest {
 
     private static final PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>("postgres:16-alpine")
+            new PostgreSQLContainer<>("postgres:18-alpine")
                     .withInitScript("create-test-database.sql");
 
     private static EntityManagerFactory emf;
