@@ -88,6 +88,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>1.21.3</version>
+                <scope>test</scope>
+            </dependency>
             <!-- Make ArchUnit work with JUnit 6 -->
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
