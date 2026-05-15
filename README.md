@@ -105,11 +105,15 @@ There are many possible hybrid scenarios, in which we can at least partially ben
 
 ## Prerequisites
 
-To run code in this project (console programs or unit tests), first make sure to have a locally running
+To run (non-test) code in this project (i.e. the console programs), first make sure to have a locally running
 [PostgreSQL Docker container](https://hub.docker.com/_/postgres) containing the
 [Pagila sample database](https://github.com/devrimgunduz/pagila). Instructions on how to run the
 PostgreSQL Docker container with the Pagila database can also be found at
 [Pagila sample database](https://github.com/devrimgunduz/pagila).
+
+Most unit tests use [Testcontainers](https://testcontainers.com/), in particular
+the [Postgres Module](https://java.testcontainers.org/modules/databases/postgres/). This requires only
+a Docker installation, which is required in any case, as mentioned above.
 
 In the remainder of this "readme" file the Pagila database setup will not be mentioned anymore,
 so please keep this necessary prerequisite in mind.
