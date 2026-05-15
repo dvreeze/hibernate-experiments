@@ -54,6 +54,11 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Make ArchUnit work with JUnit 6 -->
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
