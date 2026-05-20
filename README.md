@@ -39,6 +39,7 @@ modern APIs. Java records clearly remind of Scala's *case classes*.
 My experiences with internalizing *Effective Java* and (later) the use of *Scala* have made me a better
 application developer. In particular:
 * A more *functional* programming style (when not taking this to extremes) leads to code that is *easier to reason about*
+  * Local reasoning about code becomes a breeze for *pure functions* that are *deterministic*, *total* and *free from side effects*
 * Investing in the creation of a domain model as *immutable classes* makes the code almost follow automatically
   * And this code tends to be quite clear and low in bugs
   * An excellent (early) example of such an API is the [java.time API](https://docs.oracle.com/en/java/javase/25/docs/api///java.base/java/time/package-summary.html)
@@ -154,8 +155,9 @@ $MAVEN_HOME/bin/mvn clean verify
 ## Runtime behavior analysis using the debugger
 
 Sometimes we would like to know in more detail what is happening at runtime, e.g. what the actual transactional
-boundaries are. One way to find out is by using the debugger, and set breakpoints at locations where
-an `EntityManager` or `EntityAgent` is present, and analyze Java expressions at those breakpoints such as:
+boundaries are (provided the transaction is resource-local as opposed to a JTA transaction). One way to find
+out is by using the debugger, and set breakpoints at locations where an `EntityManager` or `EntityAgent` is
+present, and analyze Java expressions at those breakpoints such as:
 
 ```
 entityManager.unwrap(org.hibernate.Session.class)
@@ -207,3 +209,21 @@ and less verbose (JPQL-based) querying experience in return.
 
 Subproject *criteria* is like *jpql*, but it uses Criteria queries rather than JPQL query strings,
 to get even more compile-time type-safety.
+
+## A few words about Hibernate antipatterns
+
+In the wild many projects using Hibernate/JPA suffer from shortcomings that lead to an explosion of
+generated SQL statements and/or difficulty reasoning about the code. Among the antipatterns commonly
+seen (in typical Hibernate projects using an `EntityManager`/`Session` rather than a `StatelessSession`) are:
+* Eager fetching of associations specified (explicitly or implicitly) at the entity level, in a large complex deeply nested domain model
+* Failing to specify per-query fetching
+* Going overboard with cascading of operations (specified at the entity level)
+* Retrieving tons of entity fields in queries where simple (Java record) projections with only a few fields would suffice
+* Persistence contexts spanning multiple method calls (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
+* "Transactional service" methods with entity parameters and side effects on those entities in the method body, leading to unclear semantics that heavily depends on the calling context
+  * Does an update to such a parameter entity in the method body lead to a database update due to "dirty checking"? That depends on the calling context.
+* Overall: a mind set of wanting to see no SQL but just Java objects, leading to non-performant code in production
+
+Tutorials such as [common Hibernate mistakes crippling performance](https://thorben-janssen.com/common-hibernate-mistakes-cripple-performance/)
+warn against many of these antipatterns. Fortunately we can make Hibernate work for us rather than against us,
+but it may take some time to "repair" a project using Hibernate in a non-performant way.
