@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.criteria.model;
+package eu.cdevreeze.hibernateexperiments.plainsql.service.factory;
 
 import module java.base;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.FilmService;
+import eu.cdevreeze.hibernateexperiments.plainsql.service.impl.ConcreteFilmService;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Immutable category {@link Record}.
+ * Factory of {@link FilmService} objects.
  *
  * @author Chris de Vreeze
  */
-public record Category(
-        long id,
-        String name,
-        Instant lastUpdate
-) {
+public final class FilmServiceFactory {
+
+    private FilmServiceFactory() {
+        // Non-instantiable
+    }
+
+    public static FilmService create(EntityManagerFactory emf) {
+        return new ConcreteFilmService(emf);
+    }
 }

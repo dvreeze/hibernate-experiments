@@ -42,7 +42,7 @@ public record Film(
         String fullText
 ) {
 
-    public record WithActors(Film film, ImmutableList<Actor> actors) {
+    public record WithActorsAndCategories(Film film, ImmutableList<Actor> actors, ImmutableList<Category> categories) {
     }
 
     public Optional<String> descriptionOption() {

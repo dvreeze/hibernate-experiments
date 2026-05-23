@@ -220,8 +220,13 @@ seen (in typical Hibernate projects using an `EntityManager`/`Session` rather th
 * Going overboard with cascading of operations (specified at the entity level)
 * Retrieving tons of entity fields in queries where simple (Java record) projections with only a few fields would suffice
 * Persistence contexts spanning multiple method calls (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
+  * Increasingly I find (mandatory) DAO layers behind the implementation of a transactional service layer problematic
+  * After all, DAOs hide the persistence context, but the latter is (implicit) program state that we need to keep in mind instead of hide
+  * In particular, sometimes we need to influence the persistence context through `EntityManager`/`Session` methods
+  * Yet the service layer itself should present itself through a technology-agnostic Java interface as API contract, hiding the use of JPA
 * "Transactional service" methods with entity parameters and side effects on those entities in the method body, leading to unclear semantics that heavily depends on the calling context
   * Does an update to such a parameter entity in the method body lead to a database update due to "dirty checking"? That depends on the calling context.
+  * In other words, such methods have unclear semantics and are therefore not very useful
 * Overall: a mind set of wanting to see no SQL but just Java objects, leading to non-performant code in production
 
 Tutorials such as [common Hibernate mistakes crippling performance](https://thorben-janssen.com/common-hibernate-mistakes-cripple-performance/)

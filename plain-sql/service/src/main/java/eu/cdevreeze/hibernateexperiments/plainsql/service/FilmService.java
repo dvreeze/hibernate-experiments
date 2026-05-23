@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.criteria.model;
+package eu.cdevreeze.hibernateexperiments.plainsql.service;
 
-import module java.base;
+import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Film;
 
 /**
- * Immutable category {@link Record}.
+ * Abstract {@link Film}-related service API.
  *
  * @author Chris de Vreeze
  */
-public record Category(
-        long id,
-        String name,
-        Instant lastUpdate
-) {
+public interface FilmService {
+
+    // In reality this would return too many results
+    ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories();
 }

@@ -24,7 +24,7 @@ import module java.base;
  * @author Chris de Vreeze
  */
 public record Category(
-        long filmId,
+        long id,
         String name,
         Instant lastUpdate
 ) {
