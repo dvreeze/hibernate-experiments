@@ -19,6 +19,8 @@ package eu.cdevreeze.hibernateexperiments.plainsql.console;
 import module eu.cdevreeze.hibernateexperiments.plainsql.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Program finding all films with actors and categories in the database.
@@ -28,12 +30,16 @@ import jakarta.persistence.EntityManagerFactory;
 public class FindAllFilmsWithActorsAndCategories {
 
     static void main(String... args) {
+        JsonMapper jsonMapper = JsonMapper.builder()
+                .addModule(new GuavaModule())
+                .build();
+
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 
             List<Film.WithActorsAndCategories> films = filmService.findAllFilmsWithActorsAndCategories();
 
-            films.forEach(IO::println);
+            jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
         }
     }
 }
