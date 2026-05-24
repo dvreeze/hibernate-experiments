@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
+package eu.cdevreeze.hibernateexperiments.criteria.service.factory;
+
+import module java.base;
+import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
+import eu.cdevreeze.hibernateexperiments.criteria.service.impl.ConcreteFilmService;
+import jakarta.persistence.EntityManagerFactory;
+
 /**
- * Module descriptor of the console programs using the corresponding service layer API.
+ * Factory of {@link FilmService} objects.
  *
  * @author Chris de Vreeze
  */
-module eu.cdevreeze.hibernateexperiments.criteria.console {
-    requires eu.cdevreeze.hibernateexperiments.criteria.service;
-    requires jakarta.persistence;
-    requires org.jspecify;
-    requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
+public final class FilmServiceFactory {
 
-    exports eu.cdevreeze.hibernateexperiments.criteria.console;
+    private FilmServiceFactory() {
+        // Non-instantiable
+    }
+
+    public static FilmService create(EntityManagerFactory emf) {
+        return new ConcreteFilmService(emf);
+    }
 }

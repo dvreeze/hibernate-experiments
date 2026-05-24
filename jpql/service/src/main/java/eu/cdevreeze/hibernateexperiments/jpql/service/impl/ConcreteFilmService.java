@@ -19,6 +19,7 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
+import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
@@ -29,6 +30,10 @@ import tools.jackson.datatype.guava.GuavaModule;
  * The implementation has been inspired by
  * <a href="https://blog.jooq.org/jooq-3-15s-new-multiset-operator-will-change-how-you-think-about-sql/">jOOQ's multiset operator</a>,
  * which can be simulated by the database's SQL/JSON support.
+ * <p>
+ * The use of "json_object" inside "json_arrayagg" below, while being Hibernate HQL, has been deeply
+ * inspired by Oracle's SQL/JSON support, as explained in this article:
+ * <a href="https://oracle-base.com/articles/12c/sql-json-functions-12cr2">SQL/JSON generation functions in Oracle DB 12C</a>.
  *
  * @author Chris de Vreeze
  */
@@ -49,6 +54,75 @@ public final class ConcreteFilmService implements FilmService {
 
     @Override
     public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            // Hibernate HQL, which extends JPQL
+            String qlString = """
+                            select json_object(
+                                       'film': json_object(
+                                           'id': f.id,
+                                           'title': f.title,
+                                           'description': f.description,
+                                           'releaseYear': f.releaseYear,
+                                           'language': json_object(
+                                               'id': l1.id,
+                                               'name': l1.name,
+                                               'last_update': l1.lastUpdate
+                                           ),
+                                           'originalLanguage':
+                                               case
+                                                   when f.originalLanguage.id is null
+                                                   then null
+                                                   else json_object(
+                                                            'id': l2.id,
+                                                            'name': l2.name,
+                                                            'last_update': l2.lastUpdate
+                                                        )
+                                               end,
+                                           'rentalDuration': f.rentalDuration,
+                                           'rentalRate': f.rentalRate,
+                                           'length': f.length,
+                                           'replacementCost': f.replacementCost,
+                                           'rating': f.rating,
+                                           'lastUpdate': f.lastUpdate,
+                                           'specialFeatures': json_array(),
+                                           'fullText': ''
+                                       ),
+                                       'actors':
+                                           (select json_arrayagg(
+                                                      json_object(
+                                                          'id': a.id,
+                                                          'firstName': a.firstName,
+                                                          'lastName': a.lastName,
+                                                          'lastUpdate': a.lastUpdate
+                                                      )
+                                                  )
+                                             from FilmActor fa
+                                            inner join Actor a on (fa.actorId = a.id)
+                                            where fa.filmId = f.id)
+                                       ),
+                                       'categories':
+                                           (select json_arrayagg(
+                                                       json_object(
+                                                           'id': c.id,
+                                                           'name': c.name,
+                                                           'lastUpdate': c.lastUpdate
+                                                       )
+                                                   )
+                                             from FilmCategory fc
+                                            inner join Category c on (fc.categoryId = c.id)
+                                            where fc.filmId = f.id)
+                                       )
+                                   )
+                              from Film f
+                              left join f.language l1
+                              left join f.originalLanguage l2
+                    """;
+
+            return entityAgent.createQuery(qlString, String.class)
+                    .getResultStream()
+                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .collect(ImmutableList.toImmutableList());
+        });
     }
 }

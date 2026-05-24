@@ -23,6 +23,8 @@ module eu.cdevreeze.hibernateexperiments.jpql.console {
     requires eu.cdevreeze.hibernateexperiments.jpql.service;
     requires jakarta.persistence;
     requires org.jspecify;
+    requires tools.jackson.databind;
+    requires tools.jackson.datatype.guava;
 
     exports eu.cdevreeze.hibernateexperiments.jpql.console;
 }
