@@ -67,7 +67,7 @@ public final class ConcreteFilmService implements FilmService {
                                            'language': json_object(
                                                'id': l1.id,
                                                'name': l1.name,
-                                               'last_update': l1.lastUpdate
+                                               'lastUpdate': l1.lastUpdate
                                            ),
                                            'originalLanguage':
                                                case
@@ -76,7 +76,7 @@ public final class ConcreteFilmService implements FilmService {
                                                    else json_object(
                                                             'id': l2.id,
                                                             'name': l2.name,
-                                                            'last_update': l2.lastUpdate
+                                                            'lastUpdate': l2.lastUpdate
                                                         )
                                                end,
                                            'rentalDuration': f.rentalDuration,
@@ -99,7 +99,7 @@ public final class ConcreteFilmService implements FilmService {
                                                   )
                                              from FilmActor fa
                                             inner join Actor a on (fa.actorId = a.id)
-                                            where fa.filmId = f.id)
+                                            where fa.filmId = f.id
                                        ),
                                        'categories':
                                            (select json_arrayagg(
@@ -111,7 +111,7 @@ public final class ConcreteFilmService implements FilmService {
                                                    )
                                              from FilmCategory fc
                                             inner join Category c on (fc.categoryId = c.id)
-                                            where fc.filmId = f.id)
+                                            where fc.filmId = f.id
                                        )
                                    )
                               from Film f

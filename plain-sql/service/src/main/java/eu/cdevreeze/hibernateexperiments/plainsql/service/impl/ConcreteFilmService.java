@@ -62,7 +62,7 @@ public final class ConcreteFilmService implements FilmService {
                                            'language': json_object(
                                                'id': l1.language_id,
                                                'name': l1.name,
-                                               'last_update': l1.last_update
+                                               'lastUpdate': l1.last_update
                                            ),
                                            'originalLanguage':
                                                case
@@ -71,7 +71,7 @@ public final class ConcreteFilmService implements FilmService {
                                                    else json_object(
                                                             'id': l2.language_id,
                                                             'name': l2.name,
-                                                            'last_update': l2.last_update
+                                                            'lastUpdate': l2.last_update
                                                         )
                                                end,
                                            'rentalDuration': f.rental_duration,
