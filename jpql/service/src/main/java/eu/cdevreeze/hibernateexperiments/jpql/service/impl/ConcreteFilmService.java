@@ -16,15 +16,17 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
+import module java.base;
+import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
 import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
-
-import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.
@@ -72,11 +74,19 @@ public final class ConcreteFilmService implements FilmService {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Hibernate HQL, which extends JPQL
-            // Not ideal, because JPQL/HQL/SQL string composition using string concatenation is error-prone
-            String qlString = QL_STRING.strip() + " where f.id = :filmId";
+            // Beautiful: no JPQL/HQL String concatenation!
+            // Instead, turning the HQL into a criteria query, adding a where clause in a type-safe way!
+            // See https://www.baeldung.com/hibernate-criteria-queries
+            // Soon this will be part of JPA 4.0! See https://in.relation.to/2026/04/23/JPA-4-M2/
 
-            return entityAgent.createQuery(qlString, String.class)
-                    .setParameter("filmId", filmId)
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
+
+            JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
+
+            cq.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
+
+            return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .findFirst();
