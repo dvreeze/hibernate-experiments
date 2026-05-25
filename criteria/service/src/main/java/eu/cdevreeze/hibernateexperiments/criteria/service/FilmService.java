@@ -19,6 +19,8 @@ package eu.cdevreeze.hibernateexperiments.criteria.service;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
 
+import java.util.Optional;
+
 /**
  * Abstract {@link Film}-related service API.
  *
@@ -28,4 +30,6 @@ public interface FilmService {
 
     // In reality this would return too many results
     ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories();
+
+    Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId);
 }

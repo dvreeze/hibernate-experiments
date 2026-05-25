@@ -24,6 +24,8 @@ import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
+import java.util.Optional;
+
 /**
  * Concrete {@link FilmService} implementation.
  * <p>
@@ -51,69 +53,84 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            String sqlString = """
-                            select json_object(
-                                       'film': json_object(
-                                           'id': f.film_id,
-                                           'title': f.title,
-                                           'description': f.description,
-                                           'releaseYear': f.release_year,
-                                           'language': json_object(
-                                               'id': l1.language_id,
-                                               'name': l1.name,
-                                               'lastUpdate': l1.last_update
-                                           ),
-                                           'originalLanguage':
-                                               case
-                                                   when f.original_language_id is null
-                                                   then null
-                                                   else json_object(
-                                                            'id': l2.language_id,
-                                                            'name': l2.name,
-                                                            'lastUpdate': l2.last_update
-                                                        )
-                                               end,
-                                           'rentalDuration': f.rental_duration,
-                                           'rentalRate': f.rental_rate,
-                                           'length': f.length,
-                                           'replacementCost': f.replacement_cost,
-                                           'rating': f.rating,
-                                           'lastUpdate': f.last_update,
-                                           'specialFeatures': json_array(),
-                                           'fullText': ''
-                                       ),
-                                       'actors': json_array(
-                                           select json_object(
-                                                      'id': a.actor_id,
-                                                      'firstName': a.first_name,
-                                                      'lastName': a.last_name,
-                                                      'lastUpdate': a.last_update
-                                                  )
-                                             from film_actor fa
-                                            inner join actor a on (fa.actor_id = a.actor_id)
-                                            where fa.film_id = f.film_id
-                                       ),
-                                       'categories': json_array(
-                                           select json_object(
-                                                      'id': c.category_id,
-                                                      'name': c.name,
-                                                      'lastUpdate': c.last_update
-                                                  )
-                                             from film_category fc
-                                            inner join category c on (fc.category_id = c.category_id)
-                                            where fc.film_id = f.film_id
-                                       )
-                                   )
-                              from Film f
-                              left join Language l1 on (f.language_id = l1.language_id)
-                              left join Language l2 on (f.original_language_id = l2.language_id)
-                    """;
-
-            return entityAgent.createNativeQuery(sqlString, String.class)
-                    .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
-                    .collect(ImmutableList.toImmutableList());
-        });
+        return emf.callInTransaction(EntityAgent.class, entityAgent ->
+                entityAgent.createNativeQuery(SQL_STRING, String.class)
+                        .getResultStream()
+                        .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                        .collect(ImmutableList.toImmutableList())
+        );
     }
+
+    @Override
+    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+        // Not ideal, because SQL string composition using string concatenation is error-prone
+        String sqlString = SQL_STRING.strip() + " where f.film_id = ?1";
+
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent ->
+                entityAgent.createNativeQuery(sqlString, String.class)
+                        .setParameter(1, filmId)
+                        .getResultStream()
+                        .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                        .findFirst()
+        );
+    }
+
+    private static final String SQL_STRING = """
+                    select json_object(
+                               'film': json_object(
+                                   'id': f.film_id,
+                                   'title': f.title,
+                                   'description': f.description,
+                                   'releaseYear': f.release_year,
+                                   'language': json_object(
+                                       'id': l1.language_id,
+                                       'name': l1.name,
+                                       'lastUpdate': l1.last_update
+                                   ),
+                                   'originalLanguage':
+                                       case
+                                           when f.original_language_id is null
+                                           then null
+                                           else json_object(
+                                                    'id': l2.language_id,
+                                                    'name': l2.name,
+                                                    'lastUpdate': l2.last_update
+                                                )
+                                       end,
+                                   'rentalDuration': f.rental_duration,
+                                   'rentalRate': f.rental_rate,
+                                   'length': f.length,
+                                   'replacementCost': f.replacement_cost,
+                                   'rating': f.rating,
+                                   'lastUpdate': f.last_update,
+                                   'specialFeatures': json_array(),
+                                   'fullText': ''
+                               ),
+                               'actors': json_array(
+                                   select json_object(
+                                              'id': a.actor_id,
+                                              'firstName': a.first_name,
+                                              'lastName': a.last_name,
+                                              'lastUpdate': a.last_update
+                                          )
+                                     from film_actor fa
+                                    inner join actor a on (fa.actor_id = a.actor_id)
+                                    where fa.film_id = f.film_id
+                               ),
+                               'categories': json_array(
+                                   select json_object(
+                                              'id': c.category_id,
+                                              'name': c.name,
+                                              'lastUpdate': c.last_update
+                                          )
+                                     from film_category fc
+                                    inner join category c on (fc.category_id = c.category_id)
+                                    where fc.film_id = f.film_id
+                               )
+                           )
+                      from Film f
+                      left join Language l1 on (f.language_id = l1.language_id)
+                      left join Language l2 on (f.original_language_id = l2.language_id)
+            """;
 }

@@ -29,6 +29,7 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.
@@ -64,7 +65,12 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
-            JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
+            JpaCriteriaQuery<String> cq = cb.createQuery(String.class);
+            JpaRoot<FilmEntity> filmRoot = cq.from(FilmEntity.class);
+            JpaJoin<FilmEntity, LanguageEntity> filmLanguage = filmRoot.join(FilmEntity_.language, JoinType.LEFT);
+            JpaJoin<FilmEntity, LanguageEntity> filmOriginalLanguage = filmRoot.join(FilmEntity_.originalLanguage, JoinType.LEFT);
+
+            JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb, cq, filmRoot, filmLanguage, filmOriginalLanguage);
 
             return entityAgent.createQuery(resultQuery)
                     .getResultStream()
@@ -73,12 +79,35 @@ public final class ConcreteFilmService implements FilmService {
         });
     }
 
-    private JpaCriteriaQuery<String> createFilmQuery(HibernateCriteriaBuilder cb) {
-        JpaCriteriaQuery<String> cq = cb.createQuery(String.class);
-        JpaRoot<FilmEntity> filmRoot = cq.from(FilmEntity.class);
-        JpaJoin<FilmEntity, LanguageEntity> filmLanguage = filmRoot.join(FilmEntity_.language, JoinType.LEFT);
-        JpaJoin<FilmEntity, LanguageEntity> filmOriginalLanguage = filmRoot.join(FilmEntity_.originalLanguage, JoinType.LEFT);
+    @Override
+    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
 
+            JpaCriteriaQuery<String> cq = cb.createQuery(String.class);
+            JpaRoot<FilmEntity> filmRoot = cq.from(FilmEntity.class);
+            JpaJoin<FilmEntity, LanguageEntity> filmLanguage = filmRoot.join(FilmEntity_.language, JoinType.LEFT);
+            JpaJoin<FilmEntity, LanguageEntity> filmOriginalLanguage = filmRoot.join(FilmEntity_.originalLanguage, JoinType.LEFT);
+
+            JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb, cq, filmRoot, filmLanguage, filmOriginalLanguage);
+            // There was no where clause before, so no "restriction" gets lost
+            resultQuery.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
+
+            return entityAgent.createQuery(resultQuery)
+                    .getResultStream()
+                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .findFirst();
+        });
+    }
+
+    private JpaCriteriaQuery<String> createFilmQuery(
+            HibernateCriteriaBuilder cb,
+            JpaCriteriaQuery<String> cq,
+            JpaRoot<FilmEntity> filmRoot,
+            JpaJoin<FilmEntity, LanguageEntity> filmLanguage,
+            JpaJoin<FilmEntity, LanguageEntity> filmOriginalLanguage
+    ) {
         // See https://thorben-janssen.com/hibernate-tip-subquery-criteriaquery/
         JpaSubQuery<String> actorsSubquery = cq.subquery(String.class);
         JpaRoot<FilmActorEntity> filmActorRoot = actorsSubquery.from(FilmActorEntity.class);
