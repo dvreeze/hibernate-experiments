@@ -32,4 +32,6 @@ public interface FilmService {
     ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories();
 
     Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId);
+
+    ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId);
 }

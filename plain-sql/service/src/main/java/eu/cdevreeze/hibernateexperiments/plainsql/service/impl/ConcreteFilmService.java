@@ -76,6 +76,27 @@ public final class ConcreteFilmService implements FilmService {
         );
     }
 
+    @Override
+    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+        // Not ideal, because SQL string composition using string concatenation is error-prone
+        String sqlString = SQL_STRING.strip() + """
+                where f.film_id in (
+                    select fac.film_id
+                      from film_actor fac
+                     where fac.actor_id = ?1
+                )
+                """;
+
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent ->
+                entityAgent.createNativeQuery(sqlString, String.class)
+                        .setParameter(1, actorId)
+                        .getResultStream()
+                        .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                        .collect(ImmutableList.toImmutableList())
+        );
+    }
+
     private static final String SQL_STRING = """
                     select json_object(
                                'film': json_object(

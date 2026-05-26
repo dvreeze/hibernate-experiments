@@ -27,6 +27,7 @@ import jakarta.persistence.criteria.JoinType;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -89,6 +90,31 @@ public final class ConcreteFilmService implements FilmService {
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .findFirst();
+        });
+    }
+
+    @Override
+    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+
+            JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
+
+            JpaRoot<? extends FilmEntity> filmRoot = resultQuery.getRoot(0, FilmEntity.class);
+
+            JpaSubQuery<Integer> subquery = resultQuery.subquery(Integer.class);
+            JpaRoot<FilmActorEntity> subqueryRoot = subquery.from(FilmActorEntity.class);
+            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actorId), actorId));
+            subquery.select(subqueryRoot.get(FilmActorEntity_.filmId));
+
+            // There was no where clause before, so no "restriction" gets lost
+            resultQuery.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
+
+            return entityAgent.createQuery(resultQuery)
+                    .getResultStream()
+                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .collect(ImmutableList.toImmutableList());
         });
     }
 

@@ -19,6 +19,8 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 import module java.base;
 import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
@@ -27,6 +29,8 @@ import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
+
+import java.util.List;
 
 /**
  * Concrete {@link FilmService} implementation.
@@ -90,6 +94,35 @@ public final class ConcreteFilmService implements FilmService {
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .findFirst();
+        });
+    }
+
+    @Override
+    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            // Hibernate HQL, which extends JPQL
+            // Beautiful: no JPQL/HQL String concatenation!
+            // Instead, turning the HQL into a criteria query, adding a where clause in a type-safe way!
+            // See https://www.baeldung.com/hibernate-criteria-queries
+            // Soon this will be part of JPA 4.0! See https://in.relation.to/2026/04/23/JPA-4-M2/
+
+            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
+
+            JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
+
+            JpaSubQuery<Integer> subquery = cq.subquery(Integer.class);
+            JpaRoot<FilmActorEntity> subqueryRoot = subquery.from(FilmActorEntity.class);
+            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actorId), actorId));
+            subquery.select(subqueryRoot.get(FilmActorEntity_.filmId));
+
+            cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
+
+            return entityAgent.createQuery(cq)
+                    .getResultStream()
+                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .collect(ImmutableList.toImmutableList());
         });
     }
 
