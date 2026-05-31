@@ -215,19 +215,23 @@ to get even more compile-time type-safety.
 In the wild many projects using Hibernate/JPA suffer from shortcomings that lead to an explosion of
 generated SQL statements and/or difficulty reasoning about the code. Among the antipatterns commonly
 seen (in typical Hibernate projects using an `EntityManager`/`Session` rather than a `StatelessSession`) are:
-* Eager fetching of associations specified (explicitly or implicitly) at the entity level, in a large complex deeply nested domain model
+* Eager fetching of associations specified (explicitly or implicitly) at the entity level, in a large complex deeply nested ("cyclic graph") domain model
 * Failing to specify per-query fetching
+  * This can be subtle: entity methods may contain "business logic" depending on associations of that entity, thus somewhat hiding (eager/lazy) fetching behavior
 * Going overboard with cascading of operations (specified at the entity level)
 * Retrieving tons of entity fields in queries where simple (Java record) projections with only a few fields would suffice
 * Persistence contexts spanning multiple method calls (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
   * Increasingly I find (mandatory) DAO layers behind the implementation of a transactional service layer problematic
   * After all, DAOs hide the persistence context, but the latter is (implicit) program state that we need to keep in mind instead of hide
-  * In particular, sometimes we need to influence the persistence context through `EntityManager`/`Session` methods
-  * Yet the service layer itself should present itself through a technology-agnostic Java interface as API contract, hiding the use of JPA
+  * In particular, sometimes we need to influence the persistence context through `EntityManager`/`Session` methods, or at least be able to reason about it
+  * Yet unlike that DAO layer, the service layer itself should present itself through a technology-agnostic Java interface as API contract, hiding the use of JPA
 * "Transactional service" methods with entity parameters and side effects on those entities in the method body, leading to unclear semantics that heavily depends on the calling context
   * Does an update to such a parameter entity in the method body lead to a database update due to "dirty checking"? That depends on the calling context.
-  * In other words, such methods have unclear semantics and are therefore not very useful
+  * If the caller is not another transactional service method (establishing a transactional `Session`), more likely than not the entity update is essentially a no-op
+  * In other words, such methods by themselves have *unclear semantics* and are therefore not very useful
+  * If a transactional Hibernate `Session` spans a *deep call chain* of service methods and DAO methods, code maintainability really suffers
 * Overall: a mind set of wanting to see no SQL but just Java objects, leading to non-performant code in production
+  * Contrast this with development teams taking charge of the persistence layer, effectively using jOOQ or Hibernate, thus implementing performant maintainable business logic
 
 Tutorials such as [common Hibernate mistakes crippling performance](https://thorben-janssen.com/common-hibernate-mistakes-cripple-performance/)
 warn against many of these antipatterns. Fortunately we can make Hibernate work for us rather than against us,
