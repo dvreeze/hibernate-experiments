@@ -220,6 +220,7 @@ seen (in typical Hibernate projects using an `EntityManager`/`Session` rather th
   * This can be subtle: entity methods may contain "business logic" depending on associations of that entity, thus somewhat hiding (eager/lazy) fetching behavior
 * Going overboard with cascading of operations (specified at the entity level)
 * Retrieving tons of entity fields in queries where simple (Java record) projections with only a few fields would suffice
+  * Moreover, retrieving custom DTOs rather than (managed) entities helps avoid an explosion of generated SQL statements
 * Persistence contexts spanning multiple method calls (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
   * Increasingly I find (mandatory) DAO layers behind the implementation of a transactional service layer problematic
   * After all, DAOs hide the persistence context, but the latter is (implicit) program state that we need to keep in mind instead of hide
