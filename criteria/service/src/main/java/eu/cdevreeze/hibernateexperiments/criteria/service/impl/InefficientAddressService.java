@@ -52,8 +52,6 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.id), id));
             cq.select(address);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -72,8 +70,6 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.id), cityId));
             cq.select(address);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -92,8 +88,6 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.country).get(CountryEntity_.id), countryId));
             cq.select(address);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -111,8 +105,6 @@ public final class InefficientAddressService implements AddressService {
             Root<AddressEntity> address = cq.from(AddressEntity.class);
             cq.select(address);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -131,8 +123,6 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(city.get(CityEntity_.country).get(CountryEntity_.id), countryId));
             cq.select(city);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -150,8 +140,6 @@ public final class InefficientAddressService implements AddressService {
             Root<CountryEntity> country = cq.from(CountryEntity.class);
             cq.select(country);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)

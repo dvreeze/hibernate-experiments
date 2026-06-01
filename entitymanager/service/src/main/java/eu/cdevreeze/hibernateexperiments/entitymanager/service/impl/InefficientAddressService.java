@@ -52,8 +52,6 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.id = ?1";
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
                     .getResultStream()
@@ -68,8 +66,6 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, cityId)
                     .getResultStream()
@@ -84,8 +80,6 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.city.country.id = ?1";
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -100,8 +94,6 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad";
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -115,8 +107,6 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from City c where c.country.id = ?1";
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, CityEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -131,8 +121,6 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from Country";
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, CountryEntity.class)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
