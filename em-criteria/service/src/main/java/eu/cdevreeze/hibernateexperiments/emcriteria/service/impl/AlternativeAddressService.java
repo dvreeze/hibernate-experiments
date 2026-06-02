@@ -55,7 +55,7 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -80,7 +80,7 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -105,7 +105,7 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -130,7 +130,7 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -154,7 +154,7 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cteCq = cb.createQuery(Tuple.class);
             JpaRoot<CityEntity> city = cteCq.from(CityEntity.class);
@@ -202,7 +202,7 @@ public final class AlternativeAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cteCq = cb.createQuery(Tuple.class);
             JpaRoot<CountryEntity> country = cteCq.from(CountryEntity.class);

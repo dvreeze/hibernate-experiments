@@ -62,7 +62,7 @@ public final class ConcreteFilmService implements FilmService {
     public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
@@ -77,7 +77,7 @@ public final class ConcreteFilmService implements FilmService {
     public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
@@ -97,7 +97,7 @@ public final class ConcreteFilmService implements FilmService {
     public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            HibernateCriteriaBuilder cb = entityManager.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = entityManager.unwrap(Session.class).getCriteriaBuilder();
 
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
