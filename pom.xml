@@ -43,6 +43,7 @@
         <module>jpql</module>
         <module>criteria</module>
         <module>entitymanager</module>
+        <module>em-criteria</module>
     </modules>
 
     <dependencyManagement>

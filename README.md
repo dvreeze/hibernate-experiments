@@ -197,6 +197,7 @@ The subprojects in this project are:
 * jpql
 * criteria
 * entitymanager
+* em-criteria
 
 Subproject *plain-sql* explores the use of native SQL queries in JPA 4.0. Compared to previous
 versions of JPA, its support for type-safe native SQL querying has advanced quite a lot. Also,
@@ -212,6 +213,8 @@ Subproject *criteria* is like *jpql*, but it uses Criteria queries rather than J
 to get even more compile-time type-safety.
 
 Subproject *entitymanager* is like *jpql*, but using an `EntityManager`.
+
+Subproject *em-criteria* is like *criteria*, but using an `EntityManager`.
 
 ## A few words about Hibernate antipatterns
 

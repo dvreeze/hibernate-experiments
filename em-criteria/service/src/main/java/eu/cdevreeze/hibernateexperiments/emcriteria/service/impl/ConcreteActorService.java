@@ -1,0 +1,122 @@
+/*
+ * Copyright 2026-2026 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.cdevreeze.hibernateexperiments.emcriteria.service.impl;
+
+import module eu.cdevreeze.hibernateexperiments.emcriteria.model;
+import module jakarta.persistence;
+import module java.base;
+import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.emcriteria.entity.ActorEntity;
+import eu.cdevreeze.hibernateexperiments.emcriteria.entity.ActorEntity_;
+import eu.cdevreeze.hibernateexperiments.emcriteria.entity.FilmActorEntity;
+import eu.cdevreeze.hibernateexperiments.emcriteria.entity.FilmActorEntity_;
+import eu.cdevreeze.hibernateexperiments.emcriteria.service.ActorService;
+
+/**
+ * Concrete {@link ActorService} implementation.
+ *
+ * @author Chris de Vreeze
+ */
+public final class ConcreteActorService implements ActorService {
+
+    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
+    // Yet it is not in the (current) JPA 4.0 API documentation.
+    // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteActorService(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
+    @Override
+    public Optional<Actor> findById(long id) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<ActorEntity> cq = cb.createQuery(ActorEntity.class);
+
+            Root<ActorEntity> actor = cq.from(ActorEntity.class);
+            cq.where(cb.equal(actor.get(ActorEntity_.id), id));
+            cq.select(actor);
+
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
+
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityManager.createQuery(cq)
+                    .setEntityGraph(entityGraph)
+                    .getResultStream()
+                    .map(ActorEntity::toModelObject)
+                    .findFirst();
+        });
+    }
+
+    @Override
+    public ImmutableList<Actor> findByFilmId(long filmId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            // This shows that JPQL/Criteria is essentially an elegant object-oriented SQL dialect
+            // This is even the case without path expressions to navigate between associations
+
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<ActorEntity> cq = cb.createQuery(ActorEntity.class);
+
+            Root<ActorEntity> actor = cq.from(ActorEntity.class);
+            Join<ActorEntity, FilmActorEntity> filmActor = actor.join(FilmActorEntity.class, JoinType.INNER);
+            filmActor.on(cb.equal(actor.get(ActorEntity_.id), filmActor.get(FilmActorEntity_.actorId)));
+            cq.where(cb.equal(filmActor.get(FilmActorEntity_.filmId), filmId));
+            cq.select(actor);
+
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
+
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityManager.createQuery(cq)
+                    .setEntityGraph(entityGraph)
+                    .getResultStream()
+                    .map(ActorEntity::toModelObject)
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    @Override
+    public ImmutableList<Actor> findAll() {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<ActorEntity> cq = cb.createQuery(ActorEntity.class);
+
+            Root<ActorEntity> actor = cq.from(ActorEntity.class);
+            cq.select(actor);
+
+            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
+
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityManager.createQuery(cq)
+                    .setEntityGraph(entityGraph)
+                    .getResultStream()
+                    .map(ActorEntity::toModelObject)
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    private static EntityGraph<ActorEntity> getActorEntityGraph() {
+        return ActorEntity_.class_.createEntityGraph();
+    }
+}
