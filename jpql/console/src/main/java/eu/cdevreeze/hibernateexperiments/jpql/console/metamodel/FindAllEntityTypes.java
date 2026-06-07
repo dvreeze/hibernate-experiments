@@ -19,8 +19,11 @@ package eu.cdevreeze.hibernateexperiments.jpql.console.metamodel;
 import module eu.cdevreeze.hibernateexperiments.jpql.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.metamodel.Attribute;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.Metamodel;
+
+import java.lang.annotation.Annotation;
 
 /**
  * Program finding all entity types.
@@ -46,15 +49,38 @@ public class FindAllEntityTypes {
                 IO.println(tpe.getPersistenceType());
                 IO.print("\tName: ");
                 IO.println(tpe.getName());
-                IO.print("\tJava class:");
+                IO.print("\tJava class: ");
                 IO.println(tpe.getBindableJavaType().getName());
                 IO.println("\tAttributes: ");
 
                 tpe.getAttributes().forEach(attr -> {
                     IO.print("\t\t");
                     IO.println(attr.toString());
+                    IO.println("\t\t\tName: " + attr.getName());
+                    IO.println("\t\t\tDeclaring type: " + attr.getDeclaringType());
+                    IO.println("\t\t\tJava type: " + attr.getJavaType());
+                    IO.println("\t\t\tJava member: " + attr.getJavaMember());
+                    IO.println("\t\t\tPersistent attribute type: " + attr.getPersistentAttributeType());
+                    IO.println("\t\t\tAssociation: " + attr.isAssociation());
+                    IO.println("\t\t\tCollection: " + attr.isCollection());
+                    printAnnotations(attr);
                 });
             });
+        }
+    }
+
+    private static void printAnnotations(Attribute<?, ?> attr) {
+        Member attrAsMember = attr.getJavaMember();
+        IO.println("\t\t\tAnnotations:");
+
+        if (attrAsMember instanceof Field attrField) {
+            for (Annotation annotation : attrField.getAnnotations()) {
+                IO.println("\t\t\t\tAnnotation: " + annotation);
+            }
+        } else if (attrAsMember instanceof Method attrMethod) {
+            for (Annotation annotation : attrMethod.getAnnotations()) {
+                IO.println("\t\t\t\tAnnotation: " + annotation);
+            }
         }
     }
 }
