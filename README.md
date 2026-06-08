@@ -224,20 +224,21 @@ This section is written with knowledge coming from tutorials like
 In the wild many projects using Hibernate/JPA suffer from shortcomings that lead to an explosion of
 generated SQL statements and/or difficulty reasoning about the code. Among the antipatterns commonly
 seen (in typical Hibernate projects using an `EntityManager`/`Session` rather than a `StatelessSession`) are:
-* Eager fetching of associations specified (explicitly or implicitly) at the entity level
+* *Eager fetching* of associations specified (explicitly or implicitly) at the entity level
   * This is especially problematic in a large complex deeply nested ("cyclic graph") domain model
   * If there is a mix of eagerly fetched associations going upward and downward in object graphs, much more data may be eagerly fetched than expected
   * Another complication in this regard may be recursive entity types, where entities refer to other entities of the same type (directly or indirectly)
   * In a Hibernate 8.0+ (JPA 4.0+) project, by all means, configure the default fetching for many-to-one and one-to-one associations to *lazy*
   * In a Hibernate 7.X (or lower) project, by all means, explicitly configure each many-to-one and one-to-one association to use *lazy* fetching
-* Failing to specify per-query fetching
+* Failing to specify *per-query fetching*
   * This can be subtle: entity methods may contain "business logic" depending on associations of that entity, thus somewhat hiding (eager/lazy) fetching behavior
   * JPA entities should rather be "Java representations of database table rows", without any business logic
   * It is the business logic (in a transactional "service layer") that should decide what data is needed, not the JPA entities
-* Going overboard with cascading of operations (specified at the entity level)
+  * Specifying fetching per query makes sense: we would do the same with native SQL, where we choose per query which tables are joined
+* Going overboard with *cascading* of operations (specified at the entity level)
 * Retrieving tons of entity fields in queries where simple (Java record) projections with only a few fields would suffice
   * Moreover, retrieving custom DTOs rather than (managed) entities helps avoid an explosion of generated SQL statements
-* Persistence contexts spanning multiple method calls (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
+* *Persistence contexts spanning multiple method calls* (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
   * Increasingly I find (mandatory) DAO layers behind the implementation of a transactional service layer problematic
   * After all, DAOs hide the *persistence context*, but the latter is (implicit) *program state* that we need to keep in mind instead of hide
   * In particular, sometimes we need to influence the persistence context through `EntityManager`/`Session` methods, or at least be able to reason about it
@@ -248,7 +249,8 @@ seen (in typical Hibernate projects using an `EntityManager`/`Session` rather th
   * In other words, such methods by themselves have *unclear semantics* and are therefore not very useful
   * If a transactional Hibernate `Session` spans a *deep call chain* of service methods and DAO methods, code maintainability really suffers
 * Overall: a mind set of wanting to see no SQL but just Java objects, leading to non-performant code in production
-  * Contrast this with development teams taking charge of the persistence layer, effectively using jOOQ or Hibernate, thus implementing performant maintainable business logic
+  * It looks so easy, and that is the pitfall: concise one-liner Java method call chains without considering the runtime costs (w.r.t. database and persistence context) and maintainability later on
+  * Contrast this with development teams taking charge of the persistence layer, effectively using jOOQ or Hibernate, thus implementing performant maintainable business logic, even if that requires more code
 
 Tutorials such as [common Hibernate mistakes crippling performance](https://thorben-janssen.com/common-hibernate-mistakes-cripple-performance/)
 warn against many of these antipatterns. Fortunately we can make Hibernate work for us rather than against us,
