@@ -228,7 +228,8 @@ seen (in typical Hibernate projects using an `EntityManager`/`Session` rather th
   * This is especially problematic in a large complex deeply nested ("cyclic graph") domain model
   * If there is a mix of eagerly fetched associations going upward and downward in object graphs, much more data may be eagerly fetched than expected
   * Another complication in this regard may be recursive entity types, where entities refer to other entities of the same type (directly or indirectly)
-  * In a Hibernate 8.0+ (JPA 4.0+) project, by all means, configure the default for many-to-one and one-to-one associations to *lazy*
+  * In a Hibernate 8.0+ (JPA 4.0+) project, by all means, configure the default fetching for many-to-one and one-to-one associations to *lazy*
+  * In a Hibernate 7.X (or lower) project, by all means, explicitly configure each many-to-one and one-to-one association to use *lazy* fetching
 * Failing to specify per-query fetching
   * This can be subtle: entity methods may contain "business logic" depending on associations of that entity, thus somewhat hiding (eager/lazy) fetching behavior
   * JPA entities should rather be "Java representations of database table rows", without any business logic
