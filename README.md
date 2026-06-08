@@ -218,18 +218,27 @@ Subproject *em-criteria* is like *criteria*, but using an `EntityManager`.
 
 ## A few words about Hibernate antipatterns
 
+This section is written with knowledge coming from tutorials like
+[common Hibernate mistakes crippling performance](https://thorben-janssen.com/common-hibernate-mistakes-cripple-performance/), combined with own experiences in production systems.
+
 In the wild many projects using Hibernate/JPA suffer from shortcomings that lead to an explosion of
 generated SQL statements and/or difficulty reasoning about the code. Among the antipatterns commonly
 seen (in typical Hibernate projects using an `EntityManager`/`Session` rather than a `StatelessSession`) are:
-* Eager fetching of associations specified (explicitly or implicitly) at the entity level, in a large complex deeply nested ("cyclic graph") domain model
+* Eager fetching of associations specified (explicitly or implicitly) at the entity level
+  * This is especially problematic in a large complex deeply nested ("cyclic graph") domain model
+  * If there is a mix of eagerly fetched associations going upward and downward in object graphs, much more data may be eagerly fetched than expected
+  * Another complication in this regard may be recursive entity types, where entities refer to other entities of the same type (directly or indirectly)
+  * In a Hibernate 8.0+ (JPA 4.0+) project, by all means, configure the default for many-to-one and one-to-one associations to *lazy*
 * Failing to specify per-query fetching
   * This can be subtle: entity methods may contain "business logic" depending on associations of that entity, thus somewhat hiding (eager/lazy) fetching behavior
+  * JPA entities should rather be "Java representations of database table rows", without any business logic
+  * It is the business logic (in a transactional "service layer") that should decide what data is needed, not the JPA entities
 * Going overboard with cascading of operations (specified at the entity level)
 * Retrieving tons of entity fields in queries where simple (Java record) projections with only a few fields would suffice
   * Moreover, retrieving custom DTOs rather than (managed) entities helps avoid an explosion of generated SQL statements
 * Persistence contexts spanning multiple method calls (including fine-grained "DAO calls"), thus making it hard to properly use the persistence context
   * Increasingly I find (mandatory) DAO layers behind the implementation of a transactional service layer problematic
-  * After all, DAOs hide the persistence context, but the latter is (implicit) program state that we need to keep in mind instead of hide
+  * After all, DAOs hide the *persistence context*, but the latter is (implicit) *program state* that we need to keep in mind instead of hide
   * In particular, sometimes we need to influence the persistence context through `EntityManager`/`Session` methods, or at least be able to reason about it
   * Yet unlike that DAO layer, the service layer itself should present itself through a technology-agnostic Java interface as API contract, hiding the use of JPA
 * "Transactional service" methods with entity parameters and side effects on those entities in the method body, leading to unclear semantics that heavily depends on the calling context
@@ -242,4 +251,4 @@ seen (in typical Hibernate projects using an `EntityManager`/`Session` rather th
 
 Tutorials such as [common Hibernate mistakes crippling performance](https://thorben-janssen.com/common-hibernate-mistakes-cripple-performance/)
 warn against many of these antipatterns. Fortunately we can make Hibernate work for us rather than against us,
-but it may take some time to "repair" a project using Hibernate in a non-performant way.
+but it may take quite some time to "repair" a project using Hibernate in a non-performant way.
