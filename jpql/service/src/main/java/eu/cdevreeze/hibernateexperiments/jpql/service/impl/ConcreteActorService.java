@@ -31,7 +31,6 @@ import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
  */
 public final class ConcreteActorService implements ActorService {
 
-    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
     // Yet it is not in the (current) JPA 4.0 API documentation.
     // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
 

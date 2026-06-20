@@ -28,6 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Alternative {@link AddressService} implementation that uses CTEs (and JSON result sets) internally.

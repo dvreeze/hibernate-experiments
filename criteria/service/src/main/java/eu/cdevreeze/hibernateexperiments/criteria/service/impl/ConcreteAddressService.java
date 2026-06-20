@@ -22,6 +22,7 @@ import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
+import org.hibernate.jpa.SpecHints;
 
 /**
  * Concrete {@link AddressService} implementation.
@@ -30,7 +31,6 @@ import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
  */
 public final class ConcreteAddressService implements AddressService {
 
-    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
     // Yet it is not in the (current) JPA 4.0 API documentation.
     // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
 
@@ -56,7 +56,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
@@ -79,7 +79,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -102,7 +102,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -124,7 +124,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -147,7 +147,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -169,7 +169,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

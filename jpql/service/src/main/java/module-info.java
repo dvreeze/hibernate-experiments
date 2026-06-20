@@ -24,6 +24,7 @@
 module eu.cdevreeze.hibernateexperiments.jpql.service {
     requires com.google.common;
     requires org.jspecify;
+    requires jakarta.annotation;
     requires jakarta.persistence;
     requires transitive eu.cdevreeze.hibernateexperiments.jpql.model;
     // Making explicit that Hibernate ORM is used as JPA implementation

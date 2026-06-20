@@ -115,7 +115,7 @@ public class FindAllCountriesLauncher {
                 "/org/glassfish/jaxb/jaxb-runtime/4.0.6/jaxb-runtime-4.0.6.jar",
                 "/org/glassfish/jaxb/txw2/4.0.6/txw2-4.0.6.jar",
                 "/org/hibernate/models/hibernate-models/1.0.1/hibernate-models-1.0.1.jar",
-                "/org/hibernate/orm/hibernate-core/8.0.0.Alpha1/hibernate-core-8.0.0.Alpha1.jar",
+                "/org/hibernate/orm/hibernate-core/8.0.0.Beta1/hibernate-core-8.0.0.Beta1.jar",
                 "/org/jboss/logging/jboss-logging/3.6.1.Final/jboss-logging-3.6.1.Final.jar",
                 "/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar",
                 "/org/postgresql/postgresql/42.7.11/postgresql-42.7.11.jar",

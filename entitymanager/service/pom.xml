@@ -82,7 +82,7 @@
                         <path>
                             <groupId>org.hibernate.orm</groupId>
                             <artifactId>hibernate-processor</artifactId>
-                            <version>8.0.0.Alpha1</version>
+                            <version>8.0.0.Beta1</version>
                         </path>
                     </annotationProcessorPaths>
                     <!-- This setting is required for the hibernate-processor dependencies to

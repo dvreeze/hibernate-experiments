@@ -22,6 +22,7 @@ import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
+import org.hibernate.jpa.SpecHints;
 
 /**
  * Concrete {@link AddressService} implementation.
@@ -30,7 +31,6 @@ import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
  */
 public final class ConcreteAddressService implements AddressService {
 
-    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
     // Yet it is not in the (current) JPA 4.0 API documentation.
     // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
 
@@ -51,7 +51,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -70,7 +70,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -89,7 +89,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -108,7 +108,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -126,7 +126,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, CityEntity.class)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -145,7 +145,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, CountryEntity.class)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

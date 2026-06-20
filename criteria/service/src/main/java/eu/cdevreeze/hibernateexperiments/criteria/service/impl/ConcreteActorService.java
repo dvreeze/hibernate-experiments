@@ -25,6 +25,7 @@ import eu.cdevreeze.hibernateexperiments.criteria.entity.ActorEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity_;
 import eu.cdevreeze.hibernateexperiments.criteria.service.ActorService;
+import org.hibernate.jpa.SpecHints;
 
 /**
  * Concrete {@link ActorService} implementation.
@@ -33,7 +34,6 @@ import eu.cdevreeze.hibernateexperiments.criteria.service.ActorService;
  */
 public final class ConcreteActorService implements ActorService {
 
-    // TODO Method TypedQuery.setEntityGraph confuses me. It is in the (current) JPA 4.0 spec.
     // Yet it is not in the (current) JPA 4.0 API documentation.
     // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
 
@@ -59,7 +59,7 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .findFirst();
@@ -87,7 +87,7 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -109,7 +109,7 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setEntityGraph(entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
