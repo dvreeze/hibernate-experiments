@@ -62,12 +62,12 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .collect(ImmutableList.toImmutableList());
@@ -77,8 +77,8 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
@@ -87,7 +87,7 @@ public final class ConcreteFilmService implements FilmService {
             // There was no where clause before, so no "restriction" gets lost
             resultQuery.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .findFirst();
@@ -97,8 +97,8 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
@@ -112,7 +112,7 @@ public final class ConcreteFilmService implements FilmService {
             // There was no where clause before, so no "restriction" gets lost
             resultQuery.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .collect(ImmutableList.toImmutableList());

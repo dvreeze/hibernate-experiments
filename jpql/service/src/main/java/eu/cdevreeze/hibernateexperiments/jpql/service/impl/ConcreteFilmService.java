@@ -77,21 +77,21 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Hibernate HQL, which extends JPQL
             // Beautiful: no JPQL/HQL String concatenation!
             // Instead, turning the HQL into a criteria query, adding a where clause in a type-safe way!
             // See https://www.baeldung.com/hibernate-criteria-queries
             // Soon this will be part of JPA 4.0! See https://in.relation.to/2026/04/23/JPA-4-M2/
 
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
             JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
 
             JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
 
             cq.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
 
-            return entityAgent.createQuery(cq)
+            return statelessSession.createQuery(cq)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .findFirst();
@@ -101,14 +101,14 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Hibernate HQL, which extends JPQL
             // Beautiful: no JPQL/HQL String concatenation!
             // Instead, turning the HQL into a criteria query, adding a where clause in a type-safe way!
             // See https://www.baeldung.com/hibernate-criteria-queries
             // Soon this will be part of JPA 4.0! See https://in.relation.to/2026/04/23/JPA-4-M2/
 
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
             JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
 
             JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
@@ -120,7 +120,7 @@ public final class ConcreteFilmService implements FilmService {
 
             cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
-            return entityAgent.createQuery(cq)
+            return statelessSession.createQuery(cq)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
                     .collect(ImmutableList.toImmutableList());

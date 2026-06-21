@@ -53,10 +53,10 @@ public final class AlternativeAddressService implements AddressService {
     @Override
     public Optional<Address> findById(long id) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -68,7 +68,7 @@ public final class AlternativeAddressService implements AddressService {
 
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .findFirst();
@@ -78,10 +78,10 @@ public final class AlternativeAddressService implements AddressService {
     @Override
     public ImmutableList<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -93,7 +93,7 @@ public final class AlternativeAddressService implements AddressService {
 
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
@@ -103,10 +103,10 @@ public final class AlternativeAddressService implements AddressService {
     @Override
     public ImmutableList<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -118,7 +118,7 @@ public final class AlternativeAddressService implements AddressService {
 
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
@@ -128,10 +128,10 @@ public final class AlternativeAddressService implements AddressService {
     @Override
     public ImmutableList<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
             JpaRoot<AddressEntity> address = cq.from(AddressEntity.class);
@@ -142,7 +142,7 @@ public final class AlternativeAddressService implements AddressService {
 
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
-            return entityAgent.createQuery(resultQuery)
+            return statelessSession.createQuery(resultQuery)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
@@ -152,10 +152,10 @@ public final class AlternativeAddressService implements AddressService {
     @Override
     public ImmutableList<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cteCq = cb.createQuery(Tuple.class);
             JpaRoot<CityEntity> city = cteCq.from(CityEntity.class);
@@ -190,7 +190,7 @@ public final class AlternativeAddressService implements AddressService {
                     )
             );
 
-            return entityAgent.createQuery(cq)
+            return statelessSession.createQuery(cq)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, City.class))
                     .collect(ImmutableList.toImmutableList());
@@ -200,10 +200,10 @@ public final class AlternativeAddressService implements AddressService {
     @Override
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
             // Think of the CTE itself as just another table, whether materialized or not
-            HibernateCriteriaBuilder cb = entityAgent.unwrap(StatelessSession.class).getCriteriaBuilder();
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
 
             JpaCriteriaQuery<Tuple> cteCq = cb.createQuery(Tuple.class);
             JpaRoot<CountryEntity> country = cteCq.from(CountryEntity.class);
@@ -226,7 +226,7 @@ public final class AlternativeAddressService implements AddressService {
                     )
             );
 
-            return entityAgent.createQuery(cq)
+            return statelessSession.createQuery(cq)
                     .getResultStream()
                     .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());
