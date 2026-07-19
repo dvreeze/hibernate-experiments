@@ -38,7 +38,7 @@ public class EntityManagerFactories {
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:postgresql://localhost:5432/pagila")
                 .property(Persistence.ConnectionProperties.JDBC_USER, "postgres")
                 .property(Persistence.ConnectionProperties.JDBC_PASSWORD, "postgres") // don't do this in production!
-                .property(Persistence.SchemaManagementProperties.SCHEMAGEN_DATABASE_ACTION, "validate")
+                .schemaManagementDatabaseAction(SchemaManagementAction.VALIDATE)
                 .createEntityManagerFactory();
     }
 }
