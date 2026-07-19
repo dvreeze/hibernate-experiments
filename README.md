@@ -112,12 +112,13 @@ To run (non-test) code in this project (i.e. the console programs), first make s
 PostgreSQL Docker container with the Pagila database can also be found at
 [Pagila sample database](https://github.com/devrimgunduz/pagila).
 
-Most unit tests use [Testcontainers](https://testcontainers.com/), in particular
+Some unit tests use [Testcontainers](https://testcontainers.com/), in particular
 the [Postgres Module](https://java.testcontainers.org/modules/databases/postgres/). This requires only
-a Docker installation, which is required in any case, as mentioned above.
+a Docker installation, which is required in any case, as mentioned above. Other unit tests use an
+embedded [H2 database](https://www.h2database.com/html/main.html).
 
 In the remainder of this "readme" file the Pagila database setup will not be mentioned anymore,
-so please keep this necessary prerequisite in mind.
+so please keep this necessary prerequisite (of Testcontainers requiring Docker) in mind.
 
 Another requirement is a [Java 25 JDK](https://www.oracle.com/java/technologies/downloads/#java25).
 Consider using [sdkman](https://sdkman.io/) for managing local JDK installations.
