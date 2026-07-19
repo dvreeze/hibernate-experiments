@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.emcriteria.service.impl;
+package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
-import eu.cdevreeze.hibernateexperiments.emcriteria.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.emcriteria.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.emcriteria.entity.CountryEntity;
-import eu.cdevreeze.hibernateexperiments.emcriteria.model.Address;
-import eu.cdevreeze.hibernateexperiments.emcriteria.model.City;
-import eu.cdevreeze.hibernateexperiments.emcriteria.model.Country;
-import eu.cdevreeze.hibernateexperiments.emcriteria.service.AddressService;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
+import eu.cdevreeze.hibernateexperiments.jpql.model.City;
+import eu.cdevreeze.hibernateexperiments.jpql.model.Country;
+import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.Instant;
 import java.util.List;
@@ -38,26 +37,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit test of {@link ConcreteAddressService}.
+ * Unit test of {@link ConcreteAddressService}, using an embedded H2 database.
  *
  * @author Chris de Vreeze
  */
-class ConcreteAddressServiceTest {
-
-    private static final PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>("postgres:18-alpine")
-                    .withInitScript("create-test-database.sql");
+class ConcreteAddressServiceH2Test {
 
     private static EntityManagerFactory emf;
 
     @BeforeAll
     static void beforeAll() {
-        postgreSQLContainer.start();
-        emf = createEntityManagerFactory(
-                postgreSQLContainer.getJdbcUrl(),
-                postgreSQLContainer.getUsername(),
-                postgreSQLContainer.getPassword()
-        );
+        emf = createEntityManagerFactory();
         fillInitialTestData(emf);
     }
 
@@ -65,7 +55,6 @@ class ConcreteAddressServiceTest {
     static void afterAll() {
         if (emf != null) {
             emf.close();
-            postgreSQLContainer.stop();
         }
     }
 
@@ -108,17 +97,15 @@ class ConcreteAddressServiceTest {
         assertTrue(countries.stream().anyMatch(c -> c.country().equals("Russian Federation")));
     }
 
-    private static EntityManagerFactory createEntityManagerFactory(String jdbcUrl, String username, String password) {
-        String persistenceUnitName = "pagilatest";
+    private static EntityManagerFactory createEntityManagerFactory() {
+        String persistenceUnitName = "pagilatestH2";
         return new PersistenceConfiguration(persistenceUnitName)
                 .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
                 .defaultToOneFetchType(FetchType.LAZY)
                 .provider("org.hibernate.jpa.HibernatePersistenceProvider")
-                .property(PersistenceConfiguration.JDBC_DRIVER, "org.postgresql.Driver") // no connection pooling
-                .property(Persistence.ConnectionProperties.JDBC_URL, jdbcUrl)
-                .property(Persistence.ConnectionProperties.JDBC_USER, username)
-                .property(Persistence.ConnectionProperties.JDBC_PASSWORD, password)
-                .property(Persistence.SchemaManagementProperties.SCHEMAGEN_DATABASE_ACTION, "validate")
+                .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
+                .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
+                .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)

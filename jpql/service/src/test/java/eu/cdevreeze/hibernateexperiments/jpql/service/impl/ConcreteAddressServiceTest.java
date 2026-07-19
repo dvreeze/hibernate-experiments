@@ -112,7 +112,7 @@ class ConcreteAddressServiceTest {
         String persistenceUnitName = "pagilatest";
         return new PersistenceConfiguration(persistenceUnitName)
                 .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
-                .defaultToOneFetchType(FetchType.LAZY) // although we have no entities here
+                .defaultToOneFetchType(FetchType.LAZY)
                 .provider("org.hibernate.jpa.HibernatePersistenceProvider")
                 .property(PersistenceConfiguration.JDBC_DRIVER, "org.postgresql.Driver") // no connection pooling
                 .property(Persistence.ConnectionProperties.JDBC_URL, jdbcUrl)
