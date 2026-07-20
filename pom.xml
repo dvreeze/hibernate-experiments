@@ -44,6 +44,7 @@
         <module>criteria</module>
         <module>entitymanager</module>
         <module>em-criteria</module>
+        <module>repository</module>
     </modules>
 
     <dependencyManagement>
@@ -52,6 +53,11 @@
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>8.0.0.Beta1</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.data</groupId>
+                <artifactId>jakarta.data-api</artifactId>
+                <version>1.1.0-M3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
