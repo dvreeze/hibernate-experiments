@@ -218,7 +218,18 @@ Subproject *entitymanager* is like *jpql*, but using an `EntityManager`.
 
 Subproject *em-criteria* is like *criteria*, but using an `EntityManager`.
 
-Subproject *repository* is like *jpql*, but using Jakarta Data repositories.
+Subproject *repository* is like *jpql*, but using Jakarta Data Repositories. It takes compile-time
+type-safety in Hibernate querying quite far, while generating boring "JPA boilerplate code". Queries are
+string literal values of annotations that are parsed at compile-time by the Hibernate annotation
+processor. That is, JDQL parsing errors are found at compile-time! Repositories are Java interfaces with
+annotated abstract methods; implementations of those interfaces are compile-time generated readable
+classes that add the `EntityAgent`/`EntityManager` boilerplate that we used to write by hand.
+
+It has become easier than ever to keep Java code using Hibernate/JPA up-to-date with a changing database
+schema. Most subprojects in this repository bootstrap Hibernate in such a way that the database schema
+is checked against the Hibernate entities etc. Hence, inconsistencies between database schema and
+Hibernate's metamodel are found very quickly. Combine this with the above-mentioned compile-time processing
+of Jakarta Data Repositories, and we get quite a good development experience with (modern) Hibernate.
 
 ## A few words about Hibernate antipatterns
 
