@@ -74,8 +74,8 @@ JPA 4.0 seems to finally rectify this.
 Summarized: this project is not just about experimenting with a modern Hibernate ORM, but also about
 how to combine that with functional programming techniques.
 
-Most of these subprojects do not lean heavily on Java annotations, in order to have a better feel
-for what is happening at runtime.
+Most of these subprojects do not lean heavily on Java annotations other than JPA annotations (mostly on entities),
+in order to have a better feel for what is happening at runtime.
 
 ## Using Java Modules
 
