@@ -50,7 +50,6 @@ public interface FilmRepository {
     }
 
     default List<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
         return findAllFilmsWithActorsAndCategoriesAsJson()
                 .stream()
                 .map(v -> jsonMapper().readValue(v, Film.WithActorsAndCategories.class))
@@ -77,6 +76,7 @@ public interface FilmRepository {
     // HQL annotation not yet working here. Needs to use system property "hibernate.query.hql.json_functions_enabled".
     // @HQL(FIND_BY_ACTOR_ID_QL_STRING)
     default List<String> findFilmsWithActorsAndCategoriesByActorIdAsJson(long actorId) {
+        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
         return entityAgent()
                 .createQuery(FIND_BY_ACTOR_ID_QL_STRING, String.class)
                 .setParameter("actorId", actorId)
