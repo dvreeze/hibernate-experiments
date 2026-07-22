@@ -41,4 +41,6 @@ public interface AddressService {
     ImmutableList<City> findCitiesByCountryId(long countryId);
 
     ImmutableList<Country> findAllCountries();
+
+    Address add(Address.NewAddress address);
 }
