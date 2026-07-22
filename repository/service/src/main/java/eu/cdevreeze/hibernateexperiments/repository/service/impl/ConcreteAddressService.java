@@ -108,4 +108,25 @@ public final class ConcreteAddressService implements AddressService {
                     .collect(ImmutableList.toImmutableList());
         });
     }
+
+    @Override
+    public Address add(Address.NewAddress address) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            AddressRepository addressRepository = new _AddressRepository(entityAgent);
+            CityEntity cityEntity = addressRepository.findCityById((int) address.cityId()).orElseThrow();
+
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setAddress(address.address1());
+            addressEntity.setAddress2(address.address2());
+            addressEntity.setDistrict(address.district());
+            addressEntity.setCity(cityEntity);
+            addressEntity.setPostalCode(address.postalCode());
+            addressEntity.setPhone(address.phone());
+            addressEntity.setLastUpdate(address.lastUpdate());
+
+            addressEntity = addressRepository.add(addressEntity);
+            return addressEntity.toModelObject();
+        });
+    }
 }

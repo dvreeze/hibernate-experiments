@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test of {@link ConcreteAddressService}, using an embedded H2 database.
@@ -95,6 +94,40 @@ class ConcreteAddressServiceH2Test {
         List<Country> countries = addressService.findAllCountries();
 
         assertTrue(countries.stream().anyMatch(c -> c.country().equals("Russian Federation")));
+    }
+
+    @Test
+    void testAddAddress() {
+        AddressService addressService = new ConcreteAddressService(emf);
+
+        try {
+            Address.NewAddress newAddress = new Address.NewAddress(
+                    "250 Ulitsa Kirovo",
+                    null,
+                    "Yaroslavl",
+                    235, // Yaroslavl
+                    "41777",
+                    "904253967172",
+                    Instant.now()
+            );
+
+            Address address = addressService.add(newAddress);
+
+            assertNotNull(address);
+            assertEquals("250 Ulitsa Kirovo", address.address1());
+            assertNull(address.address2());
+            assertEquals("Yaroslavl", address.district());
+            assertEquals(235L, address.city().id());
+            assertEquals("41777", address.postalCode());
+            assertEquals("904253967172", address.phone());
+        } finally {
+            // Undo insert
+            emf.runInTransaction(EntityAgent.class, entityAgent -> {
+                entityAgent.createQuery("delete from Address where city.id = 235 and address = '250 Ulitsa Kirovo'")
+                        .asStatement()
+                        .execute();
+            });
+        }
     }
 
     private static EntityManagerFactory createEntityManagerFactory() {

@@ -21,6 +21,7 @@ import eu.cdevreeze.hibernateexperiments.repository.entity.AddressEntity;
 import eu.cdevreeze.hibernateexperiments.repository.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.repository.entity.CountryEntity;
 import jakarta.data.repository.Find;
+import jakarta.data.repository.Insert;
 import jakarta.data.repository.Repository;
 import jakarta.persistence.EntityAgent;
 import org.hibernate.annotations.processing.HQL;
@@ -55,6 +56,13 @@ public interface AddressRepository {
     @HQL("select ci from City ci join fetch ci.country co where co.id = :countryId")
     List<CityEntity> findCitiesByCountryId(Integer countryId);
 
+    // Query annotation not yet working as advertised?
+    @HQL("select ci from City ci join fetch ci.country co where ci.id = :id")
+    Optional<CityEntity> findCityById(Integer id);
+
     @Find
     List<CountryEntity> findAllCountries();
+
+    @Insert
+    AddressEntity add(AddressEntity address);
 }
