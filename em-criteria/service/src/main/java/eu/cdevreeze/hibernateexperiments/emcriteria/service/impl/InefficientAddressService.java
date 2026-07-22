@@ -22,6 +22,7 @@ import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emcriteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.emcriteria.service.AddressService;
+import org.hibernate.jpa.SpecHints;
 
 /**
  * The same as {@link ConcreteAddressService}, except for the absence of {@link EntityGraph}'s.
@@ -174,9 +175,14 @@ public final class InefficientAddressService implements AddressService {
         cq.where(cb.equal(city.get(CityEntity_.id), cityId));
         cq.select(city);
 
+        // Here we do set the load graph
+        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
+        entityGraph.addAttributeNode(CityEntity_.country);
+
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(cq)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                 .getSingleResult();
     }
 }

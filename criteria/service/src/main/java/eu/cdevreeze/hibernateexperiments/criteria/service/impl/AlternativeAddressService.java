@@ -233,6 +233,44 @@ public final class AlternativeAddressService implements AddressService {
         });
     }
 
+    @Override
+    public Address add(Address.NewAddress address) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            CityEntity cityEntity = findCityEntityById((int) address.cityId(), entityAgent);
+
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setAddress(address.address1());
+            addressEntity.setAddress2(address.address2());
+            addressEntity.setDistrict(address.district());
+            addressEntity.setCity(cityEntity);
+            addressEntity.setPostalCode(address.postalCode());
+            addressEntity.setPhone(address.phone());
+            addressEntity.setLastUpdate(address.lastUpdate());
+
+            entityAgent.insert(addressEntity);
+            return addressEntity.toModelObject();
+        });
+    }
+
+    private CityEntity findCityEntityById(int cityId, EntityAgent entityAgent) {
+        CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+        CriteriaQuery<CityEntity> cq = cb.createQuery(CityEntity.class);
+
+        Root<CityEntity> city = cq.from(CityEntity.class);
+        cq.where(cb.equal(city.get(CityEntity_.id), cityId));
+        cq.select(city);
+
+        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
+        entityGraph.addAttributeNode(CityEntity_.country);
+
+        // This sets the load graph, not the fetch graph
+        // Yet that makes no difference here since we configured lazy fetching for all entity associations
+        return entityAgent.createQuery(cq)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                .getSingleResult();
+    }
+
     private JpaCriteriaQuery<Tuple> createAddressTupleSelectClause(
             HibernateCriteriaBuilder cb,
             JpaCriteriaQuery<Tuple> cq,
