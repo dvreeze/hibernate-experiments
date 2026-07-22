@@ -42,4 +42,15 @@ public record Address(
     public Optional<String> postalCodeOption() {
         return Optional.ofNullable(postalCode);
     }
+
+    public record NewAddress(
+            String address1,
+            @Nullable String address2,
+            String district,
+            long cityId,
+            @Nullable String postalCode,
+            String phone,
+            Instant lastUpdate
+    ) {
+    }
 }

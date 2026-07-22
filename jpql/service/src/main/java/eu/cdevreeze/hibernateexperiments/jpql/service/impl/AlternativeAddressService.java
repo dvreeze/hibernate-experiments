@@ -20,6 +20,8 @@ import module eu.cdevreeze.hibernateexperiments.jpql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
@@ -282,5 +284,33 @@ public final class AlternativeAddressService implements AddressService {
                     .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());
         });
+    }
+
+    @Override
+    public Address add(Address.NewAddress address) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            CityEntity cityEntity = findCityEntityById((int) address.cityId(), entityAgent);
+
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setAddress(address.address1());
+            addressEntity.setAddress2(address.address2());
+            addressEntity.setDistrict(address.district());
+            addressEntity.setCity(cityEntity);
+            addressEntity.setPostalCode(address.postalCode());
+            addressEntity.setPhone(address.phone());
+            addressEntity.setLastUpdate(address.lastUpdate());
+
+            entityAgent.insert(addressEntity);
+            return addressEntity.toModelObject();
+        });
+    }
+
+    private CityEntity findCityEntityById(int cityId, EntityAgent entityAgent) {
+        String qlString = "select ci from City ci join fetch ci.country co where ci.id = :id";
+
+        return entityAgent.createQuery(qlString, CityEntity.class)
+                .setParameter("id", cityId)
+                .getSingleResult();
     }
 }
