@@ -44,6 +44,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 abstract class AbstractAddressServiceH2Test {
 
+    static {
+        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
+    }
+
     private static EntityManagerFactory emf;
 
     protected abstract AddressService addressService(EntityManagerFactory emf);
