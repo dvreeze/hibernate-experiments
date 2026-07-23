@@ -20,6 +20,8 @@ import module eu.cdevreeze.hibernateexperiments.entitymanager.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Address;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.City;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Country;
@@ -285,5 +287,33 @@ public final class AlternativeAddressService implements AddressService {
                     .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());
         });
+    }
+
+    @Override
+    public Address add(Address.NewAddress address) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            CityEntity cityEntity = findCityEntityById((int) address.cityId(), entityManager);
+
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setAddress(address.address1());
+            addressEntity.setAddress2(address.address2());
+            addressEntity.setDistrict(address.district());
+            addressEntity.setCity(cityEntity);
+            addressEntity.setPostalCode(address.postalCode());
+            addressEntity.setPhone(address.phone());
+            addressEntity.setLastUpdate(address.lastUpdate());
+
+            entityManager.persist(addressEntity);
+            return addressEntity.toModelObject();
+        });
+    }
+
+    private CityEntity findCityEntityById(int cityId, EntityManager entityManager) {
+        String qlString = "select ci from City ci join fetch ci.country co where ci.id = :id";
+
+        return entityManager.createQuery(qlString, CityEntity.class)
+                .setParameter("id", cityId)
+                .getSingleResult();
     }
 }

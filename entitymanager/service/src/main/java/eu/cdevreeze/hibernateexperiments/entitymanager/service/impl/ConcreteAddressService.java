@@ -155,6 +155,34 @@ public final class ConcreteAddressService implements AddressService {
         });
     }
 
+    @Override
+    public Address add(Address.NewAddress address) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            CityEntity cityEntity = findCityEntityById((int) address.cityId(), entityManager);
+
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setAddress(address.address1());
+            addressEntity.setAddress2(address.address2());
+            addressEntity.setDistrict(address.district());
+            addressEntity.setCity(cityEntity);
+            addressEntity.setPostalCode(address.postalCode());
+            addressEntity.setPhone(address.phone());
+            addressEntity.setLastUpdate(address.lastUpdate());
+
+            entityManager.persist(addressEntity);
+            return addressEntity.toModelObject();
+        });
+    }
+
+    private CityEntity findCityEntityById(int cityId, EntityManager entityManager) {
+        String qlString = "select ci from City ci join fetch ci.country co where ci.id = :id";
+
+        return entityManager.createQuery(qlString, CityEntity.class)
+                .setParameter("id", cityId)
+                .getSingleResult();
+    }
+
     private EntityGraph<AddressEntity> getAddressEntityGraph() {
         EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
 
