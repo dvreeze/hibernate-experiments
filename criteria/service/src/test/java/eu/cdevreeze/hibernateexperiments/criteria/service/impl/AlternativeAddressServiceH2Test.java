@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.criteria.console;
+package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 
-import module eu.cdevreeze.hibernateexperiments.criteria.service;
-import module java.base;
+import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Program finding all addresses in the database inefficiently.
+ * Unit test of {@link AlternativeAddressService}, using an embedded H2 database.
  *
  * @author Chris de Vreeze
  */
-public class FindAllAddressesInefficiently {
+class AlternativeAddressServiceH2Test extends AbstractAddressServiceH2Test {
 
-    static void main(String... args) {
-        try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            AddressService addressService = InefficientAddressServiceFactory.create(emf);
-
-            List<Address> addresses = addressService.findAll();
-
-            addresses.forEach(IO::println);
-        }
+    @Override
+    protected AddressService addressService(EntityManagerFactory emf) {
+        return new AlternativeAddressService(emf);
     }
 }

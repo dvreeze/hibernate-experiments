@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.criteria.service.factory;
+package eu.cdevreeze.hibernateexperiments.emcriteria.service.impl;
 
-import module java.base;
-import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
-import eu.cdevreeze.hibernateexperiments.criteria.service.impl.InefficientAddressService;
+import eu.cdevreeze.hibernateexperiments.emcriteria.service.AddressService;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Factory of {@link InefficientAddressService} objects.
+ * Unit test of {@link AlternativeAddressServiceH2Test}, using an embedded H2 database.
  *
  * @author Chris de Vreeze
  */
-public final class InefficientAddressServiceFactory {
+class AlternativeAddressServiceH2Test extends AbstractAddressServiceH2Test {
 
-    private InefficientAddressServiceFactory() {
-        // Non-instantiable
-    }
-
-    public static AddressService create(EntityManagerFactory emf) {
-        return new InefficientAddressService(emf);
+    @Override
+    protected AddressService addressService(EntityManagerFactory emf) {
+        return new AlternativeAddressService(emf);
     }
 }

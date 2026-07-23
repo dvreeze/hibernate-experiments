@@ -16,184 +16,18 @@
 
 package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 
-import eu.cdevreeze.hibernateexperiments.criteria.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CountryEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Address;
-import eu.cdevreeze.hibernateexperiments.criteria.model.City;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Country;
 import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
-import jakarta.persistence.*;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
  * Unit test of {@link ConcreteAddressService}, using an embedded H2 database.
  *
  * @author Chris de Vreeze
  */
-class ConcreteAddressServiceH2Test {
+class ConcreteAddressServiceH2Test extends AbstractAddressServiceH2Test {
 
-    private static EntityManagerFactory emf;
-
-    @BeforeAll
-    static void beforeAll() {
-        emf = createEntityManagerFactory();
-        fillInitialTestData(emf);
-    }
-
-    @AfterAll
-    static void afterAll() {
-        if (emf != null) {
-            emf.close();
-        }
-    }
-
-    @Test
-    void testFindAllAddresses() {
-        AddressService addressService = new ConcreteAddressService(emf);
-
-        List<Address> addresses = addressService.findAll();
-
-        assertEquals(2, addresses.size());
-        assertEquals(
-                Set.of("Moscow", "Jaroslavl"),
-                addresses.stream().map(Address::city).map(City::city).collect(Collectors.toSet())
-        );
-        assertEquals(
-                Set.of("23616", "73431"),
-                addresses.stream().map(Address::postalCode).collect(Collectors.toSet())
-        );
-    }
-
-    @Test
-    void testFindCitiesByCountry() {
-        AddressService addressService = new ConcreteAddressService(emf);
-
-        long countryId = 80L;
-        List<City> cities = addressService.findCitiesByCountryId(countryId);
-
-        assertEquals(
-                Set.of("Moscow", "Jaroslavl", "Ivanovo"),
-                cities.stream().map(City::city).collect(Collectors.toSet())
-        );
-    }
-
-    @Test
-    void testFindAllCountries() {
-        AddressService addressService = new ConcreteAddressService(emf);
-
-        List<Country> countries = addressService.findAllCountries();
-
-        assertTrue(countries.stream().anyMatch(c -> c.country().equals("Russian Federation")));
-    }
-
-    @Test
-    void testAddAddress() {
-        AddressService addressService = new ConcreteAddressService(emf);
-
-        try {
-            Address.NewAddress newAddress = new Address.NewAddress(
-                    "250 Ulitsa Kirovo",
-                    null,
-                    "Yaroslavl",
-                    235, // Yaroslavl
-                    "41777",
-                    "904253967172",
-                    Instant.now()
-            );
-
-            Address address = addressService.add(newAddress);
-
-            assertNotNull(address);
-            assertEquals("250 Ulitsa Kirovo", address.address1());
-            assertNull(address.address2());
-            assertEquals("Yaroslavl", address.district());
-            assertEquals(235L, address.city().id());
-            assertEquals("41777", address.postalCode());
-            assertEquals("904253967172", address.phone());
-        } finally {
-            // Undo insert
-            emf.runInTransaction(EntityAgent.class, entityAgent -> {
-                entityAgent.createQuery("delete from Address where city.id = 235 and address = '250 Ulitsa Kirovo'")
-                        .asStatement()
-                        .execute();
-            });
-        }
-    }
-
-    private static EntityManagerFactory createEntityManagerFactory() {
-        String persistenceUnitName = "pagilatestH2";
-        return new PersistenceConfiguration(persistenceUnitName)
-                .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
-                .defaultToOneFetchType(FetchType.LAZY)
-                .provider("org.hibernate.jpa.HibernatePersistenceProvider")
-                .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
-                .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
-                .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
-                .managedClass(AddressEntity.class)
-                .managedClass(CityEntity.class)
-                .managedClass(CountryEntity.class)
-                .createEntityManagerFactory();
-    }
-
-    private static void fillInitialTestData(EntityManagerFactory emf) {
-        emf.runInTransaction(EntityAgent.class, eh -> {
-            CountryEntity countryEntity = new CountryEntity();
-            countryEntity.setId(80);
-            countryEntity.setCountry("Russian Federation");
-            countryEntity.setLastUpdate(Instant.now());
-            eh.upsert(countryEntity);
-
-            CityEntity ivanovo = new CityEntity();
-            ivanovo.setId(225);
-            ivanovo.setCity("Ivanovo");
-            ivanovo.setCountry(countryEntity);
-            ivanovo.setLastUpdate(Instant.now());
-            eh.upsert(ivanovo);
-
-            CityEntity jaroslavl = new CityEntity();
-            jaroslavl.setId(235);
-            jaroslavl.setCity("Jaroslavl");
-            jaroslavl.setCountry(countryEntity);
-            jaroslavl.setLastUpdate(Instant.now());
-            eh.upsert(jaroslavl);
-
-            CityEntity moscow = new CityEntity();
-            moscow.setId(343);
-            moscow.setCity("Moscow");
-            moscow.setCountry(countryEntity);
-            moscow.setLastUpdate(Instant.now());
-            eh.upsert(moscow);
-
-            AddressEntity address1 = new AddressEntity();
-            address1.setId(50);
-            address1.setAddress("46 Pjatigorsk Lane");
-            address1.setCity(moscow);
-            address1.setDistrict("Moscow (City)");
-            address1.setPostalCode("23616");
-            address1.setPhone("262076994845");
-            address1.setLastUpdate(Instant.now());
-            eh.upsert(address1);
-
-            AddressEntity address2 = new AddressEntity();
-            address2.setId(226);
-            address2.setAddress("810 Palghat (Palakkad) Boulevard");
-            address2.setCity(jaroslavl);
-            address2.setDistrict("Jaroslavl");
-            address2.setPostalCode("73431");
-            address2.setPhone("516331171356");
-            address2.setLastUpdate(Instant.now());
-            eh.upsert(address2);
-        });
+    @Override
+    protected AddressService addressService(EntityManagerFactory emf) {
+        return new ConcreteAddressService(emf);
     }
 }

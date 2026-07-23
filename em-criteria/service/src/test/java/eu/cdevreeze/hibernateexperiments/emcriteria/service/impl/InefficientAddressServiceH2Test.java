@@ -20,14 +20,14 @@ import eu.cdevreeze.hibernateexperiments.emcriteria.service.AddressService;
 import jakarta.persistence.EntityManagerFactory;
 
 /**
- * Unit test of {@link ConcreteAddressService}, using an embedded H2 database.
+ * Unit test of {@link InefficientAddressService}, using an embedded H2 database.
  *
  * @author Chris de Vreeze
  */
-class ConcreteAddressServiceH2Test extends AbstractAddressServiceH2Test {
+class InefficientAddressServiceH2Test extends AbstractAddressServiceH2Test {
 
     @Override
     protected AddressService addressService(EntityManagerFactory emf) {
-        return new ConcreteAddressService(emf);
+        return new InefficientAddressService(emf);
     }
 }
