@@ -36,7 +36,8 @@ public interface AddressRepository {
 
     EntityAgent entityAgent(); // Just in case we need it
 
-    @Find
+    // Query annotation not yet working as advertised?
+    @HQL("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = :id")
     Optional<AddressEntity> findById(Integer id);
 
     // Query annotation not yet working as advertised?
