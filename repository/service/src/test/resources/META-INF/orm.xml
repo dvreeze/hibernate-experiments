@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
+          https://jakarta.ee/xml/ns/persistence/orm/orm_4_0.xsd" version="4.0">
+    <!-- Entity overrides needed to generate H2 (test) schema from entity definitions -->
+    <entity class="eu.cdevreeze.hibernateexperiments.repository.entity.LanguageEntity">
+        <attribute-override name="name">
+            <column column-definition="text"/>
+        </attribute-override>
+    </entity>
+    <entity class="eu.cdevreeze.hibernateexperiments.repository.entity.FilmEntity">
+        <attribute-override name="releaseYear">
+            <column name="release_year" column-definition="integer"/>
+        </attribute-override>
+    </entity>
+</entity-mappings>

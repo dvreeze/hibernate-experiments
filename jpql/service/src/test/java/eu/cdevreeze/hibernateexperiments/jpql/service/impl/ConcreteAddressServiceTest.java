@@ -118,7 +118,8 @@ class ConcreteAddressServiceTest {
                 .property(Persistence.ConnectionProperties.JDBC_URL, jdbcUrl)
                 .property(Persistence.ConnectionProperties.JDBC_USER, username)
                 .property(Persistence.ConnectionProperties.JDBC_PASSWORD, password)
-                .property(Persistence.SchemaManagementProperties.SCHEMAGEN_DATABASE_ACTION, "validate")
+                // No validation, due to overrides in orm.xml meant for generated H2 schema
+                .schemaManagementDatabaseAction(SchemaManagementAction.NONE)
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)

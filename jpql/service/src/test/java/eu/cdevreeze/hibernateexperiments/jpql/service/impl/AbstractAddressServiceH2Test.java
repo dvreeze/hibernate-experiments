@@ -17,9 +17,7 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
 import eu.cdevreeze.hibernateexperiments.jpql.model.City;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Country;
