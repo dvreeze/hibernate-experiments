@@ -15,7 +15,8 @@
  */
 
 /**
- * Module descriptor of the immutable data model.
+ * Module descriptor of the immutable data model. This module enforces the property that the data model
+ * does not depend on any services and/or "infrastructure objects".
  *
  * @author Chris de Vreeze
  */
