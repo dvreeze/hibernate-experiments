@@ -17,7 +17,7 @@
 /**
  * Module descriptor of the service layer API. The service layer API and immutable model are exported
  * (along with the JPA bootstrapping code). Other than JPA bootstrapping, implementation details are
- * not exported to any other modules.
+ * not exported to any other modules. In particular, JPA entities are internal implementation details of this module.
  *
  * @author Chris de Vreeze
  */
