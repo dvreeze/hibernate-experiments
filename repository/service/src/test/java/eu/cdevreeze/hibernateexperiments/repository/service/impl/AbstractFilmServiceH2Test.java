@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
+package eu.cdevreeze.hibernateexperiments.repository.service.impl;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.ActorEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.LanguageEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Actor;
-import eu.cdevreeze.hibernateexperiments.criteria.service.ActorService;
+import eu.cdevreeze.hibernateexperiments.repository.entity.*;
+import eu.cdevreeze.hibernateexperiments.repository.model.Actor;
+import eu.cdevreeze.hibernateexperiments.repository.model.Category;
+import eu.cdevreeze.hibernateexperiments.repository.model.Film;
+import eu.cdevreeze.hibernateexperiments.repository.service.FilmService;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,15 +35,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit test of an {@link ActorService} implementation, using an embedded H2 database.
+ * Unit test of an {@link FilmService} implementation, using an embedded H2 database.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractActorServiceH2Test {
+abstract class AbstractFilmServiceH2Test {
 
     static {
         System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
@@ -52,7 +50,7 @@ abstract class AbstractActorServiceH2Test {
 
     private static EntityManagerFactory emf;
 
-    protected abstract ActorService actorService(EntityManagerFactory emf);
+    protected abstract FilmService filmService(EntityManagerFactory emf);
 
     @BeforeAll
     static void beforeAll() {
@@ -68,42 +66,56 @@ abstract class AbstractActorServiceH2Test {
     }
 
     @Test
-    void testFindAllActors() {
-        List<Actor> actors = actorService(emf).findAll();
+    void testFindAllFilms() {
+        List<Film.WithActorsAndCategories> films = filmService(emf).findAllFilmsWithActorsAndCategories();
 
-        assertEquals(3, actors.size());
-        assertEquals(
-                Set.of("Doe"),
-                actors.stream().map(Actor::lastName).collect(Collectors.toSet())
-        );
-        assertEquals(
-                Set.of("John", "Jane", "Bob"),
-                actors.stream().map(Actor::firstName).collect(Collectors.toSet())
-        );
+        assertEquals(1, films.size());
+        assertEquals("Two wolves", films.getFirst().film().title());
+        assertEquals("G", films.getFirst().film().rating());
+        assertEquals(120, films.getFirst().film().length());
+        assertEquals("English", films.getFirst().film().language().name());
+        assertEquals(Set.of("Doe"), films.getFirst().actors().stream().map(Actor::lastName).collect(Collectors.toSet()));
+        assertEquals(Set.of("Action"), films.getFirst().categories().stream().map(Category::name).collect(Collectors.toSet()));
     }
 
     @Test
-    void testFindActor() {
-        Optional<Actor> actorOption = actorService(emf).findById(2);
+    void testFindFilm() {
+        Optional<Film.WithActorsAndCategories> filmOption = filmService(emf).findFilmWithActorsAndCategories(1);
 
-        assertTrue(actorOption.isPresent());
-        assertEquals("Jane", actorOption.get().firstName());
-        assertEquals("Doe", actorOption.get().lastName());
+        assertTrue(filmOption.isPresent());
+        assertEquals("Two wolves", filmOption.get().film().title());
+        assertEquals("G", filmOption.get().film().rating());
+        assertEquals(120, filmOption.get().film().length());
+        assertEquals("English", filmOption.get().film().language().name());
+        assertEquals(Set.of("Doe"), filmOption.get().actors().stream().map(Actor::lastName).collect(Collectors.toSet()));
+        assertEquals(Set.of("Action"), filmOption.get().categories().stream().map(Category::name).collect(Collectors.toSet()));
     }
 
     @Test
-    void testFindActorsByFilmId() {
-        ImmutableList<Actor> actors = actorService(emf).findByFilmId(1);
+    void testFindNoFilm() {
+        Optional<Film.WithActorsAndCategories> filmOption = filmService(emf).findFilmWithActorsAndCategories(2);
 
-        assertEquals(2, actors.size());
-        assertEquals(
-                Set.of("Doe"),
-                actors.stream().map(Actor::lastName).collect(Collectors.toSet())
-        );
-        assertEquals(
-                Set.of("John", "Jane"),
-                actors.stream().map(Actor::firstName).collect(Collectors.toSet())
-        );
+        assertFalse(filmOption.isPresent());
+    }
+
+    @Test
+    void testFindFilmsByActorId() {
+        ImmutableList<Film.WithActorsAndCategories> films = filmService(emf).findFilmsWithActorsAndCategoriesByActorId(1);
+
+        assertEquals(1, films.size());
+        assertEquals("Two wolves", films.getFirst().film().title());
+        assertEquals("G", films.getFirst().film().rating());
+        assertEquals(120, films.getFirst().film().length());
+        assertEquals("English", films.getFirst().film().language().name());
+        assertEquals(Set.of("Doe"), films.getFirst().actors().stream().map(Actor::lastName).collect(Collectors.toSet()));
+        assertEquals(Set.of("Action"), films.getFirst().categories().stream().map(Category::name).collect(Collectors.toSet()));
+    }
+
+    @Test
+    void testFindNoFilmsByActorId() {
+        ImmutableList<Film.WithActorsAndCategories> films = filmService(emf).findFilmsWithActorsAndCategoriesByActorId(3);
+
+        assertEquals(0, films.size());
     }
 
     private static EntityManagerFactory createEntityManagerFactory() {
@@ -117,8 +129,10 @@ abstract class AbstractActorServiceH2Test {
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
                 .managedClass(ActorEntity.class)
                 .managedClass(FilmActorEntity.class)
-                .managedClass(FilmEntity.class)
+                .managedClass(CategoryEntity.class)
+                .managedClass(FilmCategoryEntity.class)
                 .managedClass(LanguageEntity.class)
+                .managedClass(FilmEntity.class)
                 .createEntityManagerFactory();
     }
 
@@ -177,6 +191,18 @@ abstract class AbstractActorServiceH2Test {
             filmActorJane.setFilmId(film.getId());
             filmActorJane.setLastUpdate(Instant.now());
             eh.insert(filmActorJane);
+
+            CategoryEntity category = new CategoryEntity();
+            category.setId(1);
+            category.setName("Action");
+            category.setLastUpdate(Instant.now());
+            eh.insert(category);
+
+            FilmCategoryEntity filmCategory = new FilmCategoryEntity();
+            filmCategory.setFilmId(film.getId());
+            filmCategory.setCategoryId(category.getId());
+            filmCategory.setLastUpdate(Instant.now());
+            eh.insert(filmCategory);
         });
     }
 }

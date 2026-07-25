@@ -92,7 +92,7 @@ abstract class AbstractActorServiceH2Test {
     }
 
     @Test
-    void testFindActorByFilmId() {
+    void testFindActorsByFilmId() {
         ImmutableList<Actor> actors = actorService(emf).findByFilmId(1);
 
         assertEquals(2, actors.size());
