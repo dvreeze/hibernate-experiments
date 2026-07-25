@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
+import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
@@ -85,6 +86,21 @@ abstract class AbstractActorServiceH2Test {
         assertTrue(actorOption.isPresent());
         assertEquals("Jane", actorOption.get().firstName());
         assertEquals("Doe", actorOption.get().lastName());
+    }
+
+    @Test
+    void testFindActorByFilmId() {
+        ImmutableList<Actor> actors = actorService(emf).findByFilmId(1);
+
+        assertEquals(2, actors.size());
+        assertEquals(
+                Set.of("Doe"),
+                actors.stream().map(Actor::lastName).collect(Collectors.toSet())
+        );
+        assertEquals(
+                Set.of("John", "Jane"),
+                actors.stream().map(Actor::firstName).collect(Collectors.toSet())
+        );
     }
 
     private static EntityManagerFactory createEntityManagerFactory() {
