@@ -27,8 +27,7 @@ import jakarta.persistence.*;
 
 import java.util.Optional;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 
 /**
  * Hibernate architecture test.
@@ -73,6 +72,20 @@ class HibernateArchitectureTest {
         };
     }
 
+    private static DescribedPredicate<JavaAnnotation<?>> isAssociationAnnotation() {
+        return new DescribedPredicate<>("association annotation") {
+
+            @Override
+            public boolean test(JavaAnnotation<?> javaAnnotation) {
+                String annotationName = javaAnnotation.getRawType().getFullName();
+                return annotationName.equals("jakarta.persistence.OneToOne")
+                        || annotationName.equals("jakarta.persistence.ManyToOne")
+                        || annotationName.equals("jakarta.persistence.OneToMany")
+                        || annotationName.equals("jakarta.persistence.ManyToMany");
+            }
+        };
+    }
+
     // Jakarta Persistence entities etc. must not depend on "infrastructure objects".
 
     @ArchTest
@@ -80,7 +93,6 @@ class HibernateArchitectureTest {
             classes()
                     .that().areAnnotatedWith(Entity.class)
                     .or().areAnnotatedWith(MappedSuperclass.class)
-                    .or().areAnnotatedWith(Embedded.class)
                     .or().areAnnotatedWith(Embeddable.class)
                     .should().onlyDependOnClassesThat().areNotAssignableTo(EntityManager.class);
 
@@ -89,7 +101,6 @@ class HibernateArchitectureTest {
             classes()
                     .that().areAnnotatedWith(Entity.class)
                     .or().areAnnotatedWith(MappedSuperclass.class)
-                    .or().areAnnotatedWith(Embedded.class)
                     .or().areAnnotatedWith(Embeddable.class)
                     .should().onlyDependOnClassesThat().areNotAssignableTo(EntityManagerFactory.class);
 
@@ -108,4 +119,8 @@ class HibernateArchitectureTest {
                     .that().areAnnotatedWith(OneToOne.class)
                     .or().areAnnotatedWith(ManyToOne.class)
                     .should().notBeAnnotatedWith(isExplicitlyEagerToOneAssociation());
+
+    @ArchTest
+    static final ArchRule methodsShouldNotBeAnnotatedWithAssociationAnnotations =
+            methods().should().notBeAnnotatedWith(isAssociationAnnotation());
 }
