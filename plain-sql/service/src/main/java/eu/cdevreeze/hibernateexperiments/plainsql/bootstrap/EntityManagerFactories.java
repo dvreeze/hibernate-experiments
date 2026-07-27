@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.bootstrap;
 
+import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
 
 /**
@@ -30,7 +31,7 @@ public class EntityManagerFactories {
     }
 
     public static EntityManagerFactory createEntityManagerFactory(String persistenceUnitName) {
-        return new PersistenceConfiguration(persistenceUnitName)
+        PersistenceConfiguration persistenceConfig = new PersistenceConfiguration(persistenceUnitName)
                 .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
                 .defaultToOneFetchType(FetchType.LAZY) // although we have no entities here
                 .provider("org.hibernate.jpa.HibernatePersistenceProvider")
@@ -38,7 +39,12 @@ public class EntityManagerFactories {
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:postgresql://localhost:5432/pagila")
                 .property(Persistence.ConnectionProperties.JDBC_USER, "postgres")
                 .property(Persistence.ConnectionProperties.JDBC_PASSWORD, "postgres") // don't do this in production!
-                .schemaManagementDatabaseAction(SchemaManagementAction.VALIDATE)
-                .createEntityManagerFactory();
+                .schemaManagementDatabaseAction(SchemaManagementAction.VALIDATE);
+        // No difference here, given that there are no entities
+        Preconditions.checkState(
+                persistenceConfig.defaultToOneFetchType() == FetchType.LAZY,
+                "By all means, the default to-one fetch type must be set to LAZY"
+        );
+        return persistenceConfig.createEntityManagerFactory();
     }
 }

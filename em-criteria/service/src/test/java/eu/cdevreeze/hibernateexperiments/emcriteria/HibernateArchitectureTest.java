@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.jpql;
+package eu.cdevreeze.hibernateexperiments.emcriteria;
 
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaAnnotation;

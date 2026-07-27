@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.bootstrap;
 
+import com.google.common.base.Preconditions;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import jakarta.persistence.*;
 
@@ -31,7 +32,7 @@ public class EntityManagerFactories {
     }
 
     public static EntityManagerFactory createEntityManagerFactory(String persistenceUnitName) {
-        return new PersistenceConfiguration(persistenceUnitName)
+        PersistenceConfiguration persistenceConfig = new PersistenceConfiguration(persistenceUnitName)
                 .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
                 .defaultToOneFetchType(FetchType.LAZY)
                 .provider("org.hibernate.jpa.HibernatePersistenceProvider")
@@ -48,7 +49,11 @@ public class EntityManagerFactories {
                 .managedClass(FilmEntity.class)
                 .managedClass(FilmActorEntity.class)
                 .managedClass(FilmCategoryEntity.class)
-                .managedClass(LanguageEntity.class)
-                .createEntityManagerFactory();
+                .managedClass(LanguageEntity.class);
+        Preconditions.checkState(
+                persistenceConfig.defaultToOneFetchType() == FetchType.LAZY,
+                "By all means, the default to-one fetch type must be set to LAZY"
+        );
+        return persistenceConfig.createEntityManagerFactory();
     }
 }
