@@ -1,6 +1,8 @@
 
 # Using the Hibernate ORM effectively
 
+Expected audience: Java developers with at least some experience with Hibernate ORM.
+
 TODO Examples, examples ...
 
 ## Introduction
@@ -13,13 +15,19 @@ Often we use Hibernate ORM through the Jakarta Persistence API, so in practice w
 
 Why this presentation? After all, most "enterprise" Java projects use Hibernate/JPA.
 
-The issue is that very many Java projects *use Hibernate ORM ineffectively*.
+Question to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least Jakarta Persistence (or its predecessor)?
+
+Question to the audience: *how happy and/or successful are you using Hibernate ORM*?
+
+Question to the audience: *do/did you use alternatives to Hibernate* (such as jOOQ, Spring JdbcTemplate etc.)?
+
+From my experience, the issue is that very many Java projects *use Hibernate ORM ineffectively*.
 Such projects suffer from code maintenance issues and performance issues in production.
 
 I have myself spent many years of Java and Scala development "hating" Hibernate, and not wanting to work with it.
 Put differently, I have spent many years not understanding Hibernate ORM.
 
-What if we start using Hibernate ORM with *realistic expectations* about what it can and cannot do for us?
+What if we start using Hibernate ORM with *realistic expectations* about what this library is and is not about?
 In particular, Hibernate ORM is *not about abstracting away the database*.
 The moment we start "working with the database" using Hibernate ORM, Hibernate ORM becomes a "productivity booster".
 
@@ -28,7 +36,7 @@ So that's what this presentation is about: using Hibernate ORM effectively. This
 
 ## Question: what is the essence of Hibernate ORM?
 
-Question to the audience: what is the essence of Hibernate ORM? What (features) do you think about first?
+Question to the audience: *what is the essence of Hibernate ORM*? What (features) do you think about first?
 
 Did anyone mention Hibernate's `StatelessSession` (or Jakarta Persistence 4.0 `EntityAgent`)?
 If `StatelessSession`/`EntityAgent` and `Session`/`EntityManager` are equally important, then Hibernate ORM
