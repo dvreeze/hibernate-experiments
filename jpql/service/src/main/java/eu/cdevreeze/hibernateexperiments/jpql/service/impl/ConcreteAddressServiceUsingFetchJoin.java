@@ -14,41 +14,38 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
+package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
-import module eu.cdevreeze.hibernateexperiments.entitymanager.model;
+import module eu.cdevreeze.hibernateexperiments.jpql.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CountryEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Address;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.City;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Country;
-import eu.cdevreeze.hibernateexperiments.entitymanager.service.AddressService;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CityEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
 
 /**
- * The same as {@link ConcreteAddressService}, except for the absence of {@link EntityGraph}'s.
- * This minor code change alone makes the number of generated SQL queries explode!
+ * Concrete {@link AddressService} implementation, using fetch joins.
  *
  * @author Chris de Vreeze
  */
-public final class InefficientAddressService implements AddressService {
+public final class ConcreteAddressServiceUsingFetchJoin implements AddressService {
 
     private final EntityManagerFactory emf;
 
-    public InefficientAddressService(EntityManagerFactory emf) {
+    public ConcreteAddressServiceUsingFetchJoin(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
     @Override
     public Optional<Address> findById(long id) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
-            String qlString = "select ad from Address ad where ad.id = ?1";
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = ?1";
 
-            return entityManager.createQuery(qlString, AddressEntity.class)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -59,10 +56,11 @@ public final class InefficientAddressService implements AddressService {
     @Override
     public ImmutableList<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
-            String qlString = "select ad from Address ad where ad.city.id = ?1";
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ct.id = ?1";
 
-            return entityManager.createQuery(qlString, AddressEntity.class)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -73,10 +71,11 @@ public final class InefficientAddressService implements AddressService {
     @Override
     public ImmutableList<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
-            String qlString = "select ad from Address ad where ad.city.country.id = ?1";
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where co.id =  ?1";
 
-            return entityManager.createQuery(qlString, AddressEntity.class)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -87,10 +86,11 @@ public final class InefficientAddressService implements AddressService {
     @Override
     public ImmutableList<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
-            String qlString = "select ad from Address ad";
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co";
 
-            return entityManager.createQuery(qlString, AddressEntity.class)
+            return entityAgent.createQuery(qlString, AddressEntity.class)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -100,10 +100,11 @@ public final class InefficientAddressService implements AddressService {
     @Override
     public ImmutableList<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
-            String qlString = "select c from City c where c.country.id = ?1";
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString =
+                    "select ci from City ci join fetch ci.country co where co.id = ?1";
 
-            return entityManager.createQuery(qlString, CityEntity.class)
+            return entityAgent.createQuery(qlString, CityEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -114,10 +115,10 @@ public final class InefficientAddressService implements AddressService {
     @Override
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from Country c";
 
-            return entityManager.createQuery(qlString, CountryEntity.class)
+            return entityAgent.createQuery(qlString, CountryEntity.class)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -127,8 +128,8 @@ public final class InefficientAddressService implements AddressService {
     @Override
     public Address add(Address.NewAddress address) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(entityManager -> {
-            CityEntity cityEntity = findCityEntityById((int) address.cityId(), entityManager);
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            CityEntity cityEntity = findCityEntityById((int) address.cityId(), entityAgent);
 
             AddressEntity addressEntity = new AddressEntity();
             addressEntity.setAddress(address.address1());
@@ -139,15 +140,15 @@ public final class InefficientAddressService implements AddressService {
             addressEntity.setPhone(address.phone());
             addressEntity.setLastUpdate(address.lastUpdate());
 
-            entityManager.persist(addressEntity);
+            entityAgent.insert(addressEntity);
             return addressEntity.toModelObject();
         });
     }
 
-    private CityEntity findCityEntityById(int cityId, EntityManager entityManager) {
+    private CityEntity findCityEntityById(int cityId, EntityAgent entityAgent) {
         String qlString = "select ci from City ci join fetch ci.country co where ci.id = :id";
 
-        return entityManager.createQuery(qlString, CityEntity.class)
+        return entityAgent.createQuery(qlString, CityEntity.class)
                 .setParameter("id", cityId)
                 .getSingleResult();
     }

@@ -32,9 +32,6 @@ import eu.cdevreeze.hibernateexperiments.entitymanager.service.ActorService;
  */
 public final class ConcreteActorService implements ActorService {
 
-    // Yet it is not in the (current) JPA 4.0 API documentation.
-    // Also, what does it mean with "returning only one result"? What I did below still seems to work in avoiding the 1 + N problem.
-
     private final EntityManagerFactory emf;
 
     public ConcreteActorService(EntityManagerFactory emf) {

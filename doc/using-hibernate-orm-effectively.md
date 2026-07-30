@@ -100,6 +100,13 @@ public class CountryEntity { // Not serializable
 A "service" method querying an address by its technical primary key:
 
 ```java
+public interface AddressService {
+
+    Optional<AddressEntity> findById(long id); // Not technology-agnostic
+
+    // Other methods
+}
+
 public final class ConcreteAddressService implements AddressService { // No separate DAO layer in this case
 
     private final EntityManagerFactory emf; // Instead of (typical) container-generated EntityManager proxy
@@ -123,7 +130,7 @@ public final class ConcreteAddressService implements AddressService { // No sepa
 *Question* to the audience: what does the following code do?
 
 ```java
-// Outside the transactional Hibernate Session/EntityManager
+// Outside the transactional Hibernate Session/EntityManager!
 
 AddressEntity address = addressService.findById(id).orElseThrow(); // Assume "id" is an existing ID
 String cityName = address.getCity().getCity();

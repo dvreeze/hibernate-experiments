@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.emcriteria.service.impl;
+package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
-import module eu.cdevreeze.hibernateexperiments.emcriteria.model;
+import module eu.cdevreeze.hibernateexperiments.entitymanager.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.emcriteria.entity.*;
-import eu.cdevreeze.hibernateexperiments.emcriteria.service.AddressService;
-import org.hibernate.jpa.SpecHints;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.AddressEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CityEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.service.AddressService;
 
 /**
- * The same as {@link ConcreteAddressService}, except for the absence of {@link EntityGraph}'s.
- * This minor code change alone makes the number of generated SQL queries explode!
+ * Concrete {@link AddressService} implementation, using fetch joins.
  *
  * @author Chris de Vreeze
  */
-public final class InefficientAddressService implements AddressService {
+public final class ConcreteAddressServiceUsingFetchJoin implements AddressService {
 
     private final EntityManagerFactory emf;
 
-    public InefficientAddressService(EntityManagerFactory emf) {
+    public ConcreteAddressServiceUsingFetchJoin(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
@@ -42,14 +42,11 @@ public final class InefficientAddressService implements AddressService {
     public Optional<Address> findById(long id) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = ?1";
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
-            cq.where(cb.equal(address.get(AddressEntity_.id), id));
-            cq.select(address);
-
-            return entityManager.createQuery(cq)
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
@@ -60,14 +57,11 @@ public final class InefficientAddressService implements AddressService {
     public ImmutableList<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ct.id = ?1";
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
-            cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.id), cityId));
-            cq.select(address);
-
-            return entityManager.createQuery(cq)
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -78,14 +72,11 @@ public final class InefficientAddressService implements AddressService {
     public ImmutableList<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where co.id =  ?1";
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
-            cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.country).get(CountryEntity_.id), countryId));
-            cq.select(address);
-
-            return entityManager.createQuery(cq)
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -96,13 +87,10 @@ public final class InefficientAddressService implements AddressService {
     public ImmutableList<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaQuery<AddressEntity> cq = cb.createQuery(AddressEntity.class);
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co";
 
-            Root<AddressEntity> address = cq.from(AddressEntity.class);
-            cq.select(address);
-
-            return entityManager.createQuery(cq)
+            return entityManager.createQuery(qlString, AddressEntity.class)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -113,14 +101,11 @@ public final class InefficientAddressService implements AddressService {
     public ImmutableList<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaQuery<CityEntity> cq = cb.createQuery(CityEntity.class);
+            String qlString =
+                    "select ci from City ci join fetch ci.country co where co.id = ?1";
 
-            Root<CityEntity> city = cq.from(CityEntity.class);
-            cq.where(cb.equal(city.get(CityEntity_.country).get(CountryEntity_.id), countryId));
-            cq.select(city);
-
-            return entityManager.createQuery(cq)
+            return entityManager.createQuery(qlString, CityEntity.class)
+                    .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -131,13 +116,9 @@ public final class InefficientAddressService implements AddressService {
     public ImmutableList<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-            CriteriaQuery<CountryEntity> cq = cb.createQuery(CountryEntity.class);
+            String qlString = "select c from Country c";
 
-            Root<CountryEntity> country = cq.from(CountryEntity.class);
-            cq.select(country);
-
-            return entityManager.createQuery(cq)
+            return entityManager.createQuery(qlString, CountryEntity.class)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -165,21 +146,10 @@ public final class InefficientAddressService implements AddressService {
     }
 
     private CityEntity findCityEntityById(int cityId, EntityManager entityManager) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<CityEntity> cq = cb.createQuery(CityEntity.class);
+        String qlString = "select ci from City ci join fetch ci.country co where ci.id = :id";
 
-        Root<CityEntity> city = cq.from(CityEntity.class);
-        cq.where(cb.equal(city.get(CityEntity_.id), cityId));
-        cq.select(city);
-
-        // Here we do set the load graph
-        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
-        entityGraph.addAttributeNode(CityEntity_.country);
-
-        // This sets the load graph, not the fetch graph
-        // Yet that makes no difference here since we configured lazy fetching for all entity associations
-        return entityManager.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+        return entityManager.createQuery(qlString, CityEntity.class)
+                .setParameter("id", cityId)
                 .getSingleResult();
     }
 }
