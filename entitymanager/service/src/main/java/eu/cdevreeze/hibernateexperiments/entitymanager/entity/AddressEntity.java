@@ -47,6 +47,7 @@ public class AddressEntity {
     @Basic(optional = false)
     private String district;
 
+    // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @ManyToOne(optional = false)
     @JoinColumn(name = "city_id", nullable = false)
     private CityEntity city;
@@ -57,7 +58,6 @@ public class AddressEntity {
     @Basic(optional = false)
     private String phone;
 
-    // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;

@@ -42,7 +42,6 @@ public class FilmCategoryEntity {
     @Column(name = "category_id")
     private Integer categoryId;
 
-    // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
