@@ -114,7 +114,9 @@ public final class ConcreteAddressService implements AddressService { // No sepa
     @Override
     public Optional<AddressEntity> findById(long id) {
         return emf.callInTransaction(entityManager -> { // Programmatic transaction demarcation in this case
-            String qlString = "select ad from Address ad where ad.id = ?1"; // Strictly, we do not need JPQL in this case
+            // Strictly, JPQL is not needed in this case
+            // Besides, this implementation is flawed (spoiler alert)
+            String qlString = "select ad from Address ad where ad.id = ?1";
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
@@ -193,7 +195,7 @@ public final class ConcreteAddressService implements AddressService {
     @Override
     public Optional<AddressEntity> findById(long id) {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            // This implementation is flawed; we do not get the related city and country
+            // This implementation is (also) flawed; we do not get the related city and country
             String qlString = "select ad from Address ad where ad.id = ?1";
 
             return entityAgent.createQuery(qlString, AddressEntity.class)
