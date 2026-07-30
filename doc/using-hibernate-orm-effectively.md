@@ -126,7 +126,7 @@ public final class ConcreteAddressService implements AddressService { // No sepa
 // Outside the transactional Hibernate Session/EntityManager
 
 AddressEntity address = addressService.findById(id).orElseThrow(); // Assume "id" is an existing ID
-CityEntity city = address.getCity();
+String cityName = address.getCity().getCity();
 ```
 
 ## Introduction
