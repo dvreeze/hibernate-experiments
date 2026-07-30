@@ -114,7 +114,7 @@ public final class ConcreteAddressService implements AddressService { // No sepa
     @Override
     public Optional<AddressEntity> findById(long id) {
         return emf.callInTransaction(entityManager -> { // Programmatic transaction demarcation in this case
-            String qlString = "select ad from Address ad where ad.id = ?1";
+            String qlString = "select ad from Address ad where ad.id = ?1"; // Strictly, we do not need JPQL in this case
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
@@ -178,6 +178,34 @@ is not foremost about the "persistence context".
 More fundamental is the *JPQL* query language, which is essentially an *OO SQL dialect*
 (that abstracts away many DBMS-specific SQL dialect differences).
 The *Criteria API* can be seen as the formal description of that OO SQL dialect.
+
+Personally, Hibernate to me is foremost about *representing a relational database as Java classes*, with a
+*SQL dialect in terms of that Java database representation* as its query language.
+
+Let's rewrite the service, using `EntityAgent` instead of `EntityManager`, thus getting the pros and cons
+of no longer using a "persistence context" (also known as the "first-level cache"):
+
+```java
+public final class ConcreteAddressService implements AddressService {
+
+    private final EntityManagerFactory emf;
+
+    @Override
+    public Optional<AddressEntity> findById(long id) {
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            // This implementation is flawed; we do not get the related city and country
+            String qlString = "select ad from Address ad where ad.id = ?1";
+
+            return entityAgent.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, id)
+                    .getResultStream()
+                    .findFirst();
+        });
+    }
+
+    // More methods
+}
+```
 
 ## Hibernate ORM best practices
 
