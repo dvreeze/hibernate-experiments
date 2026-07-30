@@ -3,7 +3,122 @@
 
 Expected audience: Java developers with at least some experience with Hibernate ORM.
 
-TODO Examples, examples ...
+The example used throughout this talk is as follows. It uses 3 related JPA entities, and a query method.
+This example uses (a small part of) the [sample Pagila database](https://github.com/devrimgunduz/pagila/tree/master).
+
+Entity class `AddressEntity`:
+
+```java
+@Entity(name = "Address")
+@Table(name = "Address")
+public class AddressEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "address_id_seq")
+    @SequenceGenerator(name = "address_id_seq", sequenceName = "address_address_id_seq", allocationSize = 1)
+    @Column(name = "address_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    private String address;
+
+    private String address2;
+
+    @Basic(optional = false)
+    private String district;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id", nullable = false)
+    private CityEntity city;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @Basic(optional = false)
+    private String phone;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Entity class `CityEntity`:
+
+```java
+@Entity(name = "City")
+@Table(name = "City")
+public class CityEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "city_id_seq")
+    @SequenceGenerator(name = "city_id_seq", sequenceName = "city_city_id_seq", allocationSize = 1)
+    @Column(name = "city_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    private String city;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id", nullable = false)
+    private CountryEntity country;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Entity class `CountryEntity`:
+
+```java
+@Entity(name = "Country")
+@Table(name = "Country")
+public class CountryEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "country_id_seq")
+    @SequenceGenerator(name = "country_id_seq", sequenceName = "country_country_id_seq", allocationSize = 1)
+    @Column(name = "country_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    private String country;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+A "service" method querying an address by its technical primary key:
+
+```java
+public final class ConcreteAddressService implements AddressService { // No separate DAO layer in this case
+
+    private final EntityManagerFactory emf; // Instead of (typical) container-generated EntityManager proxy
+
+    @Override
+    public Optional<AddressEntity> findById(long id) {
+        return emf.callInTransaction(entityManager -> { // Programmatic transaction demarcation in this case
+            String qlString = "select ad from Address ad where ad.id = ?1";
+
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, id)
+                    .getResultStream()
+                    .findFirst();
+        });
+    }
+
+    // More methods
+}
+```
 
 ## Introduction
 
