@@ -120,6 +120,15 @@ public final class ConcreteAddressService implements AddressService { // No sepa
 }
 ```
 
+*Question* to the audience: what does the following code do?
+
+```java
+// Outside the transactional Hibernate Session/EntityManager
+
+AddressEntity address = addressService.findById(id).orElseThrow(); // Assume "id" is an existing ID
+CityEntity city = address.getCity();
+```
+
 ## Introduction
 
 When I say "Hibernate ORM", I could have said "Jakarta Persistence API" (formerly JPA).
