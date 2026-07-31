@@ -217,9 +217,11 @@ To use Hibernate ORM effectively, go to [Hibernate tutorials by Thorben Janssen]
 In particular, see [Hibernate performance tuning](https://thorben-janssen.com/hibernate-performance-tuning/),
 although it is perfectly fine to disagree with some of the points made.
 
-... TODO ...
+Useful advice from the Hibernate team can be found at [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice).
+It is probably even a good idea to read the entire (opinionated) [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/).
 
-... main problem: too many generated SQL queries (1 + N problem) ...
+The [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) is probably best used
+as reference material. The same as true for the [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/).
 
 Recall the preceding flawed code:
 
@@ -248,7 +250,8 @@ public final class ConcreteAddressService implements AddressService {
 What to do about this, if we want the city and country associations to be fetched as part of the result?
 
 We could feel urged to choose fetch type "eager" for both associations in the entity classes, but this
-would affect all code using those entities.
+would affect all code using those entities. This could easily lead to a hidden explosion of fetched data where
+only a small subset of that data is needed.
 
 The Hibernate team ([Hibernate ORM short guide](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one))
 and experts like Thorben Janssen
@@ -259,13 +262,122 @@ So, use the default fetch type for to-many associations, and *explicitly choose 
 Jakarta Persistence 4.0 (and therefore Hibernate 8) makes this easy, by a global configuration setting!
 
 Still, this does not solve our problem. Both the Hibernate team and Thorben Janssen also advice the following:
-*choose the "fetch graph" per query*.
+*use per-query fetching*.
 
-... all entity associations should have fetch type lazy (mind Hibernate 8 vs. pre-8) ...
+That is, we could do "fetch joins" in our Hibernate/JPQL queries:
 
-... per query, the fetch graph should be chosen ...
+```java
+public final class ConcreteAddressService implements AddressService {
 
-... this is consistent with per-query choice of joined tables in plain SQL query result; again note that Hibernate is not about abstracting away the database ...
+    private final EntityManagerFactory emf;
+
+    @Override
+    public Optional<AddressEntity> findById(long id) {
+        return emf.callInTransaction(entityManager -> {
+            // The city and country of the address are fetched as well
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = ?1";
+
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, id)
+                    .getResultStream()
+                    .findFirst();
+        });
+    }
+
+    // More methods
+}
+```
+
+Alternatively, we could specify a "fetch graph" or "load graph":
+
+```java
+public final class ConcreteAddressService implements AddressService {
+
+    private final EntityManagerFactory emf;
+
+    @Override
+    public Optional<AddressEntity> findById(long id) {
+        return emf.callInTransaction(entityManager -> {
+            String qlString = "select ad from Address ad where ad.id = ?1";
+
+            // Programmatically created entity graph
+            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
+
+            // In our case, there is no difference between load graph and fetch graph
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setParameter(1, id)
+                    .getResultStream()
+                    .findFirst();
+        });
+    }
+
+    // More methods
+
+    // Private methods (note the use of the generated metamodel)
+
+    private EntityGraph<AddressEntity> getAddressEntityGraph() {
+        EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
+
+        entityGraph.addAttributeNode(AddressEntity_.city);
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<CityEntity> citySubgraph = entityGraph.addSubgraph(AddressEntity_.city);
+        citySubgraph.addAttributeNode(CityEntity_.country);
+
+        return entityGraph;
+    }
+
+    private EntityGraph<CityEntity> getCityEntityGraph() {
+        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
+        entityGraph.addAttributeNode(CityEntity_.country);
+        return entityGraph;
+    }
+
+    private EntityGraph<CountryEntity> getCountryEntityGraph() {
+        return CountryEntity_.class_.createEntityGraph();
+    }
+}
+```
+
+In both cases we used per-query fetching, be it through different means. This is in spirit similar to what
+we did when we used to write all SQL ourselves: per SQL query we chose our "fetch joins". So also in that regard
+we should not abandon proven database querying practices, even when using Hibernate ORM. Again, the library
+is not about abstracting away the database; it is about Java and the database working well together.
+
+In this case, our entities only used to-one associations, but in practice many associations are collection-valued
+to-many associations. This brings us to what might be the main problem in production with (naive?) Hibernate
+ORM application code, the dreaded *N + 1 problem*:
+
+```java
+// Hypothetical Order and LineItem entities
+
+@Entity
+public class Order {
+
+    // ...
+
+    // Default fetch type Lazy; by all means leave it that way!
+    @OneToMany
+    private List<LineItem> lineItems;
+
+    // ...
+}
+
+@Entity
+public class LineItem {
+
+    // Ignoring bidirectional associations, owning/mapped side etc.
+
+    // ...
+}
+```
+
+Again, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
+That way we prevent the N + 1 problem.
+
+... TODO ...
 
 ... overall, keep entity configuration (via annotations) simple ...
 
