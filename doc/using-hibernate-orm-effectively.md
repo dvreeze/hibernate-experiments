@@ -1,7 +1,9 @@
 
 # Using the Hibernate ORM effectively
 
-Expected audience: Java developers with at least some experience with Hibernate ORM.
+Expected audience: mostly Java developers with at least some experience with Hibernate ORM.
+
+*Question* to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least Jakarta Persistence (or its predecessor)?
 
 The example used throughout this talk is as follows. It uses 3 related JPA entities, and a query method.
 This example uses (a small part of) the [sample Pagila database](https://github.com/devrimgunduz/pagila/tree/master).
@@ -149,8 +151,6 @@ Typically, we use Hibernate ORM through the Jakarta Persistence API, so in pract
 Note that Hibernate 6+ uses the "jakarta" namespace (introduced in "JPA" version 3.0) instead of "javax" namespace.
 
 Why this presentation? After all, most "enterprise" Java projects use Hibernate/JPA, so it should be familiar, right?
-
-*Question* to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least Jakarta Persistence (or its predecessor)?
 
 *Question* to the audience: *how happy and/or successful are you using Hibernate ORM*?
 
@@ -351,16 +351,18 @@ to-many associations. This brings us to what might be the main problem in produc
 ORM application code, the dreaded *N + 1 problem*:
 
 ```java
-// Hypothetical Order and LineItem entities
+// Hypothetical Order and LineItem entities (unrelated to the previous examples)
 
 @Entity
 public class Order {
 
-    // ...
+    @Id
+    private Long id;
 
+    // Bidirectional association
     // Default fetch type Lazy; by all means leave it that way!
-    @OneToMany
-    private List<LineItem> lineItems;
+    @OneToMany(mappedBy = "order") // We can use a constant if there is a generated metamodel
+    private List<LineItem> lineItems = new ArrayList<>();
 
     // ...
 }
@@ -368,7 +370,12 @@ public class Order {
 @Entity
 public class LineItem {
 
-    // Ignoring bidirectional associations, owning/mapped side etc.
+    @Id
+    private Long id;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     // ...
 }
