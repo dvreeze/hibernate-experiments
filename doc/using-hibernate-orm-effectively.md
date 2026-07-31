@@ -102,7 +102,8 @@ A "service" method querying an address by its technical primary key:
 ```java
 public interface AddressService {
 
-    Optional<AddressEntity> findById(long id); // Not technology-agnostic
+    // Flaw: result not technology-agnostic and poorly defined w.r.t. which associations are fetched
+    Optional<AddressEntity> findById(long id);
 
     // Other methods
 }
@@ -179,10 +180,10 @@ is not foremost about the "persistence context".
 
 More fundamental is the *JPQL* query language, which is essentially an *OO SQL dialect*
 (that abstracts away many DBMS-specific SQL dialect differences).
-The *Criteria API* can be seen as the formal description of that OO SQL dialect.
+The *Criteria API* can in a way be seen as the "formal description" of that OO SQL dialect.
 
-Personally, Hibernate to me is foremost about *representing a relational database as Java classes*, with a
-*SQL dialect in terms of that Java database representation* as its query language.
+Personally, to me Hibernate is foremost about *representing a relational database as Java classes*, with a
+well-defined *SQL dialect in terms of that Java database representation* as its query language.
 
 Let's rewrite the service, using `EntityAgent` instead of `EntityManager`, thus getting the pros and cons
 of no longer using a "persistence context" (also known as the "first-level cache"):
@@ -219,6 +220,46 @@ although it is perfectly fine to disagree with some of the points made.
 ... TODO ...
 
 ... main problem: too many generated SQL queries (1 + N problem) ...
+
+Recall the preceding flawed code:
+
+```java
+public final class ConcreteAddressService implements AddressService {
+
+    private final EntityManagerFactory emf;
+
+    @Override
+    public Optional<AddressEntity> findById(long id) {
+        return emf.callInTransaction(entityManager -> {
+            // Flawed: within the transactional Session the city and country associations are not fetched
+            String qlString = "select ad from Address ad where ad.id = ?1";
+
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, id)
+                    .getResultStream()
+                    .findFirst();
+        });
+    }
+
+    // More methods
+}
+```
+
+What to do about this, if we want the city and country associations to be fetched as part of the result?
+
+We could feel urged to choose fetch type "eager" for both associations in the entity classes, but this
+would affect all code using those entities.
+
+The Hibernate team ([Hibernate ORM short guide](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one))
+and experts like Thorben Janssen
+([Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype))
+are very clear: *choose fetch type "lazy" for all entity associations*.
+
+So, use the default fetch type for to-many associations, and *explicitly choose fetch type "lazy" for to-one associations*.
+Jakarta Persistence 4.0 (and therefore Hibernate 8) makes this easy, by a global configuration setting!
+
+Still, this does not solve our problem. Both the Hibernate team and Thorben Janssen also advice the following:
+*choose the "fetch graph" per query*.
 
 ... all entity associations should have fetch type lazy (mind Hibernate 8 vs. pre-8) ...
 
