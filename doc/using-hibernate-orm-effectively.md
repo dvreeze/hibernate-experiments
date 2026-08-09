@@ -328,16 +328,6 @@ public final class ConcreteAddressService implements AddressService {
 
         return entityGraph;
     }
-
-    private EntityGraph<CityEntity> getCityEntityGraph() {
-        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
-        entityGraph.addAttributeNode(CityEntity_.country);
-        return entityGraph;
-    }
-
-    private EntityGraph<CountryEntity> getCountryEntityGraph() {
-        return CountryEntity_.class_.createEntityGraph();
-    }
 }
 ```
 
