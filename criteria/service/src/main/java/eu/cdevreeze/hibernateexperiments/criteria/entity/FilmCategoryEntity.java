@@ -34,6 +34,8 @@ public class FilmCategoryEntity {
     // Note that the entity class is not Serializable
     // Note the absence of overridden equals and hashCode
 
+    // We intentionally kept the primary key "specification" simple, at the expense of having no associations.
+
     @Id
     @Column(name = "film_id")
     private Integer filmId;
