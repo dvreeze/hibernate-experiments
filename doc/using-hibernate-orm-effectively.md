@@ -4,10 +4,11 @@
 Expected audience: mostly Java developers with at least some experience with Hibernate ORM.
 
 Motivation for this presentation: I have encountered Hibernate ORM in many projects, mostly struggling
-with it instead of using it effectively. It took me many years before starting to understand that this does
-not have to be that way, and I would like to share those insights. Hence, this presentation.
+with it instead of using it effectively. Typically, my co-workers struggled with Hibernate ORM as well.
+It took me many years before starting to understand that this does not have to be that way, and I would
+like to share those insights. Hence, this presentation.
 
-*Question* to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least Jakarta Persistence (or its predecessor)?
+*Question* to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least *Jakarta Persistence* (or its predecessor)?
 
 ## Example used in this presentation
 
@@ -147,6 +148,8 @@ AddressEntity address = addressService.findById(id).orElseThrow(); // Assume "id
 String cityName = address.getCity().getCity();
 ```
 
+Indeed, it throws a [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
+
 ## Introduction
 
 When I say "Hibernate ORM", I could have said "Jakarta Persistence API" (formerly JPA).
@@ -253,7 +256,8 @@ public final class ConcreteAddressService implements AddressService {
 }
 ```
 
-What to do about this, if we want the city and country associations to be fetched as part of the result?
+What to do about this, if we want the city and country associations to be fetched as part of the result,
+and we want to prevent the dreaded [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)?
 
 We could feel urged to choose fetch type "eager" for both associations in the entity classes, but this
 would affect all code using those entities. This could easily lead to a hidden explosion of fetched data where
@@ -338,9 +342,10 @@ public final class ConcreteAddressService implements AddressService {
 ```
 
 In both cases we used per-query fetching, be it through different means. This is in spirit similar to what
-we did when we used to write all SQL ourselves: per SQL query we chose our "fetch joins". So also in that regard
+we did when we used to write all SQL ourselves: per SQL query we chose our "fetch joins" (getting no help from
+the database access library to turn result sets into nested Java objects). So also in that regard
 we should not abandon proven database querying practices, even when using Hibernate ORM. Again, the library
-is not about abstracting away the database; it is about Java and the database working well together.
+is not about abstracting away the database; it is about *Java and the database working well together*.
 
 In this case, our entities only used to-one associations, but in practice many associations are collection-valued
 to-many associations. This brings us to what might be the main problem in production with (naive?) Hibernate
@@ -378,11 +383,21 @@ public class LineItem {
 ```
 
 Again, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
-That way we prevent the N + 1 problem.
+That way we prevent the N + 1 problem. Again, see [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
+for correct ways to prevent/fix `LazyInitializationException`s.
 
-... TODO ...
+Note that the query result could also have been a *DTO projection*. See the next section about this approach.
 
-... overall, keep entity configuration (via annotations) simple ...
+Of course, much more can be said (and found) about effective use of Hibernate ORM, but this is a very good
+start that should not be ignored in any project using Hibernate ORM.
+
+Another rather general advice is: *keep things simple*. For example, keep the use of JPA annotations simple.
+In particular, do not go overboard with *cascading* in association annotations. The less we make use of
+cascading of operations to associated entities, the less we invite surprising Hibernate behavior.
+Again, see [Thorben Janssen](https://thorben-janssen.com/tutorials/) for more on this (e.g.
+[cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)).
+
+The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessary SQL*.
 
 ## Combining mutable JPA entities with immutable Java record DTOs
 
@@ -390,7 +405,7 @@ That way we prevent the N + 1 problem.
 
 ... there are multiple reasons why immutable Java records as query results are attractive (immutable, not too many queries or fields to query, etc.) ...
 
-... as an aside, Hibernate queries (but not JPQL queries) can also return JSON and use CTEs (again, JPQL/HQL is an OO SQL dialect) ...
+... as an aside, Hibernate queries (but not JPQL queries) can also return JSON and use CTEs (again, JPQL/HQL is an OO SQL dialect; it is ok to sometimes use Hibernate-specific APIs) ...
 
 ## The metamodel, and type-safe querying
 
