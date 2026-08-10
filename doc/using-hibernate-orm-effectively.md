@@ -3,7 +3,13 @@
 
 Expected audience: mostly Java developers with at least some experience with Hibernate ORM.
 
+Motivation for this presentation: I have encountered Hibernate ORM in many projects, mostly struggling
+with it instead of using it effectively. It took me many years before starting to understand that this does
+not have to be that way, and I would like to share those insights. Hence, this presentation.
+
 *Question* to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least Jakarta Persistence (or its predecessor)?
+
+## Example used in this presentation
 
 The example used throughout this talk is as follows. It uses 3 related JPA entities, and a query method.
 This example uses (a small part of) the [sample Pagila database](https://github.com/devrimgunduz/pagila/tree/master).
