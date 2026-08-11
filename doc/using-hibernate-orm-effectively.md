@@ -401,11 +401,150 @@ The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessar
 
 ## Combining mutable JPA entities with immutable Java record DTOs
 
-... TODO ...
+Legacy old school Java is about imperative programming, mutable JavaBeans with getters and setters,
+(implicit) nullability everywhere.
 
-... there are multiple reasons why immutable Java records as query results are attractive (immutable, not too many queries or fields to query, etc.) ...
+*Modern Java* is about *functional programming*, including *Stream pipelines*, *immutable Java records*,
+and the use of type `Optional` and/or explicit nullability using *JSpecify* annotations.
 
-... as an aside, Hibernate queries (but not JPQL queries) can also return JSON and use CTEs (again, JPQL/HQL is an OO SQL dialect; it is ok to sometimes use Hibernate-specific APIs) ...
+As a good example, compare the old school `Date` and `Calendar` APIs versus the Java 8 `java.time` API.
+The latter is a huge improvement over the former, leading to client code that is easy to reason about,
+which to a large part can be attributed to the *immutable* date and time concepts in the `java.time` API.
+
+Hibernate/JPA *entities* are in this sense mutable *old school JavaBeans* with getters and setters. They carry a lot
+of hidden state, such as the presence or absence of an open "persistence context", associations that may or
+may not have been loaded, etc. So they are poor DTOs to pass across application layers. By contrast, immutable
+Java records are extremely simple to reason about, since they can have only 1 state, namely the state
+created by the constructor. Let's define some DTOs and use them in the `AddressService` interface.
+
+Assume annotation `org.jspecify.annotations.NullMarked` to be set at the package level, thus specifying
+that everything in that package is non-null unless specified otherwise.
+
+Record class `Country`:
+
+```java
+public record Country(
+        long id,
+        String country,
+        Instant lastUpdate
+) {
+}
+```
+
+Record class `City`:
+
+```java
+public record City(
+        long id,
+        String city,
+        Country country,
+        Instant lastUpdate
+) {
+}
+```
+
+And finally record class `Address` (with a nested record class for new addresses):
+
+```java
+public record Address(
+        long id,
+        String address1,
+        @Nullable String address2,
+        String district,
+        City city,
+        @Nullable String postalCode,
+        String phone,
+        Instant lastUpdate
+) {
+
+    public Optional<String> address2Option() {
+        return Optional.ofNullable(address2);
+    }
+
+    public Optional<String> postalCodeOption() {
+        return Optional.ofNullable(postalCode);
+    }
+
+    public record NewAddress(
+            String address1,
+            @Nullable String address2,
+            String district,
+            long cityId,
+            @Nullable String postalCode,
+            String phone,
+            Instant lastUpdate
+    ) {
+    }
+}
+```
+
+The adapted `AddressService` API:
+
+```java
+public interface AddressService {
+
+    // Good: result is technology-agnostic and immutable, so extremely easy to reason about
+    Optional<Address> findById(long id);
+
+    // Other methods
+}
+```
+
+Let's adapt `ConcreteAddressService` accordingly, assuming the existence of method `AddressEntity.toModelObject`:
+
+```java
+public final class ConcreteAddressService implements AddressService {
+
+    private final EntityManagerFactory emf;
+
+    @Override
+    public Optional<Address> findById(long id) {
+        return emf.callInTransaction(entityManager -> {
+            // The city and country of the address are fetched as well
+            String qlString =
+                    "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = ?1";
+
+            return entityManager.createQuery(qlString, AddressEntity.class)
+                    .setParameter(1, id)
+                    .getResultStream()
+                    .map(AddressEntity::toModelObject)
+                    .findFirst();
+        });
+    }
+
+    // More methods
+}
+```
+
+Here the address entities are internal to the Hibernate `Session`, and they are converted to immutable DTOs
+within the same `Session`.
+
+Assume method `AddressEntity.toModelObject` trivially calls `CityEntity.toModelObject`, which trivially calls
+`CountryEntity.toModelObject`. Now the same code above would work without the "fetch joins", yet with
+additional Hibernate-generated queries to lazily load city and country associations.
+
+There are several ways to (indirectly, via entities, or directly, using constructor calls in the query) create
+DTOs from Hibernate/JPQL queries. Custom DTOs can be used to reduce the number of data fields to retrieve.
+Recall the preceding section in which different proper ways of preventing `LazyInitializationException`s were
+discussed. Using custom DTO projections is one of those ways. Fortunately, immutable Java records make perfect
+DTO projections.
+
+Also note that DTO projections can prevent the creation of too many entities to be managed by the persistence
+context. Yet again recall that sometimes a `StatelessSession`/`EntityAgent` can be a better choice than
+`Session`/`EntityManager`, thus circumventing the need for a persistence context.
+
+Are there ways to use a Hibernate/JPQL query to populate a nested Java DTO projection, without using any
+intermediate entities? After all, SQL itself is a very powerful query language, with support for *SQL/JSON*
+and *Common Table Expressions*. It is not hard to imagine how JSON results can be converted easily to
+nested Java DTOs.
+
+Fortunately, *HQL* is also an extremely rich OO SQL dialect, including support for SQL/JSON and CTEs
+(since Hibernate 8). Given that it is quite unlikely that Hibernate is swapped for another JPA implementation,
+why not *stick to the JPA standard where feasible, and use Hibernate-specific features where needed*?
+No example is given here, but SQL/JSON HQL querying without needing any entities is feasible.
+
+In summary, *JPQL/HQL querying returning (immutable) DTO projections can be done in many ways*, and comes
+with *several advantages*.
 
 ## The metamodel, and type-safe querying
 
