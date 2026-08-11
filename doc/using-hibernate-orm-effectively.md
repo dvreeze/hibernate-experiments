@@ -402,12 +402,12 @@ The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessar
 ## Combining mutable JPA entities with immutable Java record DTOs
 
 Legacy old school Java is about imperative programming, mutable JavaBeans with getters and setters,
-(implicit) nullability everywhere.
+(implicit) nullability everywhere, and often lots of hidden implicit state.
 
 *Modern Java* is about *functional programming*, including *Stream pipelines*, *immutable Java records*,
 and the use of type `Optional` and/or explicit nullability using *JSpecify* annotations.
 
-As a good example, compare the old school `Date` and `Calendar` APIs versus the Java 8 `java.time` API.
+As a good example, compare the old school `Date` and `Calendar` APIs with the Java 8 `java.time` API.
 The latter is a huge improvement over the former, leading to client code that is easy to reason about,
 which to a large part can be attributed to the *immutable* date and time concepts in the `java.time` API.
 
@@ -481,6 +481,7 @@ public record Address(
 The adapted `AddressService` API:
 
 ```java
+// Completely technology-agnostic service interface (also trivial to mock in presentation layer unit tests)
 public interface AddressService {
 
     // Good: result is technology-agnostic and immutable, so extremely easy to reason about
@@ -516,22 +517,23 @@ public final class ConcreteAddressService implements AddressService {
 }
 ```
 
-Here the address entities are internal to the Hibernate `Session`, and they are converted to immutable DTOs
+Here the address entities are internal to the transactional Hibernate `Session`, and they are converted to immutable DTOs
 within the same `Session`.
 
 Assume method `AddressEntity.toModelObject` trivially calls `CityEntity.toModelObject`, which trivially calls
 `CountryEntity.toModelObject`. Now the same code above would work without the "fetch joins", yet with
-additional Hibernate-generated queries to lazily load city and country associations.
+additional Hibernate-generated queries to lazily load city and country associations. In a service call
+returning multiple addresses this can easily lead to an explosion of generated SQL queries.
 
-There are several ways to (indirectly, via entities, or directly, using constructor calls in the query) create
-DTOs from Hibernate/JPQL queries. Custom DTOs can be used to reduce the number of data fields to retrieve.
+There are several ways to (indirectly, via entities, or directly, using *constructor calls in the query*) create
+DTOs from Hibernate/JPQL queries. *Custom DTOs* can be used to reduce the number of data fields to retrieve.
 Recall the preceding section in which different proper ways of preventing `LazyInitializationException`s were
 discussed. Using custom DTO projections is one of those ways. Fortunately, immutable Java records make perfect
 DTO projections.
 
 Also note that DTO projections can prevent the creation of too many entities to be managed by the persistence
 context. Yet again recall that sometimes a `StatelessSession`/`EntityAgent` can be a better choice than
-`Session`/`EntityManager`, thus circumventing the need for a persistence context.
+`Session`/`EntityManager`, thus circumventing the need for a potentially "expensive" persistence context entirely.
 
 Are there ways to use a Hibernate/JPQL query to populate a nested Java DTO projection, without using any
 intermediate entities? After all, SQL itself is a very powerful query language, with support for *SQL/JSON*
@@ -542,6 +544,22 @@ Fortunately, *HQL* is also an extremely rich OO SQL dialect, including support f
 (since Hibernate 8). Given that it is quite unlikely that Hibernate is swapped for another JPA implementation,
 why not *stick to the JPA standard where feasible, and use Hibernate-specific features where needed*?
 No example is given here, but SQL/JSON HQL querying without needing any entities is feasible.
+
+In cases where we want to temporarily turn an `EntityManager` into a Hibernate `Session` to get access
+to `Session`-specific functionality, the correct way to do so is:
+
+```java
+Session session = entityManager.unwrap(Session.class);
+```
+
+Interface `Session` extends `EntityManager`, but casting is not a good alternative, because the `EntityManager` may
+be a proxy that must be unproxied first before down-casting. The `unwrap` call takes care of this.
+
+Since Hibernate 8, an analogous remark holds for `EntityAgent` and `StatelessSession`:
+
+```java
+StatelessSession statelessSession = entityAgent.unwrap(StatelessSession.class);
+```
 
 In summary, *JPQL/HQL querying returning (immutable) DTO projections can be done in many ways*, and comes
 with *several advantages*.
