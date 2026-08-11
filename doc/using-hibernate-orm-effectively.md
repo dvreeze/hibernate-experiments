@@ -525,7 +525,7 @@ Assume method `AddressEntity.toModelObject` trivially calls `CityEntity.toModelO
 additional Hibernate-generated queries to lazily load city and country associations. In a service call
 returning multiple addresses this can easily lead to an explosion of generated SQL queries.
 
-There are several ways to (indirectly, via entities, or directly, using *constructor calls in the query*) create
+There are several ways to (indirectly, via fetched entities, or directly, using *constructor calls in the query*) create
 DTOs from Hibernate/JPQL queries. *Custom DTOs* can be used to reduce the number of data fields to retrieve.
 Recall the preceding section in which different proper ways of preventing `LazyInitializationException`s were
 discussed. Using custom DTO projections is one of those ways. Fortunately, immutable Java records make perfect
@@ -536,14 +536,14 @@ context. Yet again recall that sometimes a `StatelessSession`/`EntityAgent` can 
 `Session`/`EntityManager`, thus circumventing the need for a potentially "expensive" persistence context entirely.
 
 Are there ways to use a Hibernate/JPQL query to populate a nested Java DTO projection, without using any
-intermediate entities? After all, SQL itself is a very powerful query language, with support for *SQL/JSON*
+intermediate fetched entities? After all, SQL itself is a very powerful query language, with support for *SQL/JSON*
 and *Common Table Expressions*. It is not hard to imagine how JSON results can be converted easily to
 nested Java DTOs.
 
 Fortunately, *HQL* is also an extremely rich OO SQL dialect, including support for SQL/JSON and CTEs
 (since Hibernate 8). Given that it is quite unlikely that Hibernate is swapped for another JPA implementation,
 why not *stick to the JPA standard where feasible, and use Hibernate-specific features where needed*?
-No example is given here, but SQL/JSON HQL querying without needing any entities is feasible.
+No example is given here, but SQL/JSON HQL querying without needing any fetched entities is feasible.
 
 In cases where we want to temporarily turn an `EntityManager` into a Hibernate `Session` to get access
 to `Session`-specific functionality, the correct way to do so is:
