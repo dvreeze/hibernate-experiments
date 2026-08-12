@@ -106,6 +106,12 @@ public class CountryEntity { // Not serializable
 }
 ```
 
+Note that there are 2 categories of *JPA annotations*:
+- *logical mapping annotations*, concerning the Java object model
+  - e.g. `Entity`, `Id`, `ManyToOne`, `Basic` etc.
+- *physical mapping annotations*, concerning the underlying relational database schema
+    - e.g. `Table`, `Column`, `JoinTable`, `GeneratedValue` etc.
+
 A "service" method querying an address by its technical primary key:
 
 ```java
@@ -342,8 +348,8 @@ public final class ConcreteAddressService implements AddressService {
 ```
 
 In both cases we used per-query fetching, be it through different means. This is in spirit similar to what
-we did when we used to write all SQL ourselves: per SQL query we chose our "fetch joins" (getting no help from
-the database access library to turn result sets into nested Java objects). So also in that regard
+we did many years ago when we used to write all SQL ourselves: per SQL query we chose our "fetch joins" (getting no help
+from the database access library to turn result sets into nested Java objects). So also in that regard
 we should not abandon proven database querying practices, even when using Hibernate ORM. Again, the library
 is not about abstracting away the database; it is about *Java and the database working well together*.
 
@@ -382,11 +388,16 @@ public class LineItem {
 }
 ```
 
-Again, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
-That way we prevent the N + 1 problem. Again, see [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
+Suppose we use JPQL/HQL to query for orders, and we need their line items as well. Suppose each order can
+have tens or hundreds of line items.
+
+Also in this case, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
+That way we prevent the N + 1 problem, which in this case could lead to an explosion of generated SQL queries.
+Again, see [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
 for correct ways to prevent/fix `LazyInitializationException`s.
 
-Note that the query result could also have been a *DTO projection*. See the next section about this approach.
+Note that the query result could also have been a *DTO projection* instead of entities. See the next section about
+this approach.
 
 Of course, much more can be said (and found) about effective use of Hibernate ORM, but this is a very good
 start that should not be ignored in any project using Hibernate ORM.
