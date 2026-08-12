@@ -389,7 +389,7 @@ public class LineItem {
 ```
 
 Suppose we use JPQL/HQL to query for orders, and we need their line items as well. Suppose each order can
-have tens or hundreds of line items.
+have tens or hundreds of line items. *N + 1* in this case means N (separately retrieved) line items per 1 order.
 
 Also in this case, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
 That way we prevent the N + 1 problem, which in this case could lead to an explosion of generated SQL queries.
@@ -412,6 +412,8 @@ The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessar
 
 ## Combining mutable JPA entities with immutable Java record DTOs
 
+Let's leave the topic of JPA/Hibernate for a moment, and talk about Java in general.
+
 Legacy old school Java is about imperative programming, mutable JavaBeans with getters and setters,
 (implicit) nullability everywhere, and often lots of hidden implicit state.
 
@@ -423,7 +425,7 @@ The latter is a huge improvement over the former, leading to client code that is
 which to a large part can be attributed to the *immutable* date and time concepts in the `java.time` API.
 
 Hibernate/JPA *entities* are in this sense mutable *old school JavaBeans* with getters and setters. They carry a lot
-of hidden state, such as the presence or absence of an open "persistence context", associations that may or
+of *hidden state*, such as the presence or absence of an open "persistence context", associations that may or
 may not have been loaded, etc. So they are poor DTOs to pass across application layers. By contrast, immutable
 Java records are extremely simple to reason about, since they can have only 1 state, namely the state
 created by the constructor. Let's define some DTOs and use them in the `AddressService` interface.
@@ -536,11 +538,13 @@ Assume method `AddressEntity.toModelObject` trivially calls `CityEntity.toModelO
 additional Hibernate-generated queries to lazily load city and country associations. In a service call
 returning multiple addresses this can easily lead to an explosion of generated SQL queries.
 
-There are several ways to (indirectly, via fetched entities, or directly, using *constructor calls in the query*) create
-DTOs from Hibernate/JPQL queries. *Custom DTOs* can be used to reduce the number of data fields to retrieve.
-Recall the preceding section in which different proper ways of preventing `LazyInitializationException`s were
-discussed. Using custom DTO projections is one of those ways. Fortunately, immutable Java records make perfect
-DTO projections.
+There are several ways to create DTOs from Hibernate/JPQL queries. In the example above entities were retrieved, which
+were subsequently converted to immutable DTOs. Yet it is also possible to retrieve no entities at all and instead use
+*DTO constructor calls in the query*. No example of the latter approach is shown here.
+
+*Custom DTOs* can be used to reduce the number of data fields to retrieve. Recall the preceding section in which
+different proper ways of preventing `LazyInitializationException`s were discussed. Using custom DTO projections is
+one of those ways. Fortunately, immutable Java records make perfect DTO projections.
 
 Also note that DTO projections can prevent the creation of too many entities to be managed by the persistence
 context. Yet again recall that sometimes a `StatelessSession`/`EntityAgent` can be a better choice than
@@ -549,7 +553,7 @@ context. Yet again recall that sometimes a `StatelessSession`/`EntityAgent` can 
 Are there ways to use a Hibernate/JPQL query to populate a nested Java DTO projection, without using any
 intermediate fetched entities? After all, SQL itself is a very powerful query language, with support for *SQL/JSON*
 and *Common Table Expressions*. It is not hard to imagine how JSON results can be converted easily to
-nested Java DTOs.
+nested Java DTOs, e.g. using libraries such as [Jackson](https://github.com/fasterxml/jackson).
 
 Fortunately, *HQL* is also an extremely rich OO SQL dialect, including support for SQL/JSON and CTEs
 (since Hibernate 8). Given that it is quite unlikely that Hibernate is swapped for another JPA implementation,
