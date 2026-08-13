@@ -357,8 +357,7 @@ when using Hibernate ORM. Again, the library is not about abstracting away the d
 *Java and the database working well together*.
 
 In this case, our entities only used to-one associations, but in practice many associations are collection-valued
-to-many associations. This brings us to what might be the main problem in production with (naive?) Hibernate
-ORM application code, the dreaded *N + 1 problem*:
+to-many associations. For example:
 
 ```java
 // Hypothetical Order and LineItem entities (unrelated to the previous examples)
@@ -391,11 +390,16 @@ public class LineItem {
 }
 ```
 
-Suppose we use JPQL/HQL to query for orders, and we need their line items as well. Suppose each order can
-have tens or hundreds of line items. *N + 1* in this case means N (separately retrieved) line items per 1 order.
+This brings us to what might be the main problem in production with (naive?) Hibernate ORM application code,
+the dreaded *N + 1 select problem*. This problem can also be illustrated with to-one associations, but
+to-many associations make a description of this problem more interesting.
+
+Suppose we use JPQL/HQL to query for multiple orders, and we need their line items as well. Suppose each order can
+have tens or hundreds of line items. The *N + 1 select problem* is the issue that first a collection of
+orders is retrieved in one query, and then, per retrieved order, a query is run to fetch its line items.
 
 Also in this case, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
-That way we prevent the N + 1 problem, which in this case could lead to an explosion of generated SQL queries.
+That way we prevent the N + 1 select problem, which in this case could lead to an explosion of generated SQL queries.
 At the same time, we thus prevent the occurrence of [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)s.
 
 Note that the query result could also have been a *DTO projection* instead of entities. See the next section about
