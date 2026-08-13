@@ -1,9 +1,9 @@
 
 # Using the Hibernate ORM effectively
 
-Expected audience: mostly Java developers with at least some experience with Hibernate ORM.
+*Expected audience*: mostly Java developers with at least some experience with Hibernate ORM.
 
-Motivation for this presentation: I have encountered Hibernate ORM in many projects, mostly struggling
+*Motivation for this presentation*: I have encountered Hibernate ORM in many projects, mostly struggling
 with it instead of using it effectively. Typically, my co-workers struggled with Hibernate ORM as well.
 It took me many years before starting to understand that this does not have to be that way, and I would
 like to share those insights. Hence, this presentation.
@@ -161,11 +161,13 @@ Indeed, it throws a [LazyInitializationException](https://thorben-janssen.com/la
 When I say "Hibernate ORM", I could have said "Jakarta Persistence API" (formerly JPA).
 Loosely we can still use the term JPA for Jakarta Persistence API.
 
-Hibernate ORM is the reference implementation (and de-facto standard implementation) of the Jakarta Persistence standard.
+*Hibernate ORM* is the reference implementation (and de-facto standard implementation) of the *Jakarta Persistence standard*.
 Typically, we use Hibernate ORM through the Jakarta Persistence API, so in practice we could use both terms interchangeably.
 Note that Hibernate 6+ uses the "jakarta" namespace (introduced in "JPA" version 3.0) instead of "javax" namespace.
 
 Why this presentation? After all, most "enterprise" Java projects use Hibernate/JPA, so it should be familiar, right?
+Yet, as said earlier, many Java developers struggle or have struggled with Hibernate, including myself,
+and it does not have to be that way.
 
 *Question* to the audience: *how happy and/or successful are you using Hibernate ORM*?
 
@@ -177,8 +179,8 @@ Such projects suffer from code maintenance issues and performance issues in prod
 I have myself spent many years of Java and Scala development "hating" Hibernate, and not wanting to work with it.
 Put differently, I have spent many years not understanding Hibernate ORM.
 
-If applicable, what if we start using Hibernate ORM with *realistic expectations* about what this library is and is not about?
-In particular, Hibernate ORM is *not about abstracting away the database*.
+If this sounds familiar, what if we start using Hibernate ORM with *realistic expectations* about what this library is
+and is not about? In particular, Hibernate ORM is *not about abstracting away the database*.
 (In retrospect, Ted Neward at least partly missed the point about Hibernate ORM with his "The Vietnam of Computer Science" article.)
 The moment we start "working with the database" using Hibernate ORM, Hibernate ORM becomes a "productivity booster".
 
@@ -277,7 +279,7 @@ are very clear: *choose fetch type "lazy" for all entity associations*.
 So, use the default fetch type for to-many associations, and *explicitly choose fetch type "lazy" for to-one associations*.
 Jakarta Persistence 4.0 (and therefore Hibernate 8) makes this easy, by a global configuration setting!
 
-Still, this does not solve our problem. Both the Hibernate team and Thorben Janssen also advice the following:
+Still, this does not solve our problem. Both the Hibernate team and Thorben Janssen also offer the following advice:
 *use per-query fetching*.
 
 That is, we could do "fetch joins" in our Hibernate/JPQL queries:
@@ -350,8 +352,9 @@ public final class ConcreteAddressService implements AddressService {
 In both cases we used per-query fetching, be it through different means. This is in spirit similar to what
 we did many years ago when we used to write all SQL ourselves: per SQL query we chose our "fetch joins" (getting no help
 from the database access library to turn result sets into nested Java objects). So also in that regard
-we should not abandon proven database querying practices, even when using Hibernate ORM. Again, the library
-is not about abstracting away the database; it is about *Java and the database working well together*.
+we should not abandon proven database querying practices, even when using Hibernate ORM, or better, especially
+when using Hibernate ORM. Again, the library is not about abstracting away the database; it is about
+*Java and the database working well together*.
 
 In this case, our entities only used to-one associations, but in practice many associations are collection-valued
 to-many associations. This brings us to what might be the main problem in production with (naive?) Hibernate
@@ -393,11 +396,10 @@ have tens or hundreds of line items. *N + 1* in this case means N (separately re
 
 Also in this case, the short story is: *all entity associations should be lazy* and *use per-query fetching*.
 That way we prevent the N + 1 problem, which in this case could lead to an explosion of generated SQL queries.
-Again, see [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
-for correct ways to prevent/fix `LazyInitializationException`s.
+At the same time, we thus prevent the occurrence of [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)s.
 
 Note that the query result could also have been a *DTO projection* instead of entities. See the next section about
-this approach.
+that approach, which also prevents SQL query explosions as well as `LazyInitializationException`s.
 
 Of course, much more can be said (and found) about effective use of Hibernate ORM, but this is a very good
 start that should not be ignored in any project using Hibernate ORM.
@@ -417,7 +419,7 @@ Let's leave the topic of JPA/Hibernate for a moment, and talk about Java in gene
 Legacy old school Java is about imperative programming, mutable JavaBeans with getters and setters,
 (implicit) nullability everywhere, and often lots of hidden implicit state.
 
-*Modern Java* is about *functional programming*, including *Stream pipelines*, *immutable Java records*,
+*Modern Java* is about *functional programming*, including `java.util.stream.Stream` *pipelines*, *immutable Java records*,
 and the use of type `Optional` and/or explicit nullability using *JSpecify* annotations.
 
 As a good example, compare the old school `Date` and `Calendar` APIs with the Java 8 `java.time` API.
@@ -558,7 +560,7 @@ nested Java DTOs, e.g. using libraries such as [Jackson](https://github.com/fast
 Fortunately, *HQL* is also an extremely rich OO SQL dialect, including support for SQL/JSON and CTEs
 (since Hibernate 8). Given that it is quite unlikely that Hibernate is swapped for another JPA implementation,
 why not *stick to the JPA standard where feasible, and use Hibernate-specific features where needed*?
-No example is given here, but SQL/JSON HQL querying without needing any fetched entities is feasible.
+No example is given here, but SQL/JSON HQL querying without needing any (intermediate) fetched entities is feasible.
 
 In cases where we want to temporarily turn an `EntityManager` into a Hibernate `Session` to get access
 to `Session`-specific functionality, the correct way to do so is:
@@ -577,7 +579,7 @@ StatelessSession statelessSession = entityAgent.unwrap(StatelessSession.class);
 ```
 
 In summary, *JPQL/HQL querying returning (immutable) DTO projections can be done in many ways*, and comes
-with *several advantages*.
+with *several advantages* w.r.t. "application architecture" and performance.
 
 ## The metamodel, and type-safe querying
 
