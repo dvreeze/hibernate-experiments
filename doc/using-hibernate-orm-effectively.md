@@ -240,6 +240,9 @@ It is probably even a good idea to read the entire (opinionated) [No-nonsense gu
 The [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) is probably best used
 as reference material. The same as true for the [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/).
 
+A nice summary of Hibernate ORM difficulties can be found at
+[Hibernate ORM pitfalls or difficulties](https://www.quora.com/What-are-pitfalls-or-difficulties-in-using-Hibernate-as-ORM).
+
 Recall the preceding flawed code:
 
 ```java
