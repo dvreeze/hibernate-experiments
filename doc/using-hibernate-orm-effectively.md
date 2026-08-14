@@ -3,10 +3,11 @@
 
 *Expected audience*: mostly Java developers with at least some experience with Hibernate ORM.
 
-*Motivation for this presentation*: I have encountered Hibernate ORM in many projects, mostly struggling
-with it instead of using it effectively. Typically, my co-workers struggled with Hibernate ORM as well.
-It took me many years before starting to understand that this does not have to be that way, and I would
-like to share those insights. Hence, this presentation.
+*Motivation for this presentation*: Most real world Java projects use the ubiquitous *Hibernate ORM*.
+Still, many developers have felt a lot of pain using this powerful tool, myself included. Yet others are quite
+successful with Hibernate. What can we learn from them? How do recent Hibernate releases help us even
+more? And how can we combine Hibernate ORM with modern functional Java programming practices?
+This presentation dives into these questions.
 
 *Question* to the audience: at work, *who uses (or has used) Hibernate ORM*, or at least *Jakarta Persistence* (or its predecessor)?
 
