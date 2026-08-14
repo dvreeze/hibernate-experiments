@@ -429,8 +429,12 @@ Legacy old school Java is about imperative programming, mutable JavaBeans with g
 *Modern Java* is about *functional programming*, including `java.util.stream.Stream` *pipelines*, *immutable Java records*,
 and the use of type `Optional` and/or explicit nullability using *JSpecify* annotations.
 
-As a good example, compare the old school `Date` and `Calendar` APIs with the Java 8 `java.time` API.
-The latter is a huge improvement over the former, leading to client code that is easy to reason about,
+Modern Java is also more consistent with much of the advice offered by Joshua Bloch in his book
+*Effective Java, 3rd Edition*. In particular, recall items *Minimize mutability* and *Favor composition over
+inheritance*.
+
+As a good example of "legacy" versus modern Java, compare the old school `Date` and `Calendar` APIs with the Java 8
+`java.time` API. The latter is a huge improvement over the former, leading to client code that is easy to reason about,
 which to a large part can be attributed to the *immutable* date and time concepts in the `java.time` API.
 
 Hibernate/JPA *entities* are in this sense mutable *old school JavaBeans* with getters and setters. They carry a lot
