@@ -592,6 +592,12 @@ StatelessSession statelessSession = entityAgent.unwrap(StatelessSession.class);
 In summary, *JPQL/HQL querying returning (immutable) DTO projections can be done in many ways*, and comes
 with *several advantages* w.r.t. "application architecture" and performance.
 
+As a final note in this section, [Stop using JPA/Hibernate](https://www.stemlaur.com/blog/2021/03/30/tech-hibern-hate/)
+is quite critical of Hibernate/JPA. Much of the critique centers around *mutability of JPA entities*.
+As shown in this section, using *technology-agnostic immutable Java record DTOs* as "data carriers" across
+("service" and "presentation") application layers mitigates many of the points made in that article.
+In this approach JPA entities are internal to the service layer and therefore invisible outside that layer.
+
 ## The metamodel, and type-safe querying
 
 ... TODO ...
