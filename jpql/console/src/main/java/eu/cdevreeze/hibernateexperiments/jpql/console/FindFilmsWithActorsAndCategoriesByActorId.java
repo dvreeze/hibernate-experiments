@@ -18,10 +18,6 @@ package eu.cdevreeze.hibernateexperiments.jpql.console;
 
 import module eu.cdevreeze.hibernateexperiments.jpql.service;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.jpql.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
-import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
-import eu.cdevreeze.hibernateexperiments.jpql.service.factory.FilmServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;

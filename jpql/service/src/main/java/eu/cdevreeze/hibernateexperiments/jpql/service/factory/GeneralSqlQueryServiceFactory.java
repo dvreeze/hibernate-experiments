@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
+package eu.cdevreeze.hibernateexperiments.jpql.service.factory;
+
+import eu.cdevreeze.hibernateexperiments.jpql.service.GeneralSqlQueryService;
+import eu.cdevreeze.hibernateexperiments.jpql.service.impl.ConcreteGeneralSqlQueryService;
+import jakarta.persistence.EntityManagerFactory;
+
 /**
- * Module descriptor of the console programs using the corresponding service layer API.
+ * Factory of {@link GeneralSqlQueryService} objects.
  *
  * @author Chris de Vreeze
  */
-module eu.cdevreeze.hibernateexperiments.jpql.console {
-    requires eu.cdevreeze.hibernateexperiments.jpql.service;
-    requires jakarta.persistence;
-    requires org.jspecify;
-    requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
-    requires com.google.common;
+public final class GeneralSqlQueryServiceFactory {
 
-    exports eu.cdevreeze.hibernateexperiments.jpql.console;
+    private GeneralSqlQueryServiceFactory() {
+        // Non-instantiable
+    }
+
+    public static GeneralSqlQueryService create(EntityManagerFactory emf) {
+        return new ConcreteGeneralSqlQueryService(emf);
+    }
 }

@@ -18,6 +18,7 @@ package eu.cdevreeze.hibernateexperiments.jpql.entity;
 
 import module jakarta.persistence;
 import module java.base;
+import com.google.common.base.MoreObjects;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Country;
 import jakarta.persistence.Entity;
 
@@ -76,5 +77,14 @@ public class CountryEntity {
                 Objects.requireNonNull(country),
                 Objects.requireNonNull(lastUpdate)
         );
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("country", country)
+                .add("lastUpdate", lastUpdate)
+                .toString();
     }
 }

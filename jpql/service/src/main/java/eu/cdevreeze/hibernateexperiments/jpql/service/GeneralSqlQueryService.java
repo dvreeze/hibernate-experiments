@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
+package eu.cdevreeze.hibernateexperiments.jpql.service;
+
+import com.google.common.collect.ImmutableList;
+
 /**
- * Module descriptor of the console programs using the corresponding service layer API.
+ * General native SQL query service.
  *
  * @author Chris de Vreeze
  */
-module eu.cdevreeze.hibernateexperiments.jpql.console {
-    requires eu.cdevreeze.hibernateexperiments.jpql.service;
-    requires jakarta.persistence;
-    requires org.jspecify;
-    requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
-    requires com.google.common;
+public interface GeneralSqlQueryService {
 
-    exports eu.cdevreeze.hibernateexperiments.jpql.console;
+    /**
+     * Executes the given native SQL query, using the passed query arguments. The query string must use
+     * positional parameters corresponding to the passed query arguments. Each element in the result collection
+     * is a row as collection of columns.
+     */
+    <T> ImmutableList<T> executeSqlQuery(String qlString, Class<T> resultClass, ImmutableList<Object> args);
 }

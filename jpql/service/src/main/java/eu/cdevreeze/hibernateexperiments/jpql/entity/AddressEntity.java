@@ -18,6 +18,7 @@ package eu.cdevreeze.hibernateexperiments.jpql.entity;
 
 import module jakarta.persistence;
 import module java.base;
+import com.google.common.base.MoreObjects;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
 import jakarta.persistence.Entity;
 
@@ -137,5 +138,19 @@ public class AddressEntity {
                 Objects.requireNonNull(phone),
                 Objects.requireNonNull(lastUpdate)
         );
+    }
+
+    @Override
+    public String toString() {
+        // Leaving out associations, which may not yet have been loaded
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("address", address)
+                .add("address2", address2)
+                .add("district", district)
+                .add("postalCode", postalCode)
+                .add("phone", phone)
+                .add("lastUpdate", lastUpdate)
+                .toString();
     }
 }
