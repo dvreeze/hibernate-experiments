@@ -126,6 +126,7 @@ public class AddressEntity {
         this.lastUpdate = lastUpdate;
     }
 
+    // May cause LazyInitializationException
     public Address toModelObject() {
         return new Address(
                 Objects.requireNonNull(id),

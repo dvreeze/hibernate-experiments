@@ -174,6 +174,7 @@ public class FilmEntity {
         this.lastUpdate = lastUpdate;
     }
 
+    // May cause LazyInitializationException
     public Film toModelObject() {
         return new Film(
                 Objects.requireNonNull(id),

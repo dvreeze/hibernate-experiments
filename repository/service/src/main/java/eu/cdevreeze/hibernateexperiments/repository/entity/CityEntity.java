@@ -83,6 +83,7 @@ public class CityEntity {
         this.lastUpdate = lastUpdate;
     }
 
+    // May cause LazyInitializationException
     public City toModelObject() {
         return new City(
                 Objects.requireNonNull(id),
