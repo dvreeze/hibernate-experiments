@@ -155,7 +155,7 @@ AddressEntity address = addressService.findById(id).orElseThrow(); // Assume "id
 String cityName = address.getCity().getCity();
 ```
 
-Indeed, it throws a [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
+Indeed, it throws a [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/). We will get back to this in a later section.
 
 ## Introduction
 
@@ -227,6 +227,14 @@ public final class ConcreteAddressService implements AddressService {
     // More methods
 }
 ```
+
+## How not to use Hibernate ORM
+
+... TODO ...
+... pretending the database access is solely the job of Hibernate, so we can just deal with Java objects ...
+... in other words, pretending we do not need to put in any effort in order to access the database using Hibernate ORM ...
+... show example of service method taking entity parameter, without clear semantics of that method ...
+... other bad practices (explain why), such as eager fetching (see next section), "infrastructure" in entities, session escaping thread, etc. ...
 
 ## Hibernate ORM best practices
 
@@ -442,7 +450,7 @@ which to a large part can be attributed to the *immutable* date and time concept
 
 Hibernate/JPA *entities* are in this sense mutable *old school JavaBeans* with getters and setters. They carry a lot
 of *hidden state*, such as the presence or absence of an open "persistence context", associations that may or
-may not have been loaded, etc. So they are poor DTOs to pass across application layers. By contrast, immutable
+may not have been loaded, etc. So *they are poor DTOs to pass across application layers*. By contrast, immutable
 Java records are extremely simple to reason about, since they can have only 1 state, namely the state
 created by the constructor. Let's define some DTOs and use them in the `AddressService` interface.
 
@@ -560,7 +568,7 @@ were subsequently converted to immutable DTOs. Yet it is also possible to retrie
 
 *Custom DTOs* can be used to reduce the number of data fields to retrieve. Recall the preceding section in which
 different proper ways of preventing `LazyInitializationException`s were discussed. Using custom DTO projections is
-one of those ways. Fortunately, immutable Java records make perfect DTO projections.
+one of those ways. Fortunately, *immutable Java records make perfect DTO projections*.
 
 Also note that DTO projections can prevent the creation of too many entities to be managed by the persistence
 context. Yet again recall that sometimes a `StatelessSession`/`EntityAgent` can be a better choice than
