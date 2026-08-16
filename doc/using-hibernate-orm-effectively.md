@@ -418,7 +418,9 @@ cascading of operations to associated entities, the less we invite surprising Hi
 Again, see [Thorben Janssen](https://thorben-janssen.com/tutorials/) for more on this (e.g.
 [cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)).
 
-The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessary SQL*.
+The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessary SQL*, while at the same
+time *querying for all needed data* (while we still have an open `Session`) in order to prevent the
+occurrence of `LazyInitializationException`s.
 
 ## Combining mutable JPA entities with immutable Java record DTOs
 
