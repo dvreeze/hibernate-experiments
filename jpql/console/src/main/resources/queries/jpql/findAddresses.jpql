@@ -1,1 +1,1 @@
-select a from Address a join fetch a.city c join fetch c.country
+select a from Address a join fetch a.city ct join fetch ct.country

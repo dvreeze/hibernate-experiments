@@ -1,0 +1,23 @@
+select
+    new eu.cdevreeze.hibernateexperiments.jpql.model.Address(
+      a.id,
+      a.address,
+      a.address2,
+      a.district,
+      new eu.cdevreeze.hibernateexperiments.jpql.model.City(
+        ct.id,
+        ct.city,
+        new eu.cdevreeze.hibernateexperiments.jpql.model.Country(
+          co.id,
+          co.country,
+          co.lastUpdate
+        ),
+        ct.lastUpdate
+      ),
+      a.postalCode,
+      a.phone,
+      a.lastUpdate
+    )
+  from Address a
+  join a.city ct
+  join ct.country co

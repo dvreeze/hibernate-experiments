@@ -40,14 +40,14 @@ public class ExecuteSqlQuery {
 
     static void main(String... args) throws IOException, ClassNotFoundException {
         Objects.checkIndex(1, args.length);
-        Path jpqlQueryPath = Path.of(args[0]);
-        String jpqlQuery = Files.readString(jpqlQueryPath);
+        Path sqlQueryPath = Path.of(args[0]);
+        String sqlQuery = Files.readString(sqlQueryPath);
         Class<?> clazz = Class.forName(args[1]);
 
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             GeneralSqlQueryService queryService = GeneralSqlQueryServiceFactory.create(emf);
 
-            List<?> results = queryService.executeSqlQuery(jpqlQuery, clazz, ImmutableList.of());
+            List<?> results = queryService.executeSqlQuery(sqlQuery, clazz, ImmutableList.of());
 
             results.forEach(IO::println);
         }
