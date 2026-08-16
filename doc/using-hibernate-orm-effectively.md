@@ -232,7 +232,8 @@ public final class ConcreteAddressService implements AddressService {
 
 Let's first get into the topic of how *not to use Hibernate ORM*. The best way to *fail with Hibernate* is
 to *pretend we only have to deal with Java objects*, assuming that *Hibernate automagically deals with synchronization
-of those Java objects with the database*, without any necessary effort on our part.
+of those Java objects with the database*, without any necessary effort on our part, other than "configuring"
+the JPA entities.
 
 This may not be that much of an issue in small size Java projects or new Java projects. Yet otherwise this
 naive approach leads to code that is hard to understand and maintain, as well as performance problems that
