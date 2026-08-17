@@ -698,15 +698,90 @@ In this approach JPA entities are internal to the service layer and therefore in
 
 ... differences in philosophy between Jakarta Data and Spring Data ...
 
+See for example [Jakarta Data (better) repositories](https://vaadin.com/blog/jakarta-data-better-repositories).
+
 ## Schema validation and evolution
 
 ... TODO ...
 
 ## Testing Hibernate application code
 
-... TODO ... 
+Unit testing database repository code that uses Hibernate ORM can be done in several ways.
 
-... generated in-memory H2 database gets us quite far; use orm.xml to override entity attributes where needed ...
+Note that mocking unit tests probably do not get us very far. After all, when mocking dependencies such as an
+`EntityManagerFactory` and `EntityManager`, what is the unit test really testing?
+
+We could of course unit test against the same database product as in production, yet using
+[Testcontainers](https://testcontainers.com/guides/getting-started-with-testcontainers-for-java/) for
+the containerized test database. Such unit tests could give us a lot of confidence in the correctness
+of the tested repository class, but this approach is a bit cumbersome.
+
+A pragmatic unit testing approach could use an *embedded database*, in particular [H2](https://h2database.com/html/main.html).
+This exploits the fact that Hibernate/JPA does successfully abstract away many database-specific details.
+The *logical mapping annotations* in JPA entities are typically the same in the unit tests, and the
+*physical mapping annotations* can be overridden where needed, using an `META-INF/orm.xml` file on the test
+class path.
+
+For example:
+
+```xml
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
+          https://jakarta.ee/xml/ns/persistence/orm/orm_4_0.xsd" version="4.0">
+    <!-- Entity overrides needed to generate H2 (test) schema from entity definitions -->
+    <entity class="eu.cdevreeze.hibernateexperiments.jpql.entity.LanguageEntity">
+        <attribute-override name="name">
+            <column column-definition="text"/>
+        </attribute-override>
+    </entity>
+    <entity class="eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity">
+        <attribute-override name="releaseYear">
+            <column name="release_year" column-definition="integer"/>
+        </attribute-override>
+    </entity>
+</entity-mappings>
+```
+
+It may be attractive to create the unit test `EntityManagerFactory` instances programmatically within unit test code.
+For example:
+
+```java
+    private static EntityManagerFactory createEntityManagerFactory() {
+        String persistenceUnitName = "pagilatestH2";
+        return new PersistenceConfiguration(persistenceUnitName)
+                .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
+                .defaultToOneFetchType(FetchType.LAZY)
+                .provider("org.hibernate.jpa.HibernatePersistenceProvider")
+                .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
+                .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
+                .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
+                .managedClass(AddressEntity.class)
+                .managedClass(CityEntity.class)
+                .managedClass(CountryEntity.class)
+                .createEntityManagerFactory();
+    }
+```
+
+Note that dropping and recreating the embedded H2 database is a logical thing to do in these unit tests.
+This is certainly not the case for the database used in production. If we keep the bootstrapping code
+above local to the unit test class path, there is far less danger that we inadvertently empty the production
+database.
+
+Populating the embedded H2 test database with (initial) data could also be done programmatically. The following
+pattern (or something similar) could be used for that:
+
+```java
+private void populateData(EntityManager entityManager) {
+    entityManager.runWithConnection((Connection connection) -> {
+        try (var statement = connection.createStatement()) {
+            statement.execute(initDataScript);
+        }
+    });
+}
+```
+
+Personally, I think unit testing Hibernate repositories using an embedded H2 database can get us quite far.
 
 ## Conclusion
 
