@@ -19,14 +19,13 @@ package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 import module eu.cdevreeze.hibernateexperiments.entitymanager.model;
 import module jakarta.persistence;
 import module java.base;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.AddressEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.CountryEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Address;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.City;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Country;
 import eu.cdevreeze.hibernateexperiments.entitymanager.service.AddressService;
+import org.hibernate.proxy.HibernateProxy;
 
 /**
  * The same as {@link ConcreteAddressService}, except for the absence of {@link EntityGraph}'s.
@@ -51,6 +50,7 @@ public final class InefficientAddressService implements AddressService {
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
                     .getResultStream()
+                    .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .findFirst();
         });
@@ -65,6 +65,7 @@ public final class InefficientAddressService implements AddressService {
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, cityId)
                     .getResultStream()
+                    .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -79,6 +80,7 @@ public final class InefficientAddressService implements AddressService {
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
+                    .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -92,6 +94,7 @@ public final class InefficientAddressService implements AddressService {
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .getResultStream()
+                    .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
