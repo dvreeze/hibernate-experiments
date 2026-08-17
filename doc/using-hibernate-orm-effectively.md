@@ -747,20 +747,20 @@ It may be attractive to create the unit test `EntityManagerFactory` instances pr
 For example:
 
 ```java
-    private static EntityManagerFactory createEntityManagerFactory() {
-        String persistenceUnitName = "pagilatestH2";
-        return new PersistenceConfiguration(persistenceUnitName)
-                .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
-                .defaultToOneFetchType(FetchType.LAZY)
-                .provider("org.hibernate.jpa.HibernatePersistenceProvider")
-                .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
-                .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
-                .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
-                .managedClass(AddressEntity.class)
-                .managedClass(CityEntity.class)
-                .managedClass(CountryEntity.class)
-                .createEntityManagerFactory();
-    }
+private static EntityManagerFactory createEntityManagerFactory() {
+    String persistenceUnitName = "pagilatestH2";
+    return new PersistenceConfiguration(persistenceUnitName)
+            .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
+            .defaultToOneFetchType(FetchType.LAZY)
+            .provider("org.hibernate.jpa.HibernatePersistenceProvider")
+            .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
+            .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
+            .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
+            .managedClass(AddressEntity.class)
+            .managedClass(CityEntity.class)
+            .managedClass(CountryEntity.class)
+            .createEntityManagerFactory();
+}
 ```
 
 Note that dropping and recreating the embedded H2 database is a logical thing to do in these unit tests.
