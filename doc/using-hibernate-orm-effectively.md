@@ -772,12 +772,12 @@ Populating the embedded H2 test database with (initial) data could also be done 
 pattern (or something similar) could be used for that:
 
 ```java
-private void populateData(EntityManager entityManager) {
-    entityManager.runWithConnection((Connection connection) -> {
-        try (var statement = connection.createStatement()) {
+private void populateData(EntityManagerFactory emf) {
+    emf.runInTransaction(entityManager -> entityManager.runWithConnection((Connection conn) -> {
+        try (var statement = conn.createStatement()) {
             statement.execute(initDataScript);
         }
-    });
+    }));
 }
 ```
 
