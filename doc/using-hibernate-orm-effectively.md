@@ -494,6 +494,9 @@ The *common theme* here is to *avoid the creation by Hibernate ORM of unnecessar
 time *querying for all needed data* (while we still have an open `Session`) in order to prevent the
 occurrence of `LazyInitializationException`s.
 
+Specifically, *choose fetching behavior per query, not per entity*, while consistently leaving/setting
+*association fetching at the entity level to lazy*.
+
 ## Combining mutable JPA entities with immutable Java record DTOs
 
 Let's leave the topic of JPA/Hibernate for a moment, and talk about Java in general.
