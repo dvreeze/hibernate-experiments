@@ -785,14 +785,14 @@ void afterEach() {
 
 This approach of creating the embedded database per test method does slow down the unit tests a bit.
 Creating the test database only once per (entire) unit test, while rolling back any test method transaction,
-is clearly more efficient. That's what we could typically do in "repository" unit tests in a Spring (Boot)
-code base, for example.
+is clearly more efficient. That's what we would typically do in "repository" unit tests in a Spring (Boot)
+code base, for example. In such a code base *transaction management is usually annotation-based*.
 
 Populating the embedded H2 test database with (initial) data could also be done programmatically. The following
 pattern (or something similar) could be used for that:
 
 ```java
-private void populateData(EntityManagerFactory emf) {
+private void fillInitialTestData(EntityManagerFactory emf) {
     emf.runInTransaction(entityManager -> entityManager.runWithConnection((Connection conn) -> {
         try (var statement = conn.createStatement()) {
             statement.execute(initDataScript);
