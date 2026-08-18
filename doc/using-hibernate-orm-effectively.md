@@ -764,9 +764,24 @@ private static EntityManagerFactory createEntityManagerFactory() {
 ```
 
 Note that dropping and recreating the embedded H2 database is a logical thing to do in these unit tests.
-This is certainly not the case for the database used in production. If we keep the bootstrapping code
-above local to the unit test class path, there is far less danger that we inadvertently empty the production
-database.
+Obviously, this is certainly not the case for the database used in production. If we keep the bootstrapping code
+above local to unit tests, there is far less danger that we inadvertently empty the production database.
+
+If we create (and fill) the embedded database before each *test method*, and drop it after each test method,
+the test methods do not influence each other and each test method starts with a fresh database. Pattern:
+
+```java
+@org.junit.jupiter.api.BeforeEach
+void beforeEach() {
+    emf = createEntityManagerFactory();
+    fillInitialTestData(emf);
+}
+
+@org.junit.jupiter.api.AfterEach
+void afterEach() {
+    emf.close();
+}
+```
 
 Populating the embedded H2 test database with (initial) data could also be done programmatically. The following
 pattern (or something similar) could be used for that:
@@ -781,7 +796,7 @@ private void populateData(EntityManagerFactory emf) {
 }
 ```
 
-Personally, I think unit testing Hibernate repositories using an embedded H2 database can get us quite far.
+In summary, I think unit testing "Hibernate repositories" using an embedded H2 database can get us quite far.
 
 ## Conclusion
 
