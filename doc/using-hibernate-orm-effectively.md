@@ -783,6 +783,11 @@ void afterEach() {
 }
 ```
 
+This approach of creating the embedded database per test method does slow down the unit tests a bit.
+Creating the test database only once per (entire) unit test, while rolling back any test method transaction,
+is clearly more efficient. That's what we could typically do in "repository" unit tests in a Spring (Boot)
+code base, for example.
+
 Populating the embedded H2 test database with (initial) data could also be done programmatically. The following
 pattern (or something similar) could be used for that:
 
