@@ -17,12 +17,15 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.ActorEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.LanguageEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
 import jakarta.persistence.*;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -51,17 +54,15 @@ abstract class AbstractActorServiceH2Test {
 
     protected abstract ActorService actorService(EntityManagerFactory emf);
 
-    @BeforeAll
-    static void beforeAll() {
+    @BeforeEach
+    void beforeEach() {
         emf = createEntityManagerFactory();
         fillInitialTestData(emf);
     }
 
-    @AfterAll
-    static void afterAll() {
-        if (emf != null) {
-            emf.close();
-        }
+    @AfterEach
+    void afterEach() {
+        emf.close();
     }
 
     @Test

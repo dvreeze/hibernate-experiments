@@ -63,10 +63,8 @@ class ConcreteAddressServiceTest {
 
     @AfterAll
     static void afterAll() {
-        if (emf != null) {
-            emf.close();
-            postgreSQLContainer.stop();
-        }
+        emf.close();
+        postgreSQLContainer.stop();
     }
 
     @Test
