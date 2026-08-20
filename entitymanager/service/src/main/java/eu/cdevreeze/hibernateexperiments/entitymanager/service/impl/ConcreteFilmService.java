@@ -86,7 +86,7 @@ public final class ConcreteFilmService implements FilmService {
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f left join FilmActor fa on (f.id = fa.film.id) where fa.actor.id = ?1";
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
             EntityGraph<FilmEntity> entityGraph = getEntityGraph();
 
