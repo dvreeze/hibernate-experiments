@@ -18,7 +18,6 @@ package eu.cdevreeze.hibernateexperiments.entitymanager.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.FilmActor;
 import jakarta.persistence.Entity;
 
 /**
@@ -82,14 +81,5 @@ public class FilmActorEntity {
 
     public void setLastUpdate(Instant lastUpdate) {
         this.lastUpdate = lastUpdate;
-    }
-
-    public FilmActor toModelObject() {
-        // Mind the order of IDs, which differs between entity and model object
-        return new FilmActor(
-                Objects.requireNonNull(film).getId(),
-                Objects.requireNonNull(actor).getId(),
-                Objects.requireNonNull(lastUpdate)
-        );
     }
 }

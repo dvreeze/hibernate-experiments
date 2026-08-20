@@ -17,10 +17,7 @@
 package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.ActorEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmActorEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.LanguageEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.*;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Actor;
 import eu.cdevreeze.hibernateexperiments.entitymanager.service.ActorService;
 import jakarta.persistence.*;
@@ -114,8 +111,11 @@ abstract class AbstractActorServiceH2Test {
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
                 .managedClass(ActorEntity.class)
-                .managedClass(FilmActorEntity.class)
                 .managedClass(FilmEntity.class)
+                .managedClass(FilmActorEntity.class)
+                .managedClass(ActorEntity.class)
+                .managedClass(FilmCategoryEntity.class)
+                .managedClass(CategoryEntity.class)
                 .managedClass(LanguageEntity.class)
                 .createEntityManagerFactory();
     }

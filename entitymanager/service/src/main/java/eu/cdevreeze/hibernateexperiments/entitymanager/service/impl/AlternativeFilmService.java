@@ -58,20 +58,20 @@ public final class AlternativeFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
+    public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             // Hibernate HQL, which extends JPQL
 
             return entityManager.createQuery(QL_STRING, String.class)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
     @Override
-    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+    public Optional<Film> findFilm(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(Session.class, (Session session) -> {
             // Hibernate HQL, which extends JPQL
@@ -89,13 +89,13 @@ public final class AlternativeFilmService implements FilmService {
 
             return session.createQuery(cq)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .findFirst();
         });
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(Session.class, (Session session) -> {
             // Hibernate HQL, which extends JPQL
@@ -118,7 +118,7 @@ public final class AlternativeFilmService implements FilmService {
 
             return session.createQuery(cq)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }

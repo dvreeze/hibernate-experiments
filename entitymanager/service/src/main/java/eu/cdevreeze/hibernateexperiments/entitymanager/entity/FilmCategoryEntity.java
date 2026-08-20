@@ -18,7 +18,6 @@ package eu.cdevreeze.hibernateexperiments.entitymanager.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.FilmCategory;
 import jakarta.persistence.Entity;
 
 /**
@@ -40,12 +39,12 @@ public class FilmCategoryEntity {
 
     @MapsId("filmId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "filmId")
+    @JoinColumn(name = "film_id")
     private FilmEntity film;
 
     @MapsId("categoryId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
     @Basic(optional = false)
@@ -82,13 +81,5 @@ public class FilmCategoryEntity {
 
     public void setLastUpdate(Instant lastUpdate) {
         this.lastUpdate = lastUpdate;
-    }
-
-    public FilmCategory toModelObject() {
-        return new FilmCategory(
-                Objects.requireNonNull(film).getId(),
-                Objects.requireNonNull(category).getId(),
-                Objects.requireNonNull(lastUpdate)
-        );
     }
 }
