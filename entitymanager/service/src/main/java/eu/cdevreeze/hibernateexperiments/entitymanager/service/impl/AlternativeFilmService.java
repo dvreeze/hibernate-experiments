@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Concrete {@link FilmService} implementation.
+ * Alternative {@link FilmService} implementation that uses CTEs (and JSON result sets) internally.
  * <p>
  * The implementation has been inspired by
  * <a href="https://blog.jooq.org/jooq-3-15s-new-multiset-operator-will-change-how-you-think-about-sql/">jOOQ's multiset operator</a>,
@@ -42,7 +42,7 @@ import java.util.Optional;
  *
  * @author Chris de Vreeze
  */
-public final class ConcreteFilmService implements FilmService {
+public final class AlternativeFilmService implements FilmService {
 
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
@@ -53,7 +53,7 @@ public final class ConcreteFilmService implements FilmService {
 
     private final EntityManagerFactory emf;
 
-    public ConcreteFilmService(EntityManagerFactory emf) {
+    public AlternativeFilmService(EntityManagerFactory emf) {
         this.emf = emf;
     }
 

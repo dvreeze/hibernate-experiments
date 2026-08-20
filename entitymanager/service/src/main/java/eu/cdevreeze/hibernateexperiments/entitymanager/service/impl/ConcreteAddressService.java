@@ -21,9 +21,6 @@ import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.*;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Address;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.City;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Country;
 import eu.cdevreeze.hibernateexperiments.entitymanager.service.AddressService;
 import org.hibernate.jpa.SpecHints;
 

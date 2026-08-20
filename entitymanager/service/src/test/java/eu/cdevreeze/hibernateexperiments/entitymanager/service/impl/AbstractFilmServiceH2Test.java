@@ -179,14 +179,14 @@ abstract class AbstractFilmServiceH2Test {
             eh.insert(film);
 
             FilmActorEntity filmActorJohn = new FilmActorEntity();
-            filmActorJohn.setActorId(john.getId());
-            filmActorJohn.setFilmId(film.getId());
+            filmActorJohn.setActor(john);
+            filmActorJohn.setFilm(film);
             filmActorJohn.setLastUpdate(Instant.now());
             eh.insert(filmActorJohn);
 
             FilmActorEntity filmActorJane = new FilmActorEntity();
-            filmActorJane.setActorId(jane.getId());
-            filmActorJane.setFilmId(film.getId());
+            filmActorJane.setActor(jane);
+            filmActorJane.setFilm(film);
             filmActorJane.setLastUpdate(Instant.now());
             eh.insert(filmActorJane);
 
@@ -197,8 +197,8 @@ abstract class AbstractFilmServiceH2Test {
             eh.insert(category);
 
             FilmCategoryEntity filmCategory = new FilmCategoryEntity();
-            filmCategory.setFilmId(film.getId());
-            filmCategory.setCategoryId(category.getId());
+            filmCategory.setFilm(film);
+            filmCategory.setCategory(category);
             filmCategory.setLastUpdate(Instant.now());
             eh.insert(filmCategory);
         });

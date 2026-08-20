@@ -22,7 +22,6 @@ import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.ActorEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.ActorEntity_;
-import eu.cdevreeze.hibernateexperiments.entitymanager.model.Actor;
 import eu.cdevreeze.hibernateexperiments.entitymanager.service.ActorService;
 
 /**
@@ -65,8 +64,8 @@ public final class ConcreteActorService implements ActorService {
             String qlString = """
                     select act
                       from Actor act
-                     inner join FilmActor fa on fa.actorId = act.id
-                     where fa.filmId = ?1
+                     inner join FilmActor fa on fa.actor.id = act.id
+                     where fa.film.id = ?1
                     """;
 
             EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();

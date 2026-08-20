@@ -28,40 +28,52 @@ import jakarta.persistence.Entity;
  */
 @Entity(name = "FilmCategory")
 @Table(name = "Film_Category")
-@IdClass(FilmCategoryKey.class)
 public class FilmCategoryEntity {
 
     // Note that the entity class is not Serializable
     // Note the absence of overridden equals and hashCode
 
-    // We intentionally kept the primary key "specification" simple, at the expense of having no associations.
+    @EmbeddedId
+    @AttributeOverride(name = "categoryId", column = @Column(name = "category_id"))
+    @AttributeOverride(name = "filmId", column = @Column(name = "film_id"))
+    private FilmCategoryKey filmCategoryKey;
 
-    @Id
-    @Column(name = "film_id")
-    private Integer filmId;
+    @MapsId("filmId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "filmId")
+    private FilmEntity film;
 
-    @Id
-    @Column(name = "category_id")
-    private Integer categoryId;
+    @MapsId("categoryId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "categoryId")
+    private CategoryEntity category;
 
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Integer getFilmId() {
-        return filmId;
+    public FilmCategoryKey getFilmCategoryKey() {
+        return filmCategoryKey;
     }
 
-    public void setFilmId(Integer filmId) {
-        this.filmId = filmId;
+    public void setFilmCategoryKey(FilmCategoryKey filmCategoryKey) {
+        this.filmCategoryKey = filmCategoryKey;
     }
 
-    public Integer getCategoryId() {
-        return categoryId;
+    public FilmEntity getFilm() {
+        return film;
     }
 
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
+    public void setFilm(FilmEntity film) {
+        this.film = film;
+    }
+
+    public CategoryEntity getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryEntity category) {
+        this.category = category;
     }
 
     public Instant getLastUpdate() {
@@ -74,8 +86,8 @@ public class FilmCategoryEntity {
 
     public FilmCategory toModelObject() {
         return new FilmCategory(
-                Objects.requireNonNull(filmId),
-                Objects.requireNonNull(categoryId),
+                Objects.requireNonNull(film).getId(),
+                Objects.requireNonNull(category).getId(),
                 Objects.requireNonNull(lastUpdate)
         );
     }
