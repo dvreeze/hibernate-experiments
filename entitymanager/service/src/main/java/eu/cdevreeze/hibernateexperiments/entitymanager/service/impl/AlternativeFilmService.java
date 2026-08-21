@@ -125,7 +125,6 @@ public final class AlternativeFilmService implements FilmService {
 
     private static final String QL_STRING = """
                     select json_object(
-                               'film': json_object(
                                    'id': f.id,
                                    'title': f.title,
                                    'description': f.description,
@@ -152,33 +151,32 @@ public final class AlternativeFilmService implements FilmService {
                                    'rating': f.rating,
                                    'lastUpdate': f.lastUpdate,
                                    'specialFeatures': json_array(),
-                                   'fullText': ''
-                               ),
-                               'actors':
-                                   (select json_arrayagg(
-                                              json_object(
-                                                  'id': a.id,
-                                                  'firstName': a.firstName,
-                                                  'lastName': a.lastName,
-                                                  'lastUpdate': a.lastUpdate
+                                   'fullText': '',
+                                   'actors':
+                                       (select json_arrayagg(
+                                                  json_object(
+                                                      'id': a.id,
+                                                      'firstName': a.firstName,
+                                                      'lastName': a.lastName,
+                                                      'lastUpdate': a.lastUpdate
+                                                  )
                                               )
-                                          )
-                                     from FilmActor fa
-                                    inner join Actor a on (fa.actor.id = a.id)
-                                    where fa.film.id = f.id
-                               ),
-                               'categories':
-                                   (select json_arrayagg(
-                                               json_object(
-                                                   'id': c.id,
-                                                   'name': c.name,
-                                                   'lastUpdate': c.lastUpdate
+                                         from FilmActor fa
+                                        inner join Actor a on (fa.actor.id = a.id)
+                                        where fa.film.id = f.id
+                                   ),
+                                   'categories':
+                                       (select json_arrayagg(
+                                                   json_object(
+                                                       'id': c.id,
+                                                       'name': c.name,
+                                                       'lastUpdate': c.lastUpdate
+                                                   )
                                                )
-                                           )
-                                     from FilmCategory fc
-                                    inner join Category c on (fc.category.id = c.id)
-                                    where fc.film.id = f.id
-                               )
+                                         from FilmCategory fc
+                                        inner join Category c on (fc.category.id = c.id)
+                                        where fc.film.id = f.id
+                                   )
                            )
                       from Film f
                       left join f.language l1
