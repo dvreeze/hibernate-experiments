@@ -118,6 +118,9 @@ public final class ConcreteFilmService implements FilmService {
         Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addSubgraph("filmCategories");
         filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
 
+        entityGraph.addAttributeNode("language");
+        entityGraph.addAttributeNode("originalLanguage");
+
         return entityGraph;
     }
 }

@@ -48,7 +48,9 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.filmActors fac
                       left join fetch fac.actor
                       left join fetch f.filmCategories fca
-                      left join fetch fca.category""";
+                      left join fetch fca.category
+                      left join fetch f.language
+                      left join fetch f.originalLanguage""";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .getResultList() // to be on the safe side
@@ -69,6 +71,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch fac.actor
                       left join fetch f.filmCategories fca
                       left join fetch fca.category
+                      left join fetch f.language
+                      left join fetch f.originalLanguage
                      where f.id = ?1""";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
@@ -90,6 +94,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch fac.actor
                       left join fetch f.filmCategories fca
                       left join fetch fca.category
+                      left join fetch f.language
+                      left join fetch f.originalLanguage
                       left join f.filmActors fa
                      where fa.actor.id = ?1""";
 

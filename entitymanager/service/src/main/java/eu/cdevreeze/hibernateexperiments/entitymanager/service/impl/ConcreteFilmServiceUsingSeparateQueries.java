@@ -167,6 +167,9 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addSubgraph("filmActors");
         filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
 
+        entityGraph.addAttributeNode("language");
+        entityGraph.addAttributeNode("originalLanguage");
+
         return entityGraph;
     }
 
