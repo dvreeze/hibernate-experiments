@@ -23,19 +23,21 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
 /**
- * Program finding all films with actors and categories in the database.
+ * Program finding all films in the database, using CTEs in the implementation.
  *
  * @author Chris de Vreeze
  */
-public class FindAllFilms {
+public class FindAllFilmsUsingCtes {
 
     static void main(String... args) {
         JsonMapper jsonMapper = JsonMapper.builder()
                 .addModule(new GuavaModule())
                 .build();
 
+        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
+
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            FilmService filmService = FilmServiceFactory.create(emf);
+            FilmService filmService = AlternativeFilmServiceFactory.create(emf);
 
             List<Film> films = filmService.findAllFilms();
 

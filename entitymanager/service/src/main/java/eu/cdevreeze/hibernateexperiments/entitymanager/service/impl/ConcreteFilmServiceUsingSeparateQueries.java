@@ -54,13 +54,11 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                             .stream()
                             .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
 
-            filmEntities.forEach(filmEntity -> {
-                filmEntity.setFilmCategories(
-                        Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
-                                .map(FilmEntity::getFilmCategories)
-                                .orElse(java.util.Set.of())
-                );
-            });
+            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
+                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
+                            .map(FilmEntity::getFilmCategories)
+                            .orElse(java.util.Set.of())
+            ));
 
             return filmEntities
                     .stream()
@@ -83,13 +81,11 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                             .stream()
                             .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
 
-            filmEntities.forEach(filmEntity -> {
-                filmEntity.setFilmCategories(
-                        Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
-                                .map(FilmEntity::getFilmCategories)
-                                .orElse(java.util.Set.of())
-                );
-            });
+            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
+                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
+                            .map(FilmEntity::getFilmCategories)
+                            .orElse(java.util.Set.of())
+            ));
 
             return filmEntities
                     .stream()
@@ -109,13 +105,11 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                             .stream()
                             .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
 
-            filmEntities.forEach(filmEntity -> {
-                filmEntity.setFilmCategories(
-                        Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
-                                .map(FilmEntity::getFilmCategories)
-                                .orElse(java.util.Set.of())
-                );
-            });
+            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
+                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
+                            .map(FilmEntity::getFilmCategories)
+                            .orElse(java.util.Set.of())
+            ));
 
             return filmEntities
                     .stream()
