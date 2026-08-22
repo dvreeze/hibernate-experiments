@@ -99,35 +99,33 @@ public final class ConcreteFilmService implements FilmService {
 
     private static final String SQL_STRING = """
                     select json_object(
-                               'film': json_object(
-                                   'id': f.film_id,
-                                   'title': f.title,
-                                   'description': f.description,
-                                   'releaseYear': f.release_year,
-                                   'language': json_object(
-                                       'id': l1.language_id,
-                                       'name': l1.name,
-                                       'lastUpdate': l1.last_update
-                                   ),
-                                   'originalLanguage':
-                                       case
-                                           when f.original_language_id is null
-                                           then null
-                                           else json_object(
-                                                    'id': l2.language_id,
-                                                    'name': l2.name,
-                                                    'lastUpdate': l2.last_update
-                                                )
-                                       end,
-                                   'rentalDuration': f.rental_duration,
-                                   'rentalRate': f.rental_rate,
-                                   'length': f.length,
-                                   'replacementCost': f.replacement_cost,
-                                   'rating': f.rating,
-                                   'lastUpdate': f.last_update,
-                                   'specialFeatures': json_array(),
-                                   'fullText': ''
+                               'id': f.film_id,
+                               'title': f.title,
+                               'description': f.description,
+                               'releaseYear': f.release_year,
+                               'language': json_object(
+                                   'id': l1.language_id,
+                                   'name': l1.name,
+                                   'lastUpdate': l1.last_update
                                ),
+                               'originalLanguage':
+                                   case
+                                       when f.original_language_id is null
+                                       then null
+                                       else json_object(
+                                                'id': l2.language_id,
+                                                'name': l2.name,
+                                                'lastUpdate': l2.last_update
+                                            )
+                                   end,
+                               'rentalDuration': f.rental_duration,
+                               'rentalRate': f.rental_rate,
+                               'length': f.length,
+                               'replacementCost': f.replacement_cost,
+                               'rating': f.rating,
+                               'lastUpdate': f.last_update,
+                               'specialFeatures': json_array(),
+                               'fullText': '',
                                'actors': json_array(
                                    select json_object(
                                               'id': a.actor_id,
