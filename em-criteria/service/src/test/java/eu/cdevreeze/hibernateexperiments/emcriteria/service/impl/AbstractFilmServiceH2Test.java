@@ -65,53 +65,53 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testFindAllFilms() {
-        List<Film.WithActorsAndCategories> films = filmService(emf).findAllFilmsWithActorsAndCategories();
+        List<Film> films = filmService(emf).findAllFilms();
 
         assertEquals(1, films.size());
-        assertEquals("Two wolves", films.getFirst().film().title());
-        assertEquals("G", films.getFirst().film().rating());
-        assertEquals(120, films.getFirst().film().length());
-        assertEquals("English", films.getFirst().film().language().name());
+        assertEquals("Two wolves", films.getFirst().title());
+        assertEquals("G", films.getFirst().rating());
+        assertEquals(120, films.getFirst().length());
+        assertEquals("English", films.getFirst().language().name());
         assertEquals(Set.of("Doe"), films.getFirst().actors().stream().map(Actor::lastName).collect(Collectors.toSet()));
         assertEquals(Set.of("Action"), films.getFirst().categories().stream().map(Category::name).collect(Collectors.toSet()));
     }
 
     @Test
     void testFindFilm() {
-        Optional<Film.WithActorsAndCategories> filmOption = filmService(emf).findFilmWithActorsAndCategories(1);
+        Optional<Film> filmOption = filmService(emf).findFilm(1);
 
         assertTrue(filmOption.isPresent());
-        assertEquals("Two wolves", filmOption.get().film().title());
-        assertEquals("G", filmOption.get().film().rating());
-        assertEquals(120, filmOption.get().film().length());
-        assertEquals("English", filmOption.get().film().language().name());
+        assertEquals("Two wolves", filmOption.get().title());
+        assertEquals("G", filmOption.get().rating());
+        assertEquals(120, filmOption.get().length());
+        assertEquals("English", filmOption.get().language().name());
         assertEquals(Set.of("Doe"), filmOption.get().actors().stream().map(Actor::lastName).collect(Collectors.toSet()));
         assertEquals(Set.of("Action"), filmOption.get().categories().stream().map(Category::name).collect(Collectors.toSet()));
     }
 
     @Test
     void testFindNoFilm() {
-        Optional<Film.WithActorsAndCategories> filmOption = filmService(emf).findFilmWithActorsAndCategories(2);
+        Optional<Film> filmOption = filmService(emf).findFilm(2);
 
         assertFalse(filmOption.isPresent());
     }
 
     @Test
     void testFindFilmsByActorId() {
-        ImmutableList<Film.WithActorsAndCategories> films = filmService(emf).findFilmsWithActorsAndCategoriesByActorId(1);
+        ImmutableList<Film> films = filmService(emf).findFilmsByActorId(1);
 
         assertEquals(1, films.size());
-        assertEquals("Two wolves", films.getFirst().film().title());
-        assertEquals("G", films.getFirst().film().rating());
-        assertEquals(120, films.getFirst().film().length());
-        assertEquals("English", films.getFirst().film().language().name());
+        assertEquals("Two wolves", films.getFirst().title());
+        assertEquals("G", films.getFirst().rating());
+        assertEquals(120, films.getFirst().length());
+        assertEquals("English", films.getFirst().language().name());
         assertEquals(Set.of("Doe"), films.getFirst().actors().stream().map(Actor::lastName).collect(Collectors.toSet()));
         assertEquals(Set.of("Action"), films.getFirst().categories().stream().map(Category::name).collect(Collectors.toSet()));
     }
 
     @Test
     void testFindNoFilmsByActorId() {
-        ImmutableList<Film.WithActorsAndCategories> films = filmService(emf).findFilmsWithActorsAndCategoriesByActorId(3);
+        ImmutableList<Film> films = filmService(emf).findFilmsByActorId(3);
 
         assertEquals(0, films.size());
     }
@@ -179,14 +179,14 @@ abstract class AbstractFilmServiceH2Test {
             eh.insert(film);
 
             FilmActorEntity filmActorJohn = new FilmActorEntity();
-            filmActorJohn.setActorId(john.getId());
-            filmActorJohn.setFilmId(film.getId());
+            filmActorJohn.setActor(john);
+            filmActorJohn.setFilm(film);
             filmActorJohn.setLastUpdate(Instant.now());
             eh.insert(filmActorJohn);
 
             FilmActorEntity filmActorJane = new FilmActorEntity();
-            filmActorJane.setActorId(jane.getId());
-            filmActorJane.setFilmId(film.getId());
+            filmActorJane.setActor(jane);
+            filmActorJane.setFilm(film);
             filmActorJane.setLastUpdate(Instant.now());
             eh.insert(filmActorJane);
 
@@ -197,8 +197,8 @@ abstract class AbstractFilmServiceH2Test {
             eh.insert(category);
 
             FilmCategoryEntity filmCategory = new FilmCategoryEntity();
-            filmCategory.setFilmId(film.getId());
-            filmCategory.setCategoryId(category.getId());
+            filmCategory.setFilm(film);
+            filmCategory.setCategory(category);
             filmCategory.setLastUpdate(Instant.now());
             eh.insert(filmCategory);
         });

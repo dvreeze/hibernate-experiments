@@ -18,16 +18,20 @@ package eu.cdevreeze.hibernateexperiments.criteria.console;
 
 import module eu.cdevreeze.hibernateexperiments.criteria.service;
 import module java.base;
+import eu.cdevreeze.hibernateexperiments.criteria.bootstrap.EntityManagerFactories;
+import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
+import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
+import eu.cdevreeze.hibernateexperiments.criteria.service.factory.FilmServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
 /**
- * Program finding all films with actors and categories in the database.
+ * Program finding the film with a given ID, returning it with actors and categories.
  *
  * @author Chris de Vreeze
  */
-public class FindAllFilmsWithActorsAndCategories {
+public class FindFilm {
 
     static void main(String... args) {
         JsonMapper jsonMapper = JsonMapper.builder()
@@ -36,10 +40,13 @@ public class FindAllFilmsWithActorsAndCategories {
 
         System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
 
+        Objects.checkIndex(0, args.length);
+        long filmId = Long.parseLong(args[0]);
+
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 
-            List<Film.WithActorsAndCategories> films = filmService.findAllFilmsWithActorsAndCategories();
+            Optional<Film> films = filmService.findFilm(filmId);
 
             jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
         }

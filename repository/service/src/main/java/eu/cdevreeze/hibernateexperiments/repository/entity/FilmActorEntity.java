@@ -18,7 +18,6 @@ package eu.cdevreeze.hibernateexperiments.repository.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.repository.model.FilmActor;
 import jakarta.persistence.Entity;
 
 /**
@@ -28,40 +27,52 @@ import jakarta.persistence.Entity;
  */
 @Entity(name = "FilmActor")
 @Table(name = "Film_Actor")
-@IdClass(FilmActorKey.class)
 public class FilmActorEntity {
 
     // Note that the entity class is not Serializable
     // Note the absence of overridden equals and hashCode
 
-    // We intentionally kept the primary key "specification" simple, at the expense of having no associations.
+    @EmbeddedId
+    @AttributeOverride(name = "actorId", column = @Column(name = "actor_id"))
+    @AttributeOverride(name = "filmId", column = @Column(name = "film_id"))
+    private FilmActorKey filmActorKey;
 
-    @Id
-    @Column(name = "actor_id")
-    private Integer actorId;
+    @MapsId("actorId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "actor_id")
+    private ActorEntity actor;
 
-    @Id
-    @Column(name = "film_id")
-    private Integer filmId;
+    @MapsId("filmId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "film_id")
+    private FilmEntity film;
 
     @Basic(optional = false)
     @Column(name = "last_update")
     private Instant lastUpdate;
 
-    public Integer getActorId() {
-        return actorId;
+    public FilmActorKey getFilmActorKey() {
+        return filmActorKey;
     }
 
-    public void setActorId(Integer actorId) {
-        this.actorId = actorId;
+    public void setFilmActorKey(FilmActorKey filmActorKey) {
+        this.filmActorKey = filmActorKey;
     }
 
-    public Integer getFilmId() {
-        return filmId;
+    public ActorEntity getActor() {
+        return actor;
     }
 
-    public void setFilmId(Integer filmId) {
-        this.filmId = filmId;
+    public void setActor(ActorEntity actor) {
+        this.actor = actor;
+    }
+
+    public FilmEntity getFilm() {
+        return film;
+    }
+
+    public void setFilm(FilmEntity film) {
+        this.film = film;
     }
 
     public Instant getLastUpdate() {
@@ -70,14 +81,5 @@ public class FilmActorEntity {
 
     public void setLastUpdate(Instant lastUpdate) {
         this.lastUpdate = lastUpdate;
-    }
-
-    public FilmActor toModelObject() {
-        // Mind the order of IDs, which differs between entity and model object
-        return new FilmActor(
-                Objects.requireNonNull(filmId),
-                Objects.requireNonNull(actorId),
-                Objects.requireNonNull(lastUpdate)
-        );
     }
 }

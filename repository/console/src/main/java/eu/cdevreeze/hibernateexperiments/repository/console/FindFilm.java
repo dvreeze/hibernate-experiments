@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.emcriteria.console;
+package eu.cdevreeze.hibernateexperiments.repository.console;
 
-import module eu.cdevreeze.hibernateexperiments.emcriteria.service;
+import module eu.cdevreeze.hibernateexperiments.repository.service;
 import module java.base;
+import eu.cdevreeze.hibernateexperiments.repository.bootstrap.EntityManagerFactories;
+import eu.cdevreeze.hibernateexperiments.repository.model.Film;
+import eu.cdevreeze.hibernateexperiments.repository.service.FilmService;
+import eu.cdevreeze.hibernateexperiments.repository.service.factory.FilmServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
 /**
- * Program finding the films with a given actor (as ID), returning it with actors and categories.
+ * Program finding the film with a given ID, returning it with actors and categories.
  *
  * @author Chris de Vreeze
  */
-public class FindFilmsWithActorsAndCategoriesByActorId {
+public class FindFilm {
 
     static void main(String... args) {
         JsonMapper jsonMapper = JsonMapper.builder()
@@ -37,12 +41,12 @@ public class FindFilmsWithActorsAndCategoriesByActorId {
         System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
 
         Objects.checkIndex(0, args.length);
-        long actorId = Long.parseLong(args[0]);
+        long filmId = Long.parseLong(args[0]);
 
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 
-            List<Film.WithActorsAndCategories> films = filmService.findFilmsWithActorsAndCategoriesByActorId(actorId);
+            Optional<Film> films = filmService.findFilm(filmId);
 
             jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
         }

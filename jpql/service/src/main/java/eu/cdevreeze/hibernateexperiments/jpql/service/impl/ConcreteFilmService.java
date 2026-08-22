@@ -19,10 +19,7 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 import module java.base;
 import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity_;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity_;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
 import jakarta.persistence.EntityAgent;
@@ -62,20 +59,20 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
+    public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Hibernate HQL, which extends JPQL
 
             return entityAgent.createQuery(QL_STRING, String.class)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
     @Override
-    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+    public Optional<Film> findFilm(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Hibernate HQL, which extends JPQL
@@ -93,13 +90,13 @@ public final class ConcreteFilmService implements FilmService {
 
             return statelessSession.createQuery(cq)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .findFirst();
         });
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             // Hibernate HQL, which extends JPQL
@@ -115,49 +112,47 @@ public final class ConcreteFilmService implements FilmService {
 
             JpaSubQuery<Integer> subquery = cq.subquery(Integer.class);
             JpaRoot<FilmActorEntity> subqueryRoot = subquery.from(FilmActorEntity.class);
-            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actorId), actorId));
-            subquery.select(subqueryRoot.get(FilmActorEntity_.filmId));
+            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
+            subquery.select(subqueryRoot.get(FilmActorEntity_.film).get(FilmEntity_.id));
 
             cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
             return statelessSession.createQuery(cq)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
     private static final String QL_STRING = """
                     select json_object(
-                               'film': json_object(
-                                   'id': f.id,
-                                   'title': f.title,
-                                   'description': f.description,
-                                   'releaseYear': f.releaseYear,
-                                   'language': json_object(
-                                       'id': l1.id,
-                                       'name': l1.name,
-                                       'lastUpdate': l1.lastUpdate
-                                   ),
-                                   'originalLanguage':
-                                       case
-                                           when f.originalLanguage.id is null
-                                           then null
-                                           else json_object(
-                                                    'id': l2.id,
-                                                    'name': l2.name,
-                                                    'lastUpdate': l2.lastUpdate
-                                                )
-                                       end,
-                                   'rentalDuration': f.rentalDuration,
-                                   'rentalRate': f.rentalRate,
-                                   'length': f.length,
-                                   'replacementCost': f.replacementCost,
-                                   'rating': f.rating,
-                                   'lastUpdate': f.lastUpdate,
-                                   'specialFeatures': json_array(),
-                                   'fullText': ''
+                               'id': f.id,
+                               'title': f.title,
+                               'description': f.description,
+                               'releaseYear': f.releaseYear,
+                               'language': json_object(
+                                   'id': l1.id,
+                                   'name': l1.name,
+                                   'lastUpdate': l1.lastUpdate
                                ),
+                               'originalLanguage':
+                                   case
+                                       when f.originalLanguage.id is null
+                                       then null
+                                       else json_object(
+                                                'id': l2.id,
+                                                'name': l2.name,
+                                                'lastUpdate': l2.lastUpdate
+                                            )
+                                   end,
+                               'rentalDuration': f.rentalDuration,
+                               'rentalRate': f.rentalRate,
+                               'length': f.length,
+                               'replacementCost': f.replacementCost,
+                               'rating': f.rating,
+                               'lastUpdate': f.lastUpdate,
+                               'specialFeatures': json_array(),
+                               'fullText': '',
                                'actors':
                                    (select json_arrayagg(
                                               json_object(
@@ -168,8 +163,8 @@ public final class ConcreteFilmService implements FilmService {
                                               )
                                           )
                                      from FilmActor fa
-                                    inner join Actor a on (fa.actorId = a.id)
-                                    where fa.filmId = f.id
+                                    inner join Actor a on (fa.actor.id = a.id)
+                                    where fa.film.id = f.id
                                ),
                                'categories':
                                    (select json_arrayagg(
@@ -180,8 +175,8 @@ public final class ConcreteFilmService implements FilmService {
                                                )
                                            )
                                      from FilmCategory fc
-                                    inner join Category c on (fc.categoryId = c.id)
-                                    where fc.filmId = f.id
+                                    inner join Category c on (fc.category.id = c.id)
+                                    where fc.film.id = f.id
                                )
                            )
                       from Film f

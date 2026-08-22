@@ -16,9 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 
-import eu.cdevreeze.hibernateexperiments.criteria.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Address;
 import eu.cdevreeze.hibernateexperiments.criteria.model.City;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Country;
@@ -121,6 +119,11 @@ class ConcreteAddressServiceTest {
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)
+                .managedClass(FilmEntity.class)
+                .managedClass(FilmActorEntity.class)
+                .managedClass(ActorEntity.class)
+                .managedClass(FilmCategoryEntity.class)
+                .managedClass(CategoryEntity.class)
                 .createEntityManagerFactory();
     }
 

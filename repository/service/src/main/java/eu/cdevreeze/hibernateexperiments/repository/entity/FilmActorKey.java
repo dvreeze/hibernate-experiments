@@ -16,10 +16,13 @@
 
 package eu.cdevreeze.hibernateexperiments.repository.entity;
 
+import jakarta.persistence.Embeddable;
+
 /**
  * Primary key class for {@link FilmActorEntity}.
  *
  * @author Chris de Vreeze
  */
+@Embeddable
 public record FilmActorKey(Integer actorId, Integer filmId) {
 }

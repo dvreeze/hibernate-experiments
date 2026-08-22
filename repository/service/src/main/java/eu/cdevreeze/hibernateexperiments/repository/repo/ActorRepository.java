@@ -37,7 +37,7 @@ public interface ActorRepository {
     Optional<ActorEntity> findById(Integer id);
 
     // Query annotation not yet working as advertised?
-    @HQL("select a from Actor a join FilmActor fa on (fa.actorId = a.id) where fa.filmId = :filmId")
+    @HQL("select a from Actor a join FilmActor fa on (fa.actor.id = a.id) where fa.film.id = :filmId")
     List<ActorEntity> findByFilmId(Integer filmId);
 
     @Find

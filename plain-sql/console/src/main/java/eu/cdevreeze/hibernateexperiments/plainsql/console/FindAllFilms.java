@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.jpql.console;
+package eu.cdevreeze.hibernateexperiments.plainsql.console;
 
-import module eu.cdevreeze.hibernateexperiments.jpql.service;
+import module eu.cdevreeze.hibernateexperiments.plainsql.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
@@ -27,19 +27,17 @@ import tools.jackson.datatype.guava.GuavaModule;
  *
  * @author Chris de Vreeze
  */
-public class FindAllFilmsWithActorsAndCategories {
+public class FindAllFilms {
 
     static void main(String... args) {
         JsonMapper jsonMapper = JsonMapper.builder()
                 .addModule(new GuavaModule())
                 .build();
 
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 
-            List<Film.WithActorsAndCategories> films = filmService.findAllFilmsWithActorsAndCategories();
+            List<Film> films = filmService.findAllFilms();
 
             jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
         }

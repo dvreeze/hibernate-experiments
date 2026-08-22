@@ -51,18 +51,18 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
+    public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent ->
                 entityAgent.createNativeQuery(SQL_STRING, String.class)
                         .getResultStream()
-                        .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                        .map(v -> jsonMapper.readValue(v, Film.class))
                         .collect(ImmutableList.toImmutableList())
         );
     }
 
     @Override
-    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+    public Optional<Film> findFilm(long filmId) {
         // Not ideal, because SQL string composition using string concatenation is error-prone
         String sqlString = SQL_STRING.strip() + " where f.film_id = ?1";
 
@@ -71,13 +71,13 @@ public final class ConcreteFilmService implements FilmService {
                 entityAgent.createNativeQuery(sqlString, String.class)
                         .setParameter(1, filmId)
                         .getResultStream()
-                        .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                        .map(v -> jsonMapper.readValue(v, Film.class))
                         .findFirst()
         );
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // Not ideal, because SQL string composition using string concatenation is error-prone
         String sqlString = SQL_STRING.strip() + """
                 where f.film_id in (
@@ -92,7 +92,7 @@ public final class ConcreteFilmService implements FilmService {
                 entityAgent.createNativeQuery(sqlString, String.class)
                         .setParameter(1, actorId)
                         .getResultStream()
-                        .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                        .map(v -> jsonMapper.readValue(v, Film.class))
                         .collect(ImmutableList.toImmutableList())
         );
     }

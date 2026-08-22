@@ -64,8 +64,8 @@ public final class ConcreteActorService implements ActorService {
             String qlString = """
                     select act
                       from Actor act
-                     inner join FilmActor fa on fa.actorId = act.id
-                     where fa.filmId = ?1
+                     inner join FilmActor fa on fa.actor.id = act.id
+                     where fa.film.id = ?1
                     """;
 
             EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();

@@ -76,6 +76,16 @@ public class FilmEntity {
     @Column(name = "last_update")
     private Instant lastUpdate;
 
+    @OneToMany(mappedBy = FilmActorEntity_.FILM)
+    // Type Set is better than List here, but requires a high quality equals method implementation, which we do not have
+    // Type Set prevents MultipleBagFetchException here, which is a "hack", but somewhat ok if the bags are small
+    private Set<FilmActorEntity> filmActors;
+
+    @OneToMany(mappedBy = FilmCategoryEntity_.FILM)
+    // Type Set is better than List here, but requires a high quality equals method implementation, which we do not have
+    // Type Set prevents MultipleBagFetchException here, which is a "hack", but somewhat ok if the bags are small
+    private Set<FilmCategoryEntity> filmCategories;
+
     // TODO Special features and full text
 
     public Integer getId() {
@@ -174,6 +184,22 @@ public class FilmEntity {
         this.lastUpdate = lastUpdate;
     }
 
+    public Set<FilmActorEntity> getFilmActors() {
+        return filmActors;
+    }
+
+    public void setFilmActors(Set<FilmActorEntity> filmActors) {
+        this.filmActors = filmActors;
+    }
+
+    public Set<FilmCategoryEntity> getFilmCategories() {
+        return filmCategories;
+    }
+
+    public void setFilmCategories(Set<FilmCategoryEntity> filmCategories) {
+        this.filmCategories = filmCategories;
+    }
+
     // May cause LazyInitializationException
     public Film toModelObject() {
         return new Film(
@@ -190,7 +216,15 @@ public class FilmEntity {
                 rating,
                 Objects.requireNonNull(lastUpdate),
                 ImmutableList.of(),
-                ""
+                "",
+                Objects.requireNonNull(filmActors).stream()
+                        .map(FilmActorEntity::getActor)
+                        .map(ActorEntity::toModelObject)
+                        .collect(ImmutableList.toImmutableList()),
+                Objects.requireNonNull(filmCategories).stream()
+                        .map(FilmCategoryEntity::getCategory)
+                        .map(CategoryEntity::toModelObject)
+                        .collect(ImmutableList.toImmutableList())
         );
     }
 }

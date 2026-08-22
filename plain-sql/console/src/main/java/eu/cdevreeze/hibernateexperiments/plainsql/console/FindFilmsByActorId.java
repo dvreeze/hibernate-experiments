@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.criteria.console;
+package eu.cdevreeze.hibernateexperiments.plainsql.console;
 
-import module eu.cdevreeze.hibernateexperiments.criteria.service;
+import module eu.cdevreeze.hibernateexperiments.plainsql.service;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.criteria.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
-import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
-import eu.cdevreeze.hibernateexperiments.criteria.service.factory.FilmServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
@@ -31,14 +27,12 @@ import tools.jackson.datatype.guava.GuavaModule;
  *
  * @author Chris de Vreeze
  */
-public class FindFilmsWithActorsAndCategoriesByActorId {
+public class FindFilmsByActorId {
 
     static void main(String... args) {
         JsonMapper jsonMapper = JsonMapper.builder()
                 .addModule(new GuavaModule())
                 .build();
-
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
 
         Objects.checkIndex(0, args.length);
         long actorId = Long.parseLong(args[0]);
@@ -46,7 +40,7 @@ public class FindFilmsWithActorsAndCategoriesByActorId {
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 
-            List<Film.WithActorsAndCategories> films = filmService.findFilmsWithActorsAndCategoriesByActorId(actorId);
+            List<Film> films = filmService.findFilmsByActorId(actorId);
 
             jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
         }

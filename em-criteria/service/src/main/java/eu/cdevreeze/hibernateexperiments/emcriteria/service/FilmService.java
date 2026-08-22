@@ -29,9 +29,9 @@ import java.util.Optional;
 public interface FilmService {
 
     // In reality this would return too many results
-    ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories();
+    ImmutableList<Film> findAllFilms();
 
-    Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId);
+    Optional<Film> findFilm(long filmId);
 
-    ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId);
+    ImmutableList<Film> findFilmsByActorId(long actorId);
 }

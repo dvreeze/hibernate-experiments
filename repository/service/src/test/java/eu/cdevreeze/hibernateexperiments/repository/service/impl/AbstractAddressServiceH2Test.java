@@ -17,9 +17,7 @@
 package eu.cdevreeze.hibernateexperiments.repository.service.impl;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.repository.entity.AddressEntity;
-import eu.cdevreeze.hibernateexperiments.repository.entity.CityEntity;
-import eu.cdevreeze.hibernateexperiments.repository.entity.CountryEntity;
+import eu.cdevreeze.hibernateexperiments.repository.entity.*;
 import eu.cdevreeze.hibernateexperiments.repository.model.Address;
 import eu.cdevreeze.hibernateexperiments.repository.model.City;
 import eu.cdevreeze.hibernateexperiments.repository.model.Country;
@@ -169,6 +167,11 @@ abstract class AbstractAddressServiceH2Test {
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)
+                .managedClass(FilmEntity.class)
+                .managedClass(FilmActorEntity.class)
+                .managedClass(ActorEntity.class)
+                .managedClass(FilmCategoryEntity.class)
+                .managedClass(CategoryEntity.class)
                 .createEntityManagerFactory();
     }
 

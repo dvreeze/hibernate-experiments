@@ -39,11 +39,10 @@ public record Film(
         @Nullable String rating,
         Instant lastUpdate,
         @Nullable ImmutableList<String> specialFeatures,
-        String fullText
+        String fullText,
+        ImmutableList<Actor> actors,
+        ImmutableList<Category> categories
 ) {
-
-    public record WithActorsAndCategories(Film film, ImmutableList<Actor> actors, ImmutableList<Category> categories) {
-    }
 
     public Optional<String> descriptionOption() {
         return Optional.ofNullable(description);

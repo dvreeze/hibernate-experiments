@@ -41,31 +41,31 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
+    public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
-            return filmRepository.findAllFilmsWithActorsAndCategories()
+            return filmRepository.findAllFilms()
                     .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
     @Override
-    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+    public Optional<Film> findFilm(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
-            return filmRepository.findFilmWithActorsAndCategories(filmId);
+            return filmRepository.findFilm(filmId);
         });
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
-            return filmRepository.findFilmsWithActorsAndCategoriesByActorId(actorId)
+            return filmRepository.findFilmsByActorId(actorId)
                     .stream()
                     .collect(ImmutableList.toImmutableList());
         });

@@ -17,10 +17,7 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.ActorEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.LanguageEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.jpql.service.ActorService;
 import jakarta.persistence.*;
@@ -114,8 +111,11 @@ abstract class AbstractActorServiceH2Test {
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
                 .managedClass(ActorEntity.class)
-                .managedClass(FilmActorEntity.class)
                 .managedClass(FilmEntity.class)
+                .managedClass(FilmActorEntity.class)
+                .managedClass(ActorEntity.class)
+                .managedClass(FilmCategoryEntity.class)
+                .managedClass(CategoryEntity.class)
                 .managedClass(LanguageEntity.class)
                 .createEntityManagerFactory();
     }
@@ -165,14 +165,14 @@ abstract class AbstractActorServiceH2Test {
             eh.insert(film);
 
             FilmActorEntity filmActorJohn = new FilmActorEntity();
-            filmActorJohn.setActorId(john.getId());
-            filmActorJohn.setFilmId(film.getId());
+            filmActorJohn.setActor(john);
+            filmActorJohn.setFilm(film);
             filmActorJohn.setLastUpdate(Instant.now());
             eh.insert(filmActorJohn);
 
             FilmActorEntity filmActorJane = new FilmActorEntity();
-            filmActorJane.setActorId(jane.getId());
-            filmActorJane.setFilmId(film.getId());
+            filmActorJane.setActor(jane);
+            filmActorJane.setFilm(film);
             filmActorJane.setLastUpdate(Instant.now());
             eh.insert(filmActorJane);
         });

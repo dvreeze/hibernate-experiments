@@ -60,7 +60,7 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findAllFilmsWithActorsAndCategories() {
+    public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(Session.class, (Session session) -> {
             HibernateCriteriaBuilder cb = session.getCriteriaBuilder();
@@ -69,13 +69,13 @@ public final class ConcreteFilmService implements FilmService {
 
             return session.createQuery(resultQuery)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
     @Override
-    public Optional<Film.WithActorsAndCategories> findFilmWithActorsAndCategories(long filmId) {
+    public Optional<Film> findFilm(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(Session.class, (Session session) -> {
             HibernateCriteriaBuilder cb = session.getCriteriaBuilder();
@@ -89,13 +89,13 @@ public final class ConcreteFilmService implements FilmService {
 
             return session.createQuery(resultQuery)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .findFirst();
         });
     }
 
     @Override
-    public ImmutableList<Film.WithActorsAndCategories> findFilmsWithActorsAndCategoriesByActorId(long actorId) {
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(Session.class, (Session session) -> {
             HibernateCriteriaBuilder cb = session.getCriteriaBuilder();
@@ -106,15 +106,15 @@ public final class ConcreteFilmService implements FilmService {
 
             JpaSubQuery<Integer> subquery = resultQuery.subquery(Integer.class);
             JpaRoot<FilmActorEntity> subqueryRoot = subquery.from(FilmActorEntity.class);
-            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actorId), actorId));
-            subquery.select(subqueryRoot.get(FilmActorEntity_.filmId));
+            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
+            subquery.select(subqueryRoot.get(FilmActorEntity_.film).get(FilmEntity_.id));
 
             // There was no where clause before, so no "restriction" gets lost
             resultQuery.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
             return session.createQuery(resultQuery)
                     .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.WithActorsAndCategories.class))
+                    .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -129,8 +129,8 @@ public final class ConcreteFilmService implements FilmService {
         JpaSubQuery<String> actorsSubquery = cq.subquery(String.class);
         JpaRoot<FilmActorEntity> filmActorRoot = actorsSubquery.from(FilmActorEntity.class);
         JpaJoin<FilmActorEntity, ActorEntity> actorJoin = filmActorRoot.join(ActorEntity.class);
-        actorJoin.on(cb.equal(filmActorRoot.get(FilmActorEntity_.actorId), actorJoin.get(ActorEntity_.id)));
-        actorsSubquery.where(cb.equal(filmActorRoot.get(FilmActorEntity_.filmId), filmRoot.get(FilmEntity_.id)));
+        actorJoin.on(cb.equal(filmActorRoot.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorJoin.get(ActorEntity_.id)));
+        actorsSubquery.where(cb.equal(filmActorRoot.get(FilmActorEntity_.film).get(FilmEntity_.id), filmRoot.get(FilmEntity_.id)));
 
         actorsSubquery.select(
                 cb.jsonArrayAgg(
@@ -149,8 +149,8 @@ public final class ConcreteFilmService implements FilmService {
         JpaSubQuery<String> categoriesSubquery = cq.subquery(String.class);
         JpaRoot<FilmCategoryEntity> filmCategoryRoot = categoriesSubquery.from(FilmCategoryEntity.class);
         JpaJoin<FilmCategoryEntity, CategoryEntity> categoryJoin = filmCategoryRoot.join(CategoryEntity.class);
-        categoryJoin.on(cb.equal(filmCategoryRoot.get(FilmCategoryEntity_.categoryId), categoryJoin.get(CategoryEntity_.id)));
-        categoriesSubquery.where(cb.equal(filmCategoryRoot.get(FilmCategoryEntity_.filmId), filmRoot.get(FilmEntity_.id)));
+        categoryJoin.on(cb.equal(filmCategoryRoot.get(FilmCategoryEntity_.category).get(CategoryEntity_.id), categoryJoin.get(CategoryEntity_.id)));
+        categoriesSubquery.where(cb.equal(filmCategoryRoot.get(FilmCategoryEntity_.film).get(FilmEntity_.id), filmRoot.get(FilmEntity_.id)));
 
         categoriesSubquery.select(
                 cb.jsonArrayAgg(
@@ -169,49 +169,42 @@ public final class ConcreteFilmService implements FilmService {
 
         cq.select(
                 cb.jsonObject(
-                        Map.of(
-                                "film",
-                                cb.jsonObject(
-                                        Map.ofEntries(
-                                                Map.entry("id", filmRoot.get(FilmEntity_.id)),
-                                                Map.entry("title", filmRoot.get(FilmEntity_.title)),
-                                                Map.entry("description", filmRoot.get(FilmEntity_.description)),
-                                                Map.entry("releaseYear", filmRoot.get(FilmEntity_.releaseYear)),
-                                                Map.entry("language",
+                        Map.ofEntries(
+                                Map.entry("id", filmRoot.get(FilmEntity_.id)),
+                                Map.entry("title", filmRoot.get(FilmEntity_.title)),
+                                Map.entry("description", filmRoot.get(FilmEntity_.description)),
+                                Map.entry("releaseYear", filmRoot.get(FilmEntity_.releaseYear)),
+                                Map.entry("language",
+                                        cb.jsonObject(
+                                                Map.of(
+                                                        "id", filmLanguage.get(LanguageEntity_.id),
+                                                        "name", filmLanguage.get(LanguageEntity_.name),
+                                                        "lastUpdate", filmLanguage.get(LanguageEntity_.lastUpdate)
+                                                )
+                                        )),
+                                Map.entry("originalLanguage",
+                                        cb.selectCase()
+                                                .when(cb.isNull(filmRoot.get(FilmEntity_.originalLanguage).get(LanguageEntity_.id)), cb.literal(null))
+                                                .otherwise(
                                                         cb.jsonObject(
                                                                 Map.of(
-                                                                        "id", filmLanguage.get(LanguageEntity_.id),
-                                                                        "name", filmLanguage.get(LanguageEntity_.name),
-                                                                        "lastUpdate", filmLanguage.get(LanguageEntity_.lastUpdate)
+                                                                        "id", filmOriginalLanguage.get(LanguageEntity_.id),
+                                                                        "name", filmOriginalLanguage.get(LanguageEntity_.name),
+                                                                        "lastUpdate", filmOriginalLanguage.get(LanguageEntity_.lastUpdate)
                                                                 )
-                                                        )),
-                                                Map.entry("originalLanguage",
-                                                        cb.selectCase()
-                                                                .when(cb.isNull(filmRoot.get(FilmEntity_.originalLanguage).get(LanguageEntity_.id)), cb.literal(null))
-                                                                .otherwise(
-                                                                        cb.jsonObject(
-                                                                                Map.of(
-                                                                                        "id", filmOriginalLanguage.get(LanguageEntity_.id),
-                                                                                        "name", filmOriginalLanguage.get(LanguageEntity_.name),
-                                                                                        "lastUpdate", filmOriginalLanguage.get(LanguageEntity_.lastUpdate)
-                                                                                )
-                                                                        )
-                                                                )
-                                                ),
-                                                Map.entry("rentalDuration", filmRoot.get(FilmEntity_.rentalDuration)),
-                                                Map.entry("rentalRate", filmRoot.get(FilmEntity_.rentalRate)),
-                                                Map.entry("length", filmRoot.get(FilmEntity_.length)),
-                                                Map.entry("replacementCost", filmRoot.get(FilmEntity_.replacementCost)),
-                                                Map.entry("rating", filmRoot.get(FilmEntity_.rating)),
-                                                Map.entry("lastUpdate", filmRoot.get(FilmEntity_.lastUpdate)),
-                                                Map.entry("specialFeatures", cb.jsonArray()),
-                                                Map.entry("fullText", cb.literal(""))
-                                        )
+                                                        )
+                                                )
                                 ),
-                                "actors",
-                                actorsSubquery,
-                                "categories",
-                                categoriesSubquery
+                                Map.entry("rentalDuration", filmRoot.get(FilmEntity_.rentalDuration)),
+                                Map.entry("rentalRate", filmRoot.get(FilmEntity_.rentalRate)),
+                                Map.entry("length", filmRoot.get(FilmEntity_.length)),
+                                Map.entry("replacementCost", filmRoot.get(FilmEntity_.replacementCost)),
+                                Map.entry("rating", filmRoot.get(FilmEntity_.rating)),
+                                Map.entry("lastUpdate", filmRoot.get(FilmEntity_.lastUpdate)),
+                                Map.entry("specialFeatures", cb.jsonArray()),
+                                Map.entry("fullText", cb.literal("")),
+                                Map.entry("actors", actorsSubquery),
+                                Map.entry("categories", categoriesSubquery)
                         )
                 )
         );

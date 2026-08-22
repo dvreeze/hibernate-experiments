@@ -27,7 +27,7 @@ import tools.jackson.datatype.guava.GuavaModule;
  *
  * @author Chris de Vreeze
  */
-public class FindFilmWithActorsAndCategories {
+public class FindFilm {
 
     static void main(String... args) {
         JsonMapper jsonMapper = JsonMapper.builder()
@@ -42,7 +42,7 @@ public class FindFilmWithActorsAndCategories {
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 
-            Optional<Film.WithActorsAndCategories> films = filmService.findFilmWithActorsAndCategories(filmId);
+            Optional<Film> films = filmService.findFilm(filmId);
 
             jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
         }

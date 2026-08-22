@@ -20,10 +20,7 @@ import module eu.cdevreeze.hibernateexperiments.criteria.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.ActorEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.ActorEntity_;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity;
-import eu.cdevreeze.hibernateexperiments.criteria.entity.FilmActorEntity_;
+import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.service.ActorService;
 import org.hibernate.jpa.SpecHints;
 
@@ -75,8 +72,8 @@ public final class ConcreteActorService implements ActorService {
 
             Root<ActorEntity> actor = cq.from(ActorEntity.class);
             Join<ActorEntity, FilmActorEntity> filmActor = actor.join(FilmActorEntity.class, JoinType.INNER);
-            filmActor.on(cb.equal(actor.get(ActorEntity_.id), filmActor.get(FilmActorEntity_.actorId)));
-            cq.where(cb.equal(filmActor.get(FilmActorEntity_.filmId), filmId));
+            filmActor.on(cb.equal(actor.get(ActorEntity_.id), filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id)));
+            cq.where(cb.equal(filmActor.get(FilmActorEntity_.film).get(FilmEntity_.id), filmId));
             cq.select(actor);
 
             EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
