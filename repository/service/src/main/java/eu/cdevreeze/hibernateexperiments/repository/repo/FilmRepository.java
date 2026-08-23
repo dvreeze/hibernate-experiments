@@ -17,11 +17,11 @@
 package eu.cdevreeze.hibernateexperiments.repository.repo;
 
 import module java.base;
+import eu.cdevreeze.hibernateexperiments.repository.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.repository.model.Film;
 import jakarta.data.repository.Repository;
 import jakarta.persistence.EntityAgent;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
+import org.hibernate.annotations.processing.HQL;
 
 /**
  * {@link Film}-related Jakarta Data Repository.
@@ -31,127 +31,39 @@ import tools.jackson.datatype.guava.GuavaModule;
 @Repository
 public interface FilmRepository {
 
-    EntityAgent entityAgent();
-
-    default JsonMapper jsonMapper() {
-        return JsonMapper.builder()
-                .addModule(new GuavaModule())
-                .build();
-    }
+    EntityAgent entityAgent(); // Just in case we need it
 
     // In reality this would return too many results
-    // HQL annotation not yet working here. Needs to use system property "hibernate.query.hql.json_functions_enabled".
-    // @HQL(FIND_ALL_QL_STRING)
-    default List<String> findAllFilmsAsJson() {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-        return entityAgent()
-                .createQuery(FIND_ALL_QL_STRING, String.class)
-                .getResultList();
-    }
+    @HQL("""
+            select f from Film f
+              left join fetch f.filmActors fac
+              left join fetch fac.actor
+              left join fetch f.filmCategories fca
+              left join fetch fca.category
+              left join fetch f.language
+              left join fetch f.originalLanguage""")
+    List<FilmEntity> findAllFilms();
 
-    default List<Film> findAllFilms() {
-        return findAllFilmsAsJson()
-                .stream()
-                .map(v -> jsonMapper().readValue(v, Film.class))
-                .toList();
-    }
+    @HQL("""
+            select f from Film f
+              left join fetch f.filmActors fac
+              left join fetch fac.actor
+              left join fetch f.filmCategories fca
+              left join fetch fca.category
+              left join fetch f.language
+              left join fetch f.originalLanguage
+             where f.id = :filmId""")
+    Optional<FilmEntity> findFilm(int filmId);
 
-    // HQL annotation not yet working here. Needs to use system property "hibernate.query.hql.json_functions_enabled".
-    // @HQL(FIND_BY_FILM_ID_QL_STRING)
-    default Optional<String> findFilmAsJson(long filmId) {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-        return entityAgent()
-                .createQuery(FIND_BY_FILM_ID_QL_STRING, String.class)
-                .setParameter("filmId", filmId)
-                .getResultList()
-                .stream()
-                .findFirst();
-    }
-
-    default Optional<Film> findFilm(long filmId) {
-        return findFilmAsJson(filmId)
-                .map(v -> jsonMapper().readValue(v, Film.class));
-    }
-
-    // HQL annotation not yet working here. Needs to use system property "hibernate.query.hql.json_functions_enabled".
-    // @HQL(FIND_BY_ACTOR_ID_QL_STRING)
-    default List<String> findFilmsByActorIdAsJson(long actorId) {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-        return entityAgent()
-                .createQuery(FIND_BY_ACTOR_ID_QL_STRING, String.class)
-                .setParameter("actorId", actorId)
-                .getResultList();
-    }
-
-    default List<Film> findFilmsByActorId(long actorId) {
-        return findFilmsByActorIdAsJson(actorId)
-                .stream()
-                .map(v -> jsonMapper().readValue(v, Film.class))
-                .toList();
-    }
-
-    String FIND_ALL_QL_STRING = """
-                    select json_object(
-                               'id': f.id,
-                               'title': f.title,
-                               'description': f.description,
-                               'releaseYear': f.releaseYear,
-                               'language': json_object(
-                                   'id': l1.id,
-                                   'name': l1.name,
-                                   'lastUpdate': l1.lastUpdate
-                               ),
-                               'originalLanguage':
-                                   case
-                                       when f.originalLanguage.id is null
-                                       then null
-                                       else json_object(
-                                                'id': l2.id,
-                                                'name': l2.name,
-                                                'lastUpdate': l2.lastUpdate
-                                            )
-                                   end,
-                               'rentalDuration': f.rentalDuration,
-                               'rentalRate': f.rentalRate,
-                               'length': f.length,
-                               'replacementCost': f.replacementCost,
-                               'rating': f.rating,
-                               'lastUpdate': f.lastUpdate,
-                               'specialFeatures': json_array(),
-                               'fullText': '',
-                               'actors':
-                                   (select json_arrayagg(
-                                              json_object(
-                                                  'id': a.id,
-                                                  'firstName': a.firstName,
-                                                  'lastName': a.lastName,
-                                                  'lastUpdate': a.lastUpdate
-                                              )
-                                          )
-                                     from FilmActor fa
-                                    inner join Actor a on (fa.actor.id = a.id)
-                                    where fa.film.id = f.id
-                               ),
-                               'categories':
-                                   (select json_arrayagg(
-                                               json_object(
-                                                   'id': c.id,
-                                                   'name': c.name,
-                                                   'lastUpdate': c.lastUpdate
-                                               )
-                                           )
-                                     from FilmCategory fc
-                                    inner join Category c on (fc.category.id = c.id)
-                                    where fc.film.id = f.id
-                               )
-                           )
-                      from Film f
-                      left join f.language l1
-                      left join f.originalLanguage l2
-            """;
-
-    String FIND_BY_FILM_ID_QL_STRING = FIND_ALL_QL_STRING + " where f.id = :filmId";
-
-    String FIND_BY_ACTOR_ID_QL_STRING = FIND_ALL_QL_STRING +
-            " where f.id in (select film.id from FilmActor where actor.id = :actorId)";
+    @HQL("""
+            select f from Film f
+              left join fetch f.filmActors fac
+              left join fetch fac.actor
+              left join fetch f.filmCategories fca
+              left join fetch fca.category
+              left join fetch f.language
+              left join fetch f.originalLanguage
+              left join f.filmActors fa
+             where fa.actor.id = :actorId""")
+    List<FilmEntity> findFilmsByActorId(int actorId);
 }

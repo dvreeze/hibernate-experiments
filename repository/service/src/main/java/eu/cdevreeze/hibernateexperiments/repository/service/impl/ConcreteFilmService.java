@@ -20,15 +20,13 @@ import module eu.cdevreeze.hibernateexperiments.repository.model;
 import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.repository.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.repository.repo.FilmRepository;
 import eu.cdevreeze.hibernateexperiments.repository.repo._FilmRepository;
 import eu.cdevreeze.hibernateexperiments.repository.service.FilmService;
 
 /**
  * Concrete {@link FilmService} implementation.
- * <p>
- * Unfortunately I do not yet know how to pass system property "hibernate.query.hql.json_functions_enabled" with value "true" to
- * the Hibernate (annotation) processor. So compile-time parsing of JDQL with JSON is nto working yet.
  *
  * @author Chris de Vreeze
  */
@@ -47,6 +45,7 @@ public final class ConcreteFilmService implements FilmService {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
             return filmRepository.findAllFilms()
                     .stream()
+                    .map(FilmEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -56,7 +55,7 @@ public final class ConcreteFilmService implements FilmService {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
-            return filmRepository.findFilm(filmId);
+            return filmRepository.findFilm((int) filmId).map(FilmEntity::toModelObject);
         });
     }
 
@@ -65,8 +64,9 @@ public final class ConcreteFilmService implements FilmService {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
-            return filmRepository.findFilmsByActorId(actorId)
+            return filmRepository.findFilmsByActorId((int) actorId)
                     .stream()
+                    .map(FilmEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
     }
