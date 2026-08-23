@@ -23,34 +23,18 @@ import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
 import jakarta.persistence.EntityAgent;
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManagerFactory;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
+import jakarta.persistence.Subgraph;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.
- * <p>
- * The implementation has been inspired by
- * <a href="https://blog.jooq.org/jooq-3-15s-new-multiset-operator-will-change-how-you-think-about-sql/">jOOQ's multiset operator</a>,
- * which can be simulated by the database's SQL/JSON support.
- * <p>
- * The use of "json_object" inside "json_arrayagg" below, while being Hibernate HQL, has been deeply
- * inspired by Oracle's SQL/JSON support, as explained in this article:
- * <a href="https://oracle-base.com/articles/12c/sql-json-functions-12cr2">SQL/JSON generation functions in Oracle DB 12C</a>.
  *
  * @author Chris de Vreeze
  */
 public final class ConcreteFilmService implements FilmService {
-
-    // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
-    // This is interesting for queries returning films and their actors
-
-    private final JsonMapper jsonMapper = JsonMapper.builder()
-            .addModule(new GuavaModule())
-            .build();
 
     private final EntityManagerFactory emf;
 
@@ -62,11 +46,18 @@ public final class ConcreteFilmService implements FilmService {
     public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            // Hibernate HQL, which extends JPQL
+            String qlString = "select f from Film f";
 
-            return entityAgent.createQuery(QL_STRING, String.class)
-                    .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.class))
+            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
+
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityAgent.createQuery(qlString, FilmEntity.class)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .getResultList() // to be on the safe side
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -74,113 +65,63 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public Optional<Film> findFilm(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
-            // Hibernate HQL, which extends JPQL
-            // Beautiful: no JPQL/HQL String concatenation!
-            // Instead, turning the HQL into a criteria query, adding a where clause in a type-safe way!
-            // See https://www.baeldung.com/hibernate-criteria-queries
-            // Soon this will be part of JPA 4.0! See https://in.relation.to/2026/04/23/JPA-4-M2/
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString = "select f from Film f where f.id = ?1";
 
-            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
-            JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
+            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
 
-            JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
-
-            cq.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
-
-            return statelessSession.createQuery(cq)
-                    .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.class))
-                    .findFirst();
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            // to be on the safe side
+            return entityAgent.createQuery(qlString, FilmEntity.class)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setParameter(1, filmId)
+                    .getResultList() // to be on the safe side
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .min(Comparator.comparingLong(Film::id));
         });
     }
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
-            // Hibernate HQL, which extends JPQL
-            // Beautiful: no JPQL/HQL String concatenation!
-            // Instead, turning the HQL into a criteria query, adding a where clause in a type-safe way!
-            // See https://www.baeldung.com/hibernate-criteria-queries
-            // Soon this will be part of JPA 4.0! See https://in.relation.to/2026/04/23/JPA-4-M2/
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
-            JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
+            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
 
-            JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
-
-            JpaSubQuery<Integer> subquery = cq.subquery(Integer.class);
-            JpaRoot<FilmActorEntity> subqueryRoot = subquery.from(FilmActorEntity.class);
-            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
-            subquery.select(subqueryRoot.get(FilmActorEntity_.film).get(FilmEntity_.id));
-
-            cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
-
-            return statelessSession.createQuery(cq)
-                    .getResultStream()
-                    .map(v -> jsonMapper.readValue(v, Film.class))
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityAgent.createQuery(qlString, FilmEntity.class)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setParameter(1, actorId)
+                    .getResultList() // to be on the safe side
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
-    private static final String QL_STRING = """
-                    select json_object(
-                               'id': f.id,
-                               'title': f.title,
-                               'description': f.description,
-                               'releaseYear': f.releaseYear,
-                               'language': json_object(
-                                   'id': l1.id,
-                                   'name': l1.name,
-                                   'lastUpdate': l1.lastUpdate
-                               ),
-                               'originalLanguage':
-                                   case
-                                       when f.originalLanguage.id is null
-                                       then null
-                                       else json_object(
-                                                'id': l2.id,
-                                                'name': l2.name,
-                                                'lastUpdate': l2.lastUpdate
-                                            )
-                                   end,
-                               'rentalDuration': f.rentalDuration,
-                               'rentalRate': f.rentalRate,
-                               'length': f.length,
-                               'replacementCost': f.replacementCost,
-                               'rating': f.rating,
-                               'lastUpdate': f.lastUpdate,
-                               'specialFeatures': json_array(),
-                               'fullText': '',
-                               'actors':
-                                   (select json_arrayagg(
-                                              json_object(
-                                                  'id': a.id,
-                                                  'firstName': a.firstName,
-                                                  'lastName': a.lastName,
-                                                  'lastUpdate': a.lastUpdate
-                                              )
-                                          )
-                                     from FilmActor fa
-                                    inner join Actor a on (fa.actor.id = a.id)
-                                    where fa.film.id = f.id
-                               ),
-                               'categories':
-                                   (select json_arrayagg(
-                                               json_object(
-                                                   'id': c.id,
-                                                   'name': c.name,
-                                                   'lastUpdate': c.lastUpdate
-                                               )
-                                           )
-                                     from FilmCategory fc
-                                    inner join Category c on (fc.category.id = c.id)
-                                    where fc.film.id = f.id
-                               )
-                           )
-                      from Film f
-                      left join f.language l1
-                      left join f.originalLanguage l2
-            """;
+    private EntityGraph<FilmEntity> getEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        entityGraph.addAttributeNode("filmActors");
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addSubgraph("filmActors");
+        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+
+        entityGraph.addAttributeNode("filmCategories");
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addSubgraph("filmCategories");
+        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+
+        entityGraph.addAttributeNode("language");
+        entityGraph.addAttributeNode("originalLanguage");
+
+        return entityGraph;
+    }
 }
