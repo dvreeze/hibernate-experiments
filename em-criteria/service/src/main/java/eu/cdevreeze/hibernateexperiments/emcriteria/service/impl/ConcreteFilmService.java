@@ -117,20 +117,16 @@ public final class ConcreteFilmService implements FilmService {
     private EntityGraph<FilmEntity> getEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        entityGraph.addAttributeNode(FilmEntity_.filmActors);
-
         // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
         filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
-
-        entityGraph.addAttributeNode(FilmEntity_.filmCategories);
 
         // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
         filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
 
         entityGraph.addAttributeNode(FilmEntity_.language);
-        entityGraph.addAttributeNode(FilmEntity_.filmCategories);
+        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
 
         return entityGraph;
     }

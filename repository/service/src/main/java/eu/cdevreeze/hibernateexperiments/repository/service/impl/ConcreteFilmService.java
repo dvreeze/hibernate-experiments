@@ -46,6 +46,7 @@ public final class ConcreteFilmService implements FilmService {
             return filmRepository.findAllFilms()
                     .stream()
                     .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -67,6 +68,7 @@ public final class ConcreteFilmService implements FilmService {
             return filmRepository.findFilmsByActorId((int) actorId)
                     .stream()
                     .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
