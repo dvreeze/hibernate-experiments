@@ -161,14 +161,14 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        entityGraph.addAttributeNode("filmActors");
+        entityGraph.addAttributeNode(FilmEntity_.filmActors);
 
         // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
-        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addSubgraph("filmActors");
+        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
         filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
 
-        entityGraph.addAttributeNode("language");
-        entityGraph.addAttributeNode("originalLanguage");
+        entityGraph.addAttributeNode(FilmEntity_.language);
+        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
 
         return entityGraph;
     }
@@ -176,10 +176,10 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        entityGraph.addAttributeNode("filmCategories");
+        entityGraph.addAttributeNode(FilmEntity_.filmCategories);
 
         // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
-        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addSubgraph("filmCategories");
+        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
         filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
 
         return entityGraph;
