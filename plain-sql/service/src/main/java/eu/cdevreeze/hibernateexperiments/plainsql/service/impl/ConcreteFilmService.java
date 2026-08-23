@@ -17,32 +17,121 @@
 package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 
 import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Category;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Film;
+import eu.cdevreeze.hibernateexperiments.plainsql.model.Language;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.FilmService;
 import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
+import jakarta.persistence.sql.ConstructorMapping;
+import jakarta.persistence.sql.ResultSetMapping;
+import org.jspecify.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.Year;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static jakarta.persistence.sql.ResultSetMapping.column;
+import static jakarta.persistence.sql.ResultSetMapping.constructor;
 
 /**
  * Concrete {@link FilmService} implementation.
- * <p>
- * The implementation has been inspired by
- * <a href="https://blog.jooq.org/jooq-3-15s-new-multiset-operator-will-change-how-you-think-about-sql/">jOOQ's multiset operator</a>,
- * which can be simulated by the database's SQL/JSON support.
  *
  * @author Chris de Vreeze
  */
 public final class ConcreteFilmService implements FilmService {
 
-    // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
-    // This is interesting for queries returning films and their actors
+    public record FilmRow(
+            Integer filmId,
+            String title,
+            @Nullable String description,
+            @Nullable Integer releaseYear,
+            int languageId,
+            String languageName,
+            Instant languageLastUpdate,
+            @Nullable Integer originalLanguageId,
+            @Nullable String originalLanguageName,
+            @Nullable Instant originalLanguageLastUpdate,
+            int rentalDuration,
+            BigDecimal rentalRate,
+            @Nullable Integer length,
+            BigDecimal replacementCost,
+            @Nullable String rating,
+            Instant lastUpdate,
+            @Nullable Integer actorId,
+            @Nullable String actorFirstName,
+            @Nullable String actorLastName,
+            @Nullable Instant actorLastUpdate,
+            @Nullable Integer categoryId,
+            @Nullable String categoryName,
+            @Nullable Instant categoryLastUpdate
+    ) {
 
-    private final JsonMapper jsonMapper = JsonMapper.builder()
-            .addModule(new GuavaModule())
-            .build();
+        public static ImmutableList<Film> convertToFilms(List<FilmRow> rows) {
+            return rows
+                    .stream()
+                    .collect(Collectors.groupingBy(FilmRow::filmId))
+                    .values()
+                    .stream()
+                    .map(grp -> new Film(
+                            grp.getFirst().filmId(),
+                            grp.getFirst().title(),
+                            grp.getFirst().description(),
+                            grp.getFirst().releaseYear() == null ?
+                                    null :
+                                    Year.of(grp.getFirst().releaseYear()),
+                            new Language(
+                                    grp.getFirst().languageId(),
+                                    grp.getFirst().languageName(),
+                                    grp.getFirst().languageLastUpdate()
+                            ),
+                            grp.getFirst().originalLanguageId() == null ?
+                                    null :
+                                    new Language(
+                                            grp.getFirst().originalLanguageId(),
+                                            Objects.requireNonNull(grp.getFirst().originalLanguageName()),
+                                            Objects.requireNonNull(grp.getFirst().originalLanguageLastUpdate())
+                                    ),
+                            grp.getFirst().rentalDuration(),
+                            grp.getFirst().rentalRate(),
+                            grp.getFirst().length(),
+                            grp.getFirst().replacementCost(),
+                            grp.getFirst().rating(),
+                            grp.getFirst().lastUpdate(),
+                            ImmutableList.of(),
+                            "",
+                            grp.stream()
+                                    .filter(row -> row.actorId() != null)
+                                    .map(row -> new Actor(
+                                            row.actorId(),
+                                            Objects.requireNonNull(row.actorFirstName()),
+                                            Objects.requireNonNull(row.actorLastName()),
+                                            Objects.requireNonNull(row.actorLastUpdate())
+                                    ))
+                                    .distinct()
+                                    .sorted(Comparator.comparing(Actor::id))
+                                    .collect(ImmutableList.toImmutableList()),
+                            grp.stream()
+                                    .filter(row -> row.categoryId() != null)
+                                    .map(row -> new Category(
+                                            row.categoryId(),
+                                            Objects.requireNonNull(row.categoryName()),
+                                            Objects.requireNonNull(row.categoryLastUpdate())
+                                    ))
+                                    .distinct()
+                                    .sorted(Comparator.comparing(Category::id))
+                                    .collect(ImmutableList.toImmutableList())
+                    ))
+                    .sorted(Comparator.comparing(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        }
+    }
 
     private final EntityManagerFactory emf;
 
@@ -53,12 +142,13 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent ->
-                entityAgent.createNativeQuery(SQL_STRING, String.class)
-                        .getResultStream()
-                        .map(v -> jsonMapper.readValue(v, Film.class))
-                        .collect(ImmutableList.toImmutableList())
-        );
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            ResultSetMapping<FilmRow> rsMapping = getFilmRowResultMapping();
+
+            List<FilmRow> rows = entityAgent.createNativeQuery(SQL_STRING, rsMapping).getResultList();
+
+            return FilmRow.convertToFilms(rows);
+        });
     }
 
     @Override
@@ -67,19 +157,21 @@ public final class ConcreteFilmService implements FilmService {
         String sqlString = SQL_STRING.strip() + " where f.film_id = ?1";
 
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent ->
-                entityAgent.createNativeQuery(sqlString, String.class)
-                        .setParameter(1, filmId)
-                        .getResultStream()
-                        .map(v -> jsonMapper.readValue(v, Film.class))
-                        .findFirst()
-        );
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            ResultSetMapping<FilmRow> rsMapping = getFilmRowResultMapping();
+
+            List<FilmRow> rows = entityAgent.createNativeQuery(sqlString, rsMapping)
+                    .setParameter(1, filmId)
+                    .getResultList();
+
+            return FilmRow.convertToFilms(rows).stream().findFirst();
+        });
     }
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // Not ideal, because SQL string composition using string concatenation is error-prone
-        String sqlString = SQL_STRING.strip() + """
+        String sqlString = SQL_STRING.strip() + " " + """
                 where f.film_id in (
                     select fac.film_id
                       from film_actor fac
@@ -88,68 +180,60 @@ public final class ConcreteFilmService implements FilmService {
                 """;
 
         // This starts a new transaction in our case of resource-local transactions
-        return emf.callInTransaction(EntityAgent.class, entityAgent ->
-                entityAgent.createNativeQuery(sqlString, String.class)
-                        .setParameter(1, actorId)
-                        .getResultStream()
-                        .map(v -> jsonMapper.readValue(v, Film.class))
-                        .collect(ImmutableList.toImmutableList())
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            ResultSetMapping<FilmRow> rsMapping = getFilmRowResultMapping();
+
+            List<FilmRow> rows = entityAgent.createNativeQuery(sqlString, rsMapping)
+                    .setParameter(1, actorId)
+                    .getResultList();
+
+            return FilmRow.convertToFilms(rows);
+        });
+    }
+
+    private static ConstructorMapping<FilmRow> getFilmRowResultMapping() {
+        return constructor(
+                FilmRow.class,
+                column("film_id", Integer.class),
+                column("title", String.class),
+                column("description", String.class),
+                column("release_year", Integer.class),
+                column("language_id", Integer.class),
+                column("language_name", String.class),
+                column("language_last_update", Instant.class),
+                column("orig_language_id", Integer.class),
+                column("orig_language_name", String.class),
+                column("orig_language_last_update", Instant.class),
+                column("rental_duration", Integer.class),
+                column("rental_rate", BigDecimal.class),
+                column("length", Integer.class),
+                column("replacement_cost", BigDecimal.class),
+                column("rating", String.class),
+                column("last_update", Instant.class),
+                column("actor_id", Integer.class),
+                column("actor_first_name", String.class),
+                column("actor_last_name", String.class),
+                column("actor_last_update", Instant.class),
+                column("category_id", Integer.class),
+                column("category_name", String.class),
+                column("category_last_update", Instant.class)
         );
     }
 
     private static final String SQL_STRING = """
-                    select json_object(
-                               'id': f.film_id,
-                               'title': f.title,
-                               'description': f.description,
-                               'releaseYear': f.release_year,
-                               'language': json_object(
-                                   'id': l1.language_id,
-                                   'name': l1.name,
-                                   'lastUpdate': l1.last_update
-                               ),
-                               'originalLanguage':
-                                   case
-                                       when f.original_language_id is null
-                                       then null
-                                       else json_object(
-                                                'id': l2.language_id,
-                                                'name': l2.name,
-                                                'lastUpdate': l2.last_update
-                                            )
-                                   end,
-                               'rentalDuration': f.rental_duration,
-                               'rentalRate': f.rental_rate,
-                               'length': f.length,
-                               'replacementCost': f.replacement_cost,
-                               'rating': f.rating,
-                               'lastUpdate': f.last_update,
-                               'specialFeatures': json_array(),
-                               'fullText': '',
-                               'actors': json_array(
-                                   select json_object(
-                                              'id': a.actor_id,
-                                              'firstName': a.first_name,
-                                              'lastName': a.last_name,
-                                              'lastUpdate': a.last_update
-                                          )
-                                     from film_actor fa
-                                    inner join actor a on (fa.actor_id = a.actor_id)
-                                    where fa.film_id = f.film_id
-                               ),
-                               'categories': json_array(
-                                   select json_object(
-                                              'id': c.category_id,
-                                              'name': c.name,
-                                              'lastUpdate': c.last_update
-                                          )
-                                     from film_category fc
-                                    inner join category c on (fc.category_id = c.category_id)
-                                    where fc.film_id = f.film_id
-                               )
-                           )
-                      from Film f
-                      left join Language l1 on (f.language_id = l1.language_id)
-                      left join Language l2 on (f.original_language_id = l2.language_id)
+            select f.film_id as film_id, f.title, f.description, f.release_year as release_year,
+                   lang.language_id as language_id, lang.name as language_name, lang.last_update as language_last_update,
+                   origlang.language_id as orig_language_id, origlang.name as orig_language_name, origlang.last_update as orig_language_last_update,
+                   f.rental_duration, f.rental_rate, f.length, f.replacement_cost,
+                   f.rating, f.last_update,
+                   ac.actor_id, ac.first_name as actor_first_name, ac.last_name as actor_last_name, ac.last_update as actor_last_update,
+                   cat.category_id, cat.name as category_name, cat.last_update as category_last_update
+              from Film f
+              left join Film_Actor fac on (f.film_id = fac.film_id)
+              left join Actor ac on (fac.actor_id = ac.actor_id)
+              left join Film_Category fcat on (f.film_id = fcat.film_id)
+              left join Category cat on (fcat.category_id = cat.category_id)
+             inner join Language lang on (f.language_id = lang.language_id)
+              left join Language origlang on (f.original_language_id = origlang.language_id)
             """;
 }

@@ -32,4 +32,7 @@ module eu.cdevreeze.hibernateexperiments.plainsql.service {
     exports eu.cdevreeze.hibernateexperiments.plainsql.bootstrap;
     exports eu.cdevreeze.hibernateexperiments.plainsql.service;
     exports eu.cdevreeze.hibernateexperiments.plainsql.service.factory;
+
+    // Needed for result set mappings
+    opens eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 }
