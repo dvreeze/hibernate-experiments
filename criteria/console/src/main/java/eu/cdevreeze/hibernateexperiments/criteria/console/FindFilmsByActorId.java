@@ -38,8 +38,6 @@ public class FindFilmsByActorId {
                 .addModule(new GuavaModule())
                 .build();
 
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-
         Objects.checkIndex(0, args.length);
         long actorId = Long.parseLong(args[0]);
 

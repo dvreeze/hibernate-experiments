@@ -34,8 +34,6 @@ public class FindAllFilms {
                 .addModule(new GuavaModule())
                 .build();
 
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);
 

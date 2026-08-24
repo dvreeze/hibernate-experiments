@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.entitymanager.console;
+package eu.cdevreeze.hibernateexperiments.emcriteria.console;
 
-import module eu.cdevreeze.hibernateexperiments.entitymanager.service;
+import module eu.cdevreeze.hibernateexperiments.emcriteria.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 /**
- * Program finding the film with a given ID, returning it with actors and categories.
+ * Program finding all films in the database inefficiently.
  *
  * @author Chris de Vreeze
  */
-public class FindFilm {
+public class FindAllFilmsInefficiently {
 
     static void main(String... args) {
-        JsonMapper jsonMapper = JsonMapper.builder()
-                .addModule(new GuavaModule())
-                .build();
-
-        Objects.checkIndex(0, args.length);
-        long filmId = Long.parseLong(args[0]);
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
-            FilmService filmService = FilmServiceFactory.create(emf);
+            FilmService filmService = InefficientFilmServiceFactory.create(emf);
 
-            Optional<Film> films = filmService.findFilm(filmId);
+            List<Film> films = filmService.findAllFilms();
 
-            jsonMapper.writerWithDefaultPrettyPrinter().writeValue(System.out, films);
+            films.forEach(IO::println);
         }
     }
 }
