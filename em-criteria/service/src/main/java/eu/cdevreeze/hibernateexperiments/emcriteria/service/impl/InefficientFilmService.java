@@ -51,6 +51,8 @@ public final class InefficientFilmService implements FilmService {
             Root<FilmEntity> film = cq.from(FilmEntity.class);
             cq.select(film);
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(cq)
                     .getResultList() // to be on the safe side
                     .stream()
@@ -71,6 +73,8 @@ public final class InefficientFilmService implements FilmService {
             cq.where(cb.equal(film.get(FilmEntity_.id), filmId));
             cq.select(film);
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(cq)
                     .getResultList() // to be on the safe side
                     .stream()
@@ -90,6 +94,8 @@ public final class InefficientFilmService implements FilmService {
             SetJoin<FilmEntity, FilmActorEntity> filmActor = film.join(FilmEntity_.filmActors, JoinType.LEFT);
             cq.where(cb.equal(filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
             cq.select(film);
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
                     .getResultList() // to be on the safe side

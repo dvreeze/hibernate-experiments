@@ -45,6 +45,8 @@ public final class ConcreteAddressService implements AddressService {
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
@@ -63,6 +65,8 @@ public final class ConcreteAddressService implements AddressService {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -83,6 +87,8 @@ public final class ConcreteAddressService implements AddressService {
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
@@ -102,6 +108,8 @@ public final class ConcreteAddressService implements AddressService {
 
             EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, AddressEntity.class)
@@ -119,6 +127,8 @@ public final class ConcreteAddressService implements AddressService {
             String qlString = "select c from City c where c.country.id = ?1";
 
             EntityGraph<CityEntity> entityGraph = getCityEntityGraph();
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -138,6 +148,8 @@ public final class ConcreteAddressService implements AddressService {
             String qlString = "select c from Country c";
 
             EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations

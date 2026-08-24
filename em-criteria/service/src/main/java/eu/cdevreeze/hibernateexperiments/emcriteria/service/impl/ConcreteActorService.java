@@ -50,6 +50,8 @@ public final class ConcreteActorService implements ActorService {
 
             EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
@@ -78,6 +80,8 @@ public final class ConcreteActorService implements ActorService {
 
             EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
@@ -99,6 +103,8 @@ public final class ConcreteActorService implements ActorService {
             cq.select(actor);
 
             EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations

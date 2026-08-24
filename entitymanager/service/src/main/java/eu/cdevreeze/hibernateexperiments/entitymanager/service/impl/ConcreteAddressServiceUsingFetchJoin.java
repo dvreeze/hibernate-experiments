@@ -45,6 +45,8 @@ public final class ConcreteAddressServiceUsingFetchJoin implements AddressServic
             String qlString =
                     "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = ?1";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
                     .getResultStream()
@@ -59,6 +61,8 @@ public final class ConcreteAddressServiceUsingFetchJoin implements AddressServic
         return emf.callInTransaction(entityManager -> {
             String qlString =
                     "select ad from Address ad join fetch ad.city ct join fetch ct.country co where ct.id = ?1";
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, cityId)
@@ -75,6 +79,8 @@ public final class ConcreteAddressServiceUsingFetchJoin implements AddressServic
             String qlString =
                     "select ad from Address ad join fetch ad.city ct join fetch ct.country co where co.id =  ?1";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -90,6 +96,8 @@ public final class ConcreteAddressServiceUsingFetchJoin implements AddressServic
             String qlString =
                     "select ad from Address ad join fetch ad.city ct join fetch ct.country co";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -104,6 +112,8 @@ public final class ConcreteAddressServiceUsingFetchJoin implements AddressServic
             String qlString =
                     "select ci from City ci join fetch ci.country co where co.id = ?1";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, CityEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -117,6 +127,8 @@ public final class ConcreteAddressServiceUsingFetchJoin implements AddressServic
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from Country c";
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, CountryEntity.class)
                     .getResultStream()

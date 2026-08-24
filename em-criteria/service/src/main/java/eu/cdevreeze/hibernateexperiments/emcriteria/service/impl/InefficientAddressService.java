@@ -49,6 +49,8 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.id), id));
             cq.select(address);
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(cq)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -66,6 +68,8 @@ public final class InefficientAddressService implements AddressService {
             Root<AddressEntity> address = cq.from(AddressEntity.class);
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.id), cityId));
             cq.select(address);
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
                     .getResultStream()
@@ -85,6 +89,8 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(address.get(AddressEntity_.city).get(CityEntity_.country).get(CountryEntity_.id), countryId));
             cq.select(address);
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(cq)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -101,6 +107,8 @@ public final class InefficientAddressService implements AddressService {
 
             Root<AddressEntity> address = cq.from(AddressEntity.class);
             cq.select(address);
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
                     .getResultStream()
@@ -120,6 +128,8 @@ public final class InefficientAddressService implements AddressService {
             cq.where(cb.equal(city.get(CityEntity_.country).get(CountryEntity_.id), countryId));
             cq.select(city);
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(cq)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -136,6 +146,8 @@ public final class InefficientAddressService implements AddressService {
 
             Root<CountryEntity> country = cq.from(CountryEntity.class);
             cq.select(country);
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
                     .getResultStream()

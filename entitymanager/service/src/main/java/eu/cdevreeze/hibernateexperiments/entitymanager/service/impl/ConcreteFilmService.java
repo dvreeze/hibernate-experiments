@@ -49,6 +49,8 @@ public final class ConcreteFilmService implements FilmService {
 
             EntityGraph<FilmEntity> entityGraph = getEntityGraph();
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, FilmEntity.class)
@@ -68,6 +70,8 @@ public final class ConcreteFilmService implements FilmService {
             String qlString = "select f from Film f where f.id = ?1";
 
             EntityGraph<FilmEntity> entityGraph = getEntityGraph();
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -89,6 +93,8 @@ public final class ConcreteFilmService implements FilmService {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
             EntityGraph<FilmEntity> entityGraph = getEntityGraph();
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations

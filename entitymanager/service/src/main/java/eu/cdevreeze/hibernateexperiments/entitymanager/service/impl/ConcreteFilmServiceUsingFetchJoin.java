@@ -52,6 +52,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.language
                       left join fetch f.originalLanguage""";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .getResultList() // to be on the safe side
                     .stream()
@@ -74,6 +76,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.language
                       left join fetch f.originalLanguage
                      where f.id = ?1""";
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, filmId)
@@ -98,6 +102,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.originalLanguage
                       left join f.filmActors fa
                      where fa.actor.id = ?1""";
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)

@@ -47,6 +47,8 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.id = ?1";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
                     .getResultStream()
@@ -61,6 +63,8 @@ public final class InefficientAddressService implements AddressService {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, cityId)
@@ -77,6 +81,8 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.city.country.id = ?1";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -92,6 +98,8 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .getResultStream()
                     .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
@@ -106,6 +114,8 @@ public final class InefficientAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from City c where c.country.id = ?1";
 
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
+
             return entityManager.createQuery(qlString, CityEntity.class)
                     .setParameter(1, countryId)
                     .getResultStream()
@@ -119,6 +129,8 @@ public final class InefficientAddressService implements AddressService {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from Country c";
+
+            // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, CountryEntity.class)
                     .getResultStream()
