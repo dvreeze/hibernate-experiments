@@ -160,6 +160,7 @@ Some references follow below. When unclear about details of Hibernate/JPA usage,
 the Jakarta Persistence Specification and Hibernate ORM User Guide, before anything else.
 
 From the Jakarta Persistence standard:
+
 - [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/) as reference material
 - [Jakarta Persistence 4.0 Specification](https://jakarta.ee/specifications/persistence/4.0/jakarta-persistence-spec-4.0-m4)
 - [Jakarta Persistence 4.0 API documentation](https://jakarta.ee/specifications/persistence/4.0/apidocs/jakarta.persistence/module-summary.html)
