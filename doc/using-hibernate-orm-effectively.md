@@ -164,7 +164,7 @@ From the Jakarta Persistence standard:
 - [Jakarta Persistence 4.0 Specification](https://jakarta.ee/specifications/persistence/4.0/jakarta-persistence-spec-4.0-m4)
 - [Jakarta Persistence 4.0 API documentation](https://jakarta.ee/specifications/persistence/4.0/apidocs/jakarta.persistence/module-summary.html)
 
-From the Hibernate team or the Jakarte Persistence standard:
+From the Hibernate team:
 
 - [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice) from the Hibernate ORM team
 - [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/) (should probably be read from beginning to end)
