@@ -169,6 +169,7 @@ From the Hibernate team or the Jakarte Persistence standard:
 - [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice) from the Hibernate ORM team
 - [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/) (should probably be read from beginning to end)
 - [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) as reference material
+- [Hibernate ORM 8.0 API documentation](https://docs.hibernate.org/orm/8.0/javadocs/)
 - [Many-to-one associations](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one)
 
 From Hibernate expert Thorben Janssen:
