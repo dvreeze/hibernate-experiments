@@ -156,14 +156,19 @@ the "Hibernate magic" if we so choose. We can also get a lot of help from the co
 
 ... TODO ...
 
-Some references:
+Some references follow below. When unclear about details of Hibernate/JPA usage, consider first consulting
+the Jakarta Persistence Specification and Hibernate ORM User Guide, before anything else.
+
+From the Jakarta Persistence standard:
+- [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/) as reference material
+- [Jakarta Persistence 4.0 Specification](https://jakarta.ee/specifications/persistence/4.0/jakarta-persistence-spec-4.0-m4)
+- [Jakarta Persistence 4.0 API documentation](https://jakarta.ee/specifications/persistence/4.0/apidocs/jakarta.persistence/module-summary.html)
 
 From the Hibernate team or the Jakarte Persistence standard:
 
 - [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice) from the Hibernate ORM team
 - [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/) (should probably be read from beginning to end)
 - [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) as reference material
-- [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/) as reference material
 - [Many-to-one associations](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one)
 
 From Hibernate expert Thorben Janssen:
