@@ -11,7 +11,8 @@ This is needed because there is far too much unnecessary "Hibernate pain" in man
 What are my own experiences with Hibernate ORM? Not too good, until I decided to learn Hibernate ORM.
 I learned much from official Hibernate material, experts like Thorben Janssen, and combined that with
 my experiences in a more functional programming style (initially in Scala, but also inspired by the
-book Effective Java, 3rd Edition, by Joshua Bloch).
+book Effective Java, 3rd Edition, by Joshua Bloch). I'm not a Hibernate expert, but do have a "mind set"
+that enables me to be productive with it. Details can be looked up in material written by experts.
 
 This presentation works with one example, which is adapted many times (in many cases improved).
 
@@ -32,12 +33,15 @@ Consider this poorly defined code in terms of what happens to the database:
 ```java
 // Hypothetical transactional service method
 
+@Transactional
 public void deliver(OrderEntity order, Instant deliveryDate) {
     // ...
     order.setDeliveryDate(deliveryDate);
     // ...
 }
 ```
+
+*Ask audience* what the effect of this code is on the database.
 
 Some ways that *Hibernate ORM should not be used* include:
 
@@ -71,10 +75,11 @@ This first example returns the films as JPA entities, without fetching any assoc
 First compare old school Java to modern Java, e.g. `Date`/`Calendar` versus `java.time` API.
 Modern Java is more *functional*, uses more *immutable Java records* instead of JavaBeans with getters and
 setters, is *less about side effects* and less about `null`, and more about *expressions* than *statements*.
+It is also about *Stream/Optional pipelines*.
 
 Alas, JPA entities are more like old school JavaBeans with getters and setters. Moreover, they contain
 lots of hidden implicit state, e.g. w.r.t. associations (loaded or not), the absence/presence of a persistence
-context, etc.
+context, etc. So they make very poor DTOs to be passed to the presentation layer.
 
 Immutable Java records make great DTOs to be passed across application layers, though.
 
@@ -108,7 +113,7 @@ So, insert Java code of `ConcreteFilmServiceUsingSeparateQueries`.
 *Ask audience* if it is possible to use Hibernate ORM without persistence context overhead.
 
 Show the same `ConcreteFilmServiceUsingSeparateQueries`, except that it uses an `EntityAgent` instead
-of `EntityManager` (since Jakarta Persistence 4.0, but `StatelessSession` has existed for a long time).
+of `EntityManager` (since Jakarta Persistence 4.0, but `StatelessSession` has already existed for a long time).
 
 ## Exploiting richness of HQL
 
@@ -118,12 +123,17 @@ Insert code of `AlternativeFilmService`, exploiting JSON support and/or CTEs.
 
 Remember, JPQL and in particular HQL are very powerful *OO SQL dialects*.
 
+If need be, we can always fall back to native SQL queries, and still benefit from Hibernate (and increased
+type-safety).
+
 ## The type-safe metamodel
 
 ... TODO ...
 
 Also show its use in `ConcreteFilmService` using Criteria API, and move on to Jakarta Data repositories,
 with compile-time JPQL/HQL query string parsing/validation (through the Hibernate annotation processor).
+
+Insert repository-based `ConcreteFilmService` code.
 
 ## Testing Hibernate code
 
@@ -154,7 +164,7 @@ From the Hibernate team or the Jakarte Persistence standard:
 - [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/) (should probably be read from beginning to end)
 - [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) as reference material
 - [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/) as reference material
-- [Hibernate ORM short guide](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one)
+- [Many-to-one associations](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one)
 
 From Hibernate expert Thorben Janssen:
 
@@ -163,7 +173,7 @@ From Hibernate expert Thorben Janssen:
 - [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
 - [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype)
 - [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/)
-- [cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
+- [Cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
 
 Other links:
 
