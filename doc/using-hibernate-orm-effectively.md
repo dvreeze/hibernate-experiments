@@ -181,6 +181,7 @@ From Hibernate expert Thorben Janssen:
 - [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype)
 - [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/)
 - [Cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
+- [Hibernate query spaces](https://thorben-janssen.com/hibernate-query-spaces/)
 
 Other links:
 
