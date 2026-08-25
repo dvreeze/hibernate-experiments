@@ -182,6 +182,7 @@ From Hibernate expert Thorben Janssen:
 - [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/)
 - [Cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
 - [Hibernate query spaces](https://thorben-janssen.com/hibernate-query-spaces/)
+- [Read-only query hint](https://thorben-janssen.com/read-only-query-hint/)
 
 Other links:
 
