@@ -45,8 +45,7 @@ public final class NaiveFilmService implements FilmService {
             String qlString = "select f from Film f";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -60,8 +59,7 @@ public final class NaiveFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, filmId)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .min(Comparator.comparingLong(FilmEntity::getId));
         });
     }
@@ -74,8 +72,7 @@ public final class NaiveFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });

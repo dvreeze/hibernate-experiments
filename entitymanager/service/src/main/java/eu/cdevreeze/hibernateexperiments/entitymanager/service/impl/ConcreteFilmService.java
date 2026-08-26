@@ -55,8 +55,7 @@ public final class ConcreteFilmService implements FilmService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -75,12 +74,10 @@ public final class ConcreteFilmService implements FilmService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            // to be on the safe side
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .setParameter(1, filmId)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -101,8 +98,7 @@ public final class ConcreteFilmService implements FilmService {
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
                     .setParameter(1, actorId)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

@@ -56,8 +56,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -81,8 +80,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -106,8 +104,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

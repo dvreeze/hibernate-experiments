@@ -54,8 +54,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.originalLanguage""";
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -78,8 +77,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, filmId)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -102,8 +100,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

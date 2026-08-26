@@ -58,8 +58,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -85,8 +84,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -112,8 +110,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultList() // to be on the safe side
-                    .stream()
+                    .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
