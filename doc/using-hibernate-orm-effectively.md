@@ -309,12 +309,15 @@ public final class NaiveFilmService implements FilmService {
 Now have a look at the following code:
 
 ```java
+FilmService filmService = new NaiveFilmService(emf);
+
 ImmutableList<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
 // Outside any transaction/Session:
 var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
 ```
 
-*Ask the audience* what is wrong with this small piece of code above. Indeed, a `LazyInitializationException`.
+*Ask the audience* what is wrong with this small piece of code above. Indeed, a `LazyInitializationException`
+is thrown.
 
 ## Querying for custom projections
 
@@ -331,10 +334,180 @@ context, etc. So they make very poor DTOs to be passed to the presentation layer
 
 Immutable Java records make great DTOs to be passed across application layers, though.
 
-Insert code of an immutable film model, and conversions from JPA entities to this model.
+Let's introduce the immutable data model as immutable Java record DTOs. Assume a
+`org.jspecify.annotations.NullMarked` annotation at the package level, in `package-info.java`.
+The immutable model is as follows:
 
-Insert the Java code of an inefficient film service returning immutable film DTOs (`NaiveFilmService`,
-using `EntityManager` and JPQL query strings).
+```java
+public record Actor(long id, String firstName, String lastName, Instant lastUpdate) {
+}
+
+public record Category(long id, String name, Instant lastUpdate) {
+}
+
+public record Language(long id, String name, Instant lastUpdate) {
+}
+
+public record Film(
+        long id,
+        String title,
+        @Nullable String description,
+        @Nullable Year releaseYear,
+        Language language,
+        @Nullable Language originalLanguage,
+        int rentalDuration,
+        BigDecimal rentalRate,
+        @Nullable Integer length,
+        BigDecimal replacementCost,
+        @Nullable String rating,
+        Instant lastUpdate,
+        @Nullable ImmutableList<String> specialFeatures,
+        String fullText,
+        ImmutableList<Actor> actors,
+        ImmutableList<Category> categories
+) {
+
+    public Optional<String> descriptionOption() {
+        return Optional.ofNullable(description);
+    }
+
+    public Optional<Year> releaseYearOption() {
+        return Optional.ofNullable(releaseYear);
+    }
+
+    public Optional<Language> originalLanguageOption() {
+        return Optional.ofNullable(originalLanguage);
+    }
+
+    public OptionalInt lengthOption() {
+        return Optional.ofNullable(length).stream().mapToInt(i -> i).findFirst();
+    }
+
+    public Optional<String> ratingOption() {
+        return Optional.ofNullable(rating);
+    }
+
+    public Optional<ImmutableList<String>> specialFeaturesOption() {
+        return Optional.ofNullable(specialFeatures);
+    }
+}
+```
+
+Enhance the JPA entities with (trivial) conversion methods to that model:
+
+```java
+@Entity(name = "Actor")
+@Table(name = "Actor")
+public class ActorEntity {
+
+    // ...
+
+    public Actor toModelObject() {
+        return new Actor(
+                Objects.requireNonNull(id),
+                Objects.requireNonNull(firstName),
+                Objects.requireNonNull(lastName),
+                Objects.requireNonNull(lastUpdate)
+        );
+    }
+}
+
+@Entity(name = "Category")
+@Table(name = "Category")
+public class CategoryEntity {
+
+    // ...
+
+    public Category toModelObject() {
+        return new Category(Objects.requireNonNull(id), Objects.requireNonNull(name), Objects.requireNonNull(lastUpdate));
+    }
+}
+
+@Entity(name = "Language")
+@Table(name = "Language")
+public class LanguageEntity {
+
+    // ...
+
+    public Language toModelObject() {
+        return new Language(Objects.requireNonNull(id), Objects.requireNonNull(name), Objects.requireNonNull(lastUpdate));
+    }
+}
+```
+
+And finally:
+
+```java
+@Entity(name = "Film")
+@Table(name = "Film")
+public class FilmEntity {
+
+    // ...
+
+    // May cause LazyInitializationException
+    public Film toModelObject() {
+        return new Film(
+                Objects.requireNonNull(id),
+                Objects.requireNonNull(title),
+                description,
+                releaseYear,
+                Objects.requireNonNull(language).toModelObject(),
+                Optional.ofNullable(originalLanguage).map(LanguageEntity::toModelObject).orElse(null),
+                Objects.requireNonNull(rentalDuration),
+                rentalRate,
+                Optional.ofNullable(length).map(Short::intValue).orElse(null),
+                Objects.requireNonNull(replacementCost),
+                rating,
+                Objects.requireNonNull(lastUpdate),
+                ImmutableList.of(),
+                "",
+                Objects.requireNonNull(filmActors).stream()
+                        .map(FilmActorEntity::getActor)
+                        .map(ActorEntity::toModelObject)
+                        .collect(ImmutableList.toImmutableList()),
+                Objects.requireNonNull(filmCategories).stream()
+                        .map(FilmCategoryEntity::getCategory)
+                        .map(CategoryEntity::toModelObject)
+                        .collect(ImmutableList.toImmutableList())
+        );
+    }
+}
+```
+
+The `FilmService` is now a Java service interface returning immutable DTOs rather than JPA entities:
+
+```java
+public interface FilmService {
+
+    ImmutableList<Film> findFilmsByActorId(long actorId);
+}
+```
+
+Now consider the following implementation of that service interface:
+
+```java
+public final class InefficientFilmService implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public InefficientFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+
+            return entityManager.createQuery(qlString, FilmEntity.class)
+                    .setParameter(1, actorId)
+                    .getResultStream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+}
+```
 
 *Ask audience* what is wrong with the implementation (too many queries), other than retrieving entities
 in the same session where they are converted to immutable DTOs (therefore unnecessary flushing overhead).
@@ -344,9 +517,89 @@ That problem will be dealt with later.
 
 ... TODO ...
 
-Fixing the explosion of generated SQL.
+Fixing the explosion of generated SQL by being explicit about what entities to fetch, in this case by
+using an `EntityGraph` as "load graph":
 
-Insert the Java code of `ConcreteFilmService` and `ConcreteFIlmServiceUsingFetchJoin`.
+```java
+public final class ConcreteFilmService implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+
+            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
+
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityManager.createQuery(qlString, FilmEntity.class)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setParameter(1, actorId)
+                    .getResultStream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    private EntityGraph<FilmEntity> getEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
+        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
+        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+
+        entityGraph.addAttributeNode(FilmEntity_.language);
+        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
+
+        return entityGraph;
+    }
+}
+```
+
+Alternatively, we can use "fetch joins" in the JPQL query:
+
+```java
+public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmServiceUsingFetchJoin(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            String qlString = """
+                    select f from Film f
+                      left join fetch f.filmActors fac
+                      left join fetch fac.actor
+                      left join fetch f.filmCategories fca
+                      left join fetch fca.category
+                      left join fetch f.language
+                      left join fetch f.originalLanguage
+                      left join f.filmActors fa
+                     where fa.actor.id = ?1""";
+
+            return entityManager.createQuery(qlString, FilmEntity.class)
+                    .setParameter(1, actorId)
+                    .getResultStream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+}
+```
 
 Show how this comes much closer to the
 [correct way to fix a LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
