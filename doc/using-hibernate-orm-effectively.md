@@ -63,10 +63,258 @@ The example uses a small part of [sample Pagila database](https://github.com/dev
 
 It shows a minimal transactional film service, with one public method to query for films of a given actor.
 
-Insert the Java code of the relevant JPA entities. Mention 2 kinds of mapping annotations in JPA entities.
+Let's introduce the JPA entities relevant to our example.
 
-Show first example, and *ask audience* what is wrong with it. It will throw a `LazyInitializationException`.
-This first example returns the films as JPA entities, without fetching any associations.
+Before doing so, first note that there are 2 categories of *JPA annotations* on entities:
+- *logical mapping annotations*, concerning the Java object model
+  - e.g. `Entity`, `Id`, `ManyToOne`, `Basic` etc.
+- *physical mapping annotations*, concerning the underlying relational database schema
+  - e.g. `Table`, `Column`, `JoinTable`, `GeneratedValue` etc.
+
+First the `ActorEntity`:
+
+```java
+@Entity(name = "Actor")
+@Table(name = "Actor")
+public class ActorEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "actor_id_seq")
+    @SequenceGenerator(name = "actor_id_seq", sequenceName = "actor_actor_id_seq", allocationSize = 1)
+    @Column(name = "actor_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Basic(optional = false)
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Next the `CategoryEntity`:
+
+```java
+@Entity(name = "Category")
+@Table(name = "Category")
+public class CategoryEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_id_seq")
+    @SequenceGenerator(name = "category_id_seq", sequenceName = "category_category_id_seq", allocationSize = 1)
+    @Column(name = "category_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    private String name;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Next the `LanguageEntity`:
+
+```java
+@Entity(name = "Language")
+@Table(name = "Language")
+public class LanguageEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "language_id_seq")
+    @SequenceGenerator(name = "language_id_seq", sequenceName = "language_language_id_seq", allocationSize = 1)
+    @Column(name = "language_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    @Column(columnDefinition = "bpchar")
+    private String name;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Next the `FilmActorEntity`, which represents the n-to-m association between films and actors:
+
+```java
+@Embeddable
+public record FilmActorKey(Integer actorId, Integer filmId) { // Not serializable
+}
+
+@Entity(name = "FilmActor")
+@Table(name = "Film_Actor")
+public class FilmActorEntity { // Not serializable
+
+    @EmbeddedId
+    @AttributeOverride(name = "actorId", column = @Column(name = "actor_id"))
+    @AttributeOverride(name = "filmId", column = @Column(name = "film_id"))
+    private FilmActorKey filmActorKey;
+
+    @MapsId("actorId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "actor_id")
+    private ActorEntity actor;
+
+    @MapsId("filmId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "film_id")
+    private FilmEntity film;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Analogously, the `FilmCategoryEntity`, which represents the n-to-m association between films and categories:
+
+```java
+@Embeddable
+public record FilmCategoryKey(Integer filmId, Integer categoryId) { // Not serializable
+}
+
+@Entity(name = "FilmCategory")
+@Table(name = "Film_Category")
+public class FilmCategoryEntity { // Not serializable
+
+    @EmbeddedId
+    @AttributeOverride(name = "categoryId", column = @Column(name = "category_id"))
+    @AttributeOverride(name = "filmId", column = @Column(name = "film_id"))
+    private FilmCategoryKey filmCategoryKey;
+
+    @MapsId("filmId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "film_id")
+    private FilmEntity film;
+
+    @MapsId("categoryId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity category;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Finally, the `FilmEntity` itself:
+
+```java
+@Entity(name = "Film")
+@Table(name = "Film")
+public class FilmEntity { // Not serializable
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "film_id_seq")
+    @SequenceGenerator(name = "film_id_seq", sequenceName = "film_film_id_seq", allocationSize = 1)
+    @Column(name = "film_id")
+    private Integer id;
+
+    @Basic(optional = false)
+    private String title;
+
+    private String description;
+
+    @Column(name = "release_year", columnDefinition = "year")
+    private Year releaseYear;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "language_id", nullable = false)
+    private LanguageEntity language;
+
+    @ManyToOne
+    @JoinColumn(name = "original_language_id")
+    private LanguageEntity originalLanguage;
+
+    @Basic(optional = false)
+    @Column(name = "rental_duration")
+    private Short rentalDuration;
+
+    @Basic(optional = false)
+    @Column(name = "rental_rate")
+    private BigDecimal rentalRate;
+
+    private Short length;
+
+    @Basic(optional = false)
+    @Column(name = "replacement_cost")
+    private BigDecimal replacementCost;
+
+    private String rating;
+
+    @Basic(optional = false)
+    @Column(name = "last_update")
+    private Instant lastUpdate;
+
+    @OneToMany(mappedBy = FilmActorEntity_.FILM)
+    private Set<FilmActorEntity> filmActors;
+
+    @OneToMany(mappedBy = FilmCategoryEntity_.FILM)
+    private Set<FilmCategoryEntity> filmCategories;
+
+    // Getters and setters, and possibly also overridden equals and hashCode
+}
+```
+
+Let's now get to the first example of a transactional service querying for films (of a certain actor):
+
+```java
+public interface FilmService {
+
+    ImmutableList<FilmEntity> findFilmsByActorId(long actorId);
+}
+
+public final class NaiveFilmService implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public NaiveFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<FilmEntity> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+
+            return entityManager.createQuery(qlString, FilmEntity.class)
+                    .setParameter(1, actorId)
+                    .getResultStream()
+                    .sorted(Comparator.comparingLong(FilmEntity::getId))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+}
+```
+
+Now have a look at the following code:
+
+```java
+ImmutableList<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
+// Outside any transaction/Session:
+var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
+```
+
+*Ask the audience* what is wrong with this small piece of code above. Indeed, a `LazyInitializationException`.
 
 ## Querying for custom projections
 
@@ -85,7 +333,7 @@ Immutable Java records make great DTOs to be passed across application layers, t
 
 Insert code of an immutable film model, and conversions from JPA entities to this model.
 
-Insert the Java code of an inefficient film service returning immutable film DTOs (`InefficientFilmService`,
+Insert the Java code of an inefficient film service returning immutable film DTOs (`NaiveFilmService`,
 using `EntityManager` and JPQL query strings).
 
 *Ask audience* what is wrong with the implementation (too many queries), other than retrieving entities
