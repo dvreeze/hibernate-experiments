@@ -26,7 +26,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.util.Optional;
 
 /**
- * Inefficient {@link FilmService} implementation.
+ * Naive {@link FilmService} implementation.
  *
  * @author Chris de Vreeze
  */

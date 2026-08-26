@@ -16,8 +16,8 @@
 
 /**
  * Transactional service layer, as purely abstract API. This abstract API is not technology-agnostic,
- * because it returns film JPA entities. It is also poorly defined, because it is unclear about the extent
- * to which returned film entities have their associations filled.
+ * because it returns JPA entities. It is also poorly defined, because it is unclear about the extent
+ * to which returned entities have their associations filled.
  *
  * @author Chris de Vreeze
  */

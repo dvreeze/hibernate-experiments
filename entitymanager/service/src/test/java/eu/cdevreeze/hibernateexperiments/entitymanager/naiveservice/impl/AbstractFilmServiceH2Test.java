@@ -104,12 +104,32 @@ abstract class AbstractFilmServiceH2Test {
     }
 
     @Test
-    void testLazyInitializationException() {
+    void testLazyInitializationExceptionOnFilmActor() {
+        ImmutableList<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
+        assertThrows(LazyInitializationException.class, () -> {
+            // Outside any transaction/Session:
+            var firstActor = filmsOfActor.getFirst().getFilmActors().iterator().next();
+            assertNotNull(firstActor); // Not reached
+        });
+    }
+
+    @Test
+    void testLazyInitializationExceptionOnFilmCategory() {
         ImmutableList<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
         assertThrows(LazyInitializationException.class, () -> {
             // Outside any transaction/Session:
             var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
             assertNotNull(firstCategory); // Not reached
+        });
+    }
+
+    @Test
+    void testLazyInitializationExceptionOnFilmLanguage() {
+        ImmutableList<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
+        assertThrows(LazyInitializationException.class, () -> {
+            // Outside any transaction/Session:
+            var language = filmsOfActor.getFirst().getLanguage().getName();
+            assertNotNull(language); // Not reached
         });
     }
 
