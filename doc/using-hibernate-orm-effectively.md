@@ -541,16 +541,10 @@ public final class ConcreteFilmService implements FilmService {
 
     private EntityGraph<FilmEntity> getEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-
-        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
-        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
-
-        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
-        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
-
+        entityGraph.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
+        entityGraph.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
         entityGraph.addAttributeNode(FilmEntity_.language);
         entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
-
         return entityGraph;
     }
 }
@@ -639,9 +633,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-
-        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
-        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+        entityGraph.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
         entityGraph.addAttributeNode(FilmEntity_.language);
         entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
         return entityGraph;
@@ -649,9 +641,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-
-        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
-        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+        entityGraph.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
         return entityGraph;
     }
 }
@@ -710,9 +700,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-
-        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
-        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+        entityGraph.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
         entityGraph.addAttributeNode(FilmEntity_.language);
         entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
         return entityGraph;
@@ -720,9 +708,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-
-        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
-        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+        entityGraph.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
         return entityGraph;
     }
 }
@@ -799,16 +785,10 @@ public final class ConcreteFilmService implements FilmService {
 
     private EntityGraph<FilmEntity> getEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-
-        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
-        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
-
-        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
-        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
-
+        entityGraph.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
+        entityGraph.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
         entityGraph.addAttributeNode(FilmEntity_.language);
         entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
-
         return entityGraph;
     }
 }
