@@ -27,7 +27,7 @@ import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation that uses multiple JPQL queries in order to prevent
- * a {@link MultipleBagFetchException} in an effective way.
+ * a {@link org.hibernate.loader.MultipleBagFetchException} in an effective way.
  *
  * @author Chris de Vreeze
  */

@@ -604,7 +604,69 @@ Show how this comes much closer to the
 [correct way to fix a LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
 
 Also show how we narrowly escaped the throwing of a `MultipleBagFetchException`. Show ways to deal with that.
-So, insert Java code of `ConcreteFilmServiceUsingSeparateQueries`.
+
+A good way to prevent the `MultipleBagFetchException` is shown in `ConcreteFilmServiceUsingSeparateQueries`:
+
+```java
+public final class ConcreteFilmServiceUsingSeparateQueries implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmServiceUsingSeparateQueries(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
+
+            java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
+                    findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager)
+                            .stream()
+                            .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
+
+            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
+                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
+                            .map(FilmEntity::getFilmCategories)
+                            .orElse(java.util.Set.of())
+            ));
+
+            return filmEntities
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityManager entityManager) {
+        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+
+        return entityManager.createQuery(qlString, entityGraph)
+                .setParameter(1, actorId)
+                .getResultStream()
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
+        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+        entityGraph.addAttributeNode(FilmEntity_.language);
+        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
+        return entityGraph;
+    }
+
+    private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
+        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+        return entityGraph;
+    }
+}
+```
 
 ## Using Hibernate ORM without persistence context
 
@@ -612,28 +674,218 @@ So, insert Java code of `ConcreteFilmServiceUsingSeparateQueries`.
 
 *Ask audience* if it is possible to use Hibernate ORM without persistence context overhead.
 
-Show the same `ConcreteFilmServiceUsingSeparateQueries`, except that it uses an `EntityAgent` instead
+This gets us to the same `ConcreteFilmServiceUsingSeparateQueries`, except that it uses an `EntityAgent` instead
 of `EntityManager` (since Jakarta Persistence 4.0, but `StatelessSession` has already existed for a long time).
+
+Here is the code:
+
+```java
+public final class ConcreteFilmServiceUsingSeparateQueries implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmServiceUsingSeparateQueries(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityAgent);
+
+            java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
+                    findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityAgent)
+                            .stream()
+                            .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
+
+            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
+                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
+                            .map(FilmEntity::getFilmCategories)
+                            .orElse(java.util.Set.of())
+            ));
+
+            return filmEntities
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityAgent entityAgent) {
+        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+
+        // This sets the load graph, not the fetch graph
+        // Yet that makes no difference here since we configured lazy fetching for all entity associations
+        return entityAgent.createQuery(qlString, entityGraph)
+                .setParameter(1, actorId)
+                .getResultStream()
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
+        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+        entityGraph.addAttributeNode(FilmEntity_.language);
+        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
+        return entityGraph;
+    }
+
+    private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
+        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+        return entityGraph;
+    }
+}
+```
+
+Finally, we can reliably retrieve entities and convert them to the immutable model within the same
+`Session`/`EntityManager` without triggering any flushing overhead.
+
+Show how to use an `EntityAgent` (or, before Jakarta Persistence 4.0) its subtype `StatelessSession` for
+CRUD operations. Note that both `EntityManager` and `EntityAgent` extend interface `EntityHandler`.
+The latter contains the (relatively large) API common to both subtypes.
 
 ## Exploiting richness of HQL
 
 ... TODO ...
 
-Insert code of `AlternativeFilmService`, exploiting JSON support and/or CTEs.
+In Hibernate 8, the HQL language (which is a superset of JPQL) is such a powerful (OO) SQL dialect that
+even Common Table Expressions and JSON are supported. Note that JSON results can be converted to immutable
+model objects using a library such as [Jackson](https://github.com/fasterxml/jackson). This approach
+is not shown here.
+
+This requires a full `Session` or `StatelessSession`, instead of supertype `EntityManager` or `EntityAgent`.
+For example:
+
+```java
+public final class AlternativeFilmService implements FilmService {
+
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
+            // ...
+        }
+    }
+}
+```
 
 Remember, JPQL and in particular HQL are very powerful *OO SQL dialects*.
 
 If need be, we can always fall back to native SQL queries, and still benefit from Hibernate (and increased
-type-safety).
+type-safety). In that case we would use `EntityHandler` method `createNativeQuery` rather than `createQuery`.
 
 ## The type-safe metamodel
 
 ... TODO ...
 
-Also show its use in `ConcreteFilmService` using Criteria API, and move on to Jakarta Data repositories,
-with compile-time JPQL/HQL query string parsing/validation (through the Hibernate annotation processor).
+Let's show a `ConcreteFilmService` using the Criteria API with the metamodel, thus getting much compile-time
+type-safety when using the Criteria API:
 
-Insert repository-based `ConcreteFilmService` code.
+```java
+public final class ConcreteFilmService implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
+
+            Root<FilmEntity> film = cq.from(FilmEntity.class);
+            SetJoin<FilmEntity, FilmActorEntity> filmActor = film.join(FilmEntity_.filmActors, JoinType.LEFT);
+            cq.where(cb.equal(filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
+            cq.select(film);
+
+            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
+
+            // This sets the load graph, not the fetch graph
+            // Yet that makes no difference here since we configured lazy fetching for all entity associations
+            return entityAgent.createQuery(cq)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .getResultStream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    private EntityGraph<FilmEntity> getEntityGraph() {
+        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
+        filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
+
+        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
+        Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
+        filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
+
+        entityGraph.addAttributeNode(FilmEntity_.language);
+        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
+
+        return entityGraph;
+    }
+}
+```
+
+Now move on to Jakarta Data repositories, with compile-time JPQL/HQL query string parsing/validation
+(through the Hibernate annotation processor). Thus, we get compile-time query validation without the
+verbosity of the Criteria API.
+
+Let's show the "repository" code (returning entities):
+
+```java
+public interface FilmRepository {
+
+    @HQL("""
+            select f from Film f
+              left join fetch f.filmActors fac
+              left join fetch fac.actor
+              left join fetch f.filmCategories fca
+              left join fetch fca.category
+              left join fetch f.language
+              left join fetch f.originalLanguage
+              left join f.filmActors fa
+             where fa.actor.id = :actorId""")
+    List<FilmEntity> findFilmsByActorId(int actorId);
+}
+```
+
+The service using this "repository":
+
+```java
+public final class ConcreteFilmService implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            FilmRepository filmRepository = new _FilmRepository(entityAgent);
+            return filmRepository.findFilmsByActorId((int) actorId)
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+}
+```
+
+For now, I had to use the Hibernate-specific `HQL` annotation, but with Hibernate 8.0 Final I do not expect
+that to be the case anymore.
 
 ## Testing Hibernate code
 
