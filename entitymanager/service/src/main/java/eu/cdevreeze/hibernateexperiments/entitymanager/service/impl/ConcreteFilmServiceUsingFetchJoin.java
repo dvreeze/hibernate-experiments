@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
 import module java.base;
-import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Film;

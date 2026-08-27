@@ -18,7 +18,6 @@ package eu.cdevreeze.hibernateexperiments.emcriteria.service.impl;
 
 import module jakarta.persistence;
 import module java.base;
-import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emcriteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.emcriteria.model.Film;

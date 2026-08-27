@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
-import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
