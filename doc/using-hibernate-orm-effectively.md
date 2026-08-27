@@ -292,7 +292,6 @@ public final class NaiveFilmService implements FilmService {
 
     @Override
     public ImmutableList<FilmEntity> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
@@ -494,7 +493,6 @@ public final class InefficientFilmService implements FilmService {
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
@@ -529,15 +527,10 @@ public final class ConcreteFilmService implements FilmService {
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getEntityGraph())
                     .setParameter(1, actorId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
@@ -549,11 +542,9 @@ public final class ConcreteFilmService implements FilmService {
     private EntityGraph<FilmEntity> getEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
         filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
 
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
         filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
 
@@ -576,7 +567,6 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = """
                     select f from Film f
@@ -616,7 +606,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
 
@@ -688,7 +677,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityAgent);
 
@@ -714,8 +702,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityAgent entityAgent) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-        // This sets the load graph, not the fetch graph
-        // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(qlString, entityGraph)
                 .setParameter(1, actorId)
                 .getResultStream()
@@ -725,7 +711,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
         filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
         entityGraph.addAttributeNode(FilmEntity_.language);
@@ -736,7 +721,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
         filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
         return entityGraph;
@@ -795,7 +779,6 @@ public final class ConcreteFilmService implements FilmService {
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
             CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
@@ -805,12 +788,8 @@ public final class ConcreteFilmService implements FilmService {
             cq.where(cb.equal(filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
             cq.select(film);
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
@@ -821,11 +800,9 @@ public final class ConcreteFilmService implements FilmService {
     private EntityGraph<FilmEntity> getEntityGraph() {
         EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
 
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmActorEntity> filmActorSubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmActors);
         filmActorSubgraph.addAttributeNode(FilmActorEntity_.actor);
 
-        // Be careful: type SubGraph is Hibernate-specific, whereas type Subgraph is part of JPA
         Subgraph<FilmCategoryEntity> filmCategorySubgraph = entityGraph.addElementSubgraph(FilmEntity_.filmCategories);
         filmCategorySubgraph.addAttributeNode(FilmCategoryEntity_.category);
 
@@ -844,6 +821,7 @@ verbosity of the Criteria API.
 Let's show the "repository" code (returning entities):
 
 ```java
+@jakarta.data.repository.Repository
 public interface FilmRepository {
 
     @HQL("""
@@ -871,7 +849,6 @@ public final class ConcreteFilmService implements FilmService {
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent);
             return filmRepository.findFilmsByActorId((int) actorId)

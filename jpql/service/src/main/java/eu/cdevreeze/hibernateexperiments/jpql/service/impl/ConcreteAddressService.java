@@ -42,11 +42,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -60,11 +58,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -78,11 +74,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad where ad.city.country.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -96,11 +90,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select ad from Address ad";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -113,11 +105,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from City c where c.country.id = ?1";
 
-            EntityGraph<CityEntity> entityGraph = getCityEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getCityEntityGraph())
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -131,11 +121,9 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select c from Country c";
 
-            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getCountryEntityGraph())
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

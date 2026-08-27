@@ -50,14 +50,12 @@ public final class ConcreteFilmService implements FilmService {
             Root<FilmEntity> film = cq.from(FilmEntity.class);
             cq.select(film);
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
@@ -76,14 +74,10 @@ public final class ConcreteFilmService implements FilmService {
             cq.where(cb.equal(film.get(FilmEntity_.id), filmId));
             cq.select(film);
 
-            // This sets the load graph, not the fetch graph
-            // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
@@ -102,14 +96,12 @@ public final class ConcreteFilmService implements FilmService {
             cq.where(cb.equal(filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
             cq.select(film);
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))

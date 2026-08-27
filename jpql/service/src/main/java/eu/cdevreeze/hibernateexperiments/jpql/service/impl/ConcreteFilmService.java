@@ -47,11 +47,9 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select f from Film f";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getEntityGraph())
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
@@ -65,11 +63,9 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select f from Film f where f.id = ?1";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getEntityGraph())
                     .setParameter(1, filmId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
@@ -83,11 +79,9 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, entityGraph)
+            return entityAgent.createQuery(qlString, getEntityGraph())
                     .setParameter(1, actorId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)

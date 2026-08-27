@@ -48,12 +48,10 @@ public final class ConcreteActorService implements ActorService {
             cq.where(cb.equal(actor.get(ActorEntity_.id), id));
             cq.select(actor);
 
-            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph())
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .findFirst();
@@ -76,12 +74,10 @@ public final class ConcreteActorService implements ActorService {
             cq.where(cb.equal(filmActor.get(FilmActorEntity_.film).get(FilmEntity_.id), filmId));
             cq.select(actor);
 
-            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph())
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -98,12 +94,10 @@ public final class ConcreteActorService implements ActorService {
             Root<ActorEntity> actor = cq.from(ActorEntity.class);
             cq.select(actor);
 
-            EntityGraph<ActorEntity> entityGraph = getActorEntityGraph();
-
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph())
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

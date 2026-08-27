@@ -42,13 +42,11 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -62,13 +60,11 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.city.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -82,13 +78,11 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad where ad.city.country.id = ?1";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -102,13 +96,11 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select ad from Address ad";
 
-            EntityGraph<AddressEntity> entityGraph = getAddressEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getAddressEntityGraph())
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -121,13 +113,11 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from City c where c.country.id = ?1";
 
-            EntityGraph<CityEntity> entityGraph = getCityEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getCityEntityGraph())
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -141,13 +131,11 @@ public final class ConcreteAddressService implements AddressService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select c from Country c";
 
-            EntityGraph<CountryEntity> entityGraph = getCountryEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getCountryEntityGraph())
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

@@ -46,13 +46,11 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getEntityGraph())
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
@@ -66,13 +64,11 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f where f.id = ?1";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getEntityGraph())
                     .setParameter(1, filmId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
@@ -86,13 +82,11 @@ public final class ConcreteFilmService implements FilmService {
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-            EntityGraph<FilmEntity> entityGraph = getEntityGraph();
-
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityManager.createQuery(qlString, entityGraph)
+            return entityManager.createQuery(qlString, getEntityGraph())
                     .setParameter(1, actorId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
