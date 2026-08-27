@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
-import module org.hibernate.orm.core;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
@@ -52,8 +51,7 @@ public final class ConcreteFilmService implements FilmService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, FilmEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
@@ -71,8 +69,7 @@ public final class ConcreteFilmService implements FilmService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, FilmEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, filmId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
@@ -90,8 +87,7 @@ public final class ConcreteFilmService implements FilmService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, FilmEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, actorId)
                     .getResultStream()
                     .map(FilmEntity::toModelObject)

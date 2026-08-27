@@ -22,7 +22,6 @@ import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
 import eu.cdevreeze.hibernateexperiments.jpql.service.AddressService;
-import org.hibernate.jpa.SpecHints;
 
 /**
  * Concrete {@link AddressService} implementation.
@@ -47,8 +46,7 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, id)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -66,8 +64,7 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, cityId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -85,8 +82,7 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
@@ -104,8 +100,7 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, AddressEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -122,8 +117,7 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, CityEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .setParameter(1, countryId)
                     .getResultStream()
                     .map(CityEntity::toModelObject)
@@ -141,8 +135,7 @@ public final class ConcreteAddressService implements AddressService {
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            return entityAgent.createQuery(qlString, CountryEntity.class)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+            return entityAgent.createQuery(qlString, entityGraph)
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
