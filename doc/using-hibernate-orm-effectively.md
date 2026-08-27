@@ -238,11 +238,11 @@ public class FilmEntity { // Not serializable
     @Column(name = "release_year", columnDefinition = "year")
     private Year releaseYear;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "language_id", nullable = false)
     private LanguageEntity language;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "original_language_id")
     private LanguageEntity originalLanguage;
 
