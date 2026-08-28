@@ -47,8 +47,7 @@ public class AddressEntity {
     @Basic(optional = false)
     private String district;
 
-    // Fetch type lazy, due to global configuration of the default fetch type for to-one associations
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "city_id", nullable = false)
     private CityEntity city;
 
