@@ -169,16 +169,16 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     }
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
-        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-        entityGraph.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
-        entityGraph.addAttributeNode(FilmEntity_.language);
-        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
-        return entityGraph;
+        EntityGraph<FilmEntity> eg = FilmEntity_.class_.createEntityGraph();
+        eg.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
+        eg.addAttributeNode(FilmEntity_.language);
+        eg.addAttributeNode(FilmEntity_.originalLanguage);
+        return eg;
     }
 
     private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
-        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-        entityGraph.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
-        return entityGraph;
+        EntityGraph<FilmEntity> eg = FilmEntity_.class_.createEntityGraph();
+        eg.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
+        return eg;
     }
 }

@@ -110,11 +110,11 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     private EntityGraph<FilmEntity> getEntityGraph() {
-        EntityGraph<FilmEntity> entityGraph = FilmEntity_.class_.createEntityGraph();
-        entityGraph.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
-        entityGraph.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
-        entityGraph.addAttributeNode(FilmEntity_.language);
-        entityGraph.addAttributeNode(FilmEntity_.originalLanguage);
-        return entityGraph;
+        EntityGraph<FilmEntity> eg = FilmEntity_.class_.createEntityGraph();
+        eg.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
+        eg.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
+        eg.addAttributeNode(FilmEntity_.language);
+        eg.addAttributeNode(FilmEntity_.originalLanguage);
+        return eg;
     }
 }

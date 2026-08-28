@@ -209,15 +209,15 @@ public final class ConcreteAddressService implements AddressService {
     }
 
     private EntityGraph<AddressEntity> getAddressEntityGraph() {
-        EntityGraph<AddressEntity> entityGraph = AddressEntity_.class_.createEntityGraph();
-        entityGraph.addSubgraph(AddressEntity_.city).addAttributeNode(CityEntity_.country);
-        return entityGraph;
+        EntityGraph<AddressEntity> eg = AddressEntity_.class_.createEntityGraph();
+        eg.addSubgraph(AddressEntity_.city).addAttributeNode(CityEntity_.country);
+        return eg;
     }
 
     private EntityGraph<CityEntity> getCityEntityGraph() {
-        EntityGraph<CityEntity> entityGraph = CityEntity_.class_.createEntityGraph();
-        entityGraph.addAttributeNode(CityEntity_.country);
-        return entityGraph;
+        EntityGraph<CityEntity> eg = CityEntity_.class_.createEntityGraph();
+        eg.addAttributeNode(CityEntity_.country);
+        return eg;
     }
 
     private EntityGraph<CountryEntity> getCountryEntityGraph() {
