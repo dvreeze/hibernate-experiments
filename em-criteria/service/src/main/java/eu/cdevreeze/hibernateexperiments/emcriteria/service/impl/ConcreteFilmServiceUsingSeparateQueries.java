@@ -119,7 +119,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         });
     }
 
-    private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> entityGraph, EntityManager entityManager) {
+    private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
 
@@ -129,12 +129,12 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg)
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }
 
-    private Optional<FilmEntity> findFilm(long filmId, EntityGraph<FilmEntity> entityGraph, EntityManager entityManager) {
+    private Optional<FilmEntity> findFilm(long filmId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
 
@@ -142,16 +142,15 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         cq.where(cb.equal(film.get(FilmEntity_.id), filmId));
         cq.select(film);
 
-
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg)
                 .getResultStream()
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityManager entityManager) {
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
 
@@ -163,7 +162,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg)
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }

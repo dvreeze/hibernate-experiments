@@ -622,10 +622,10 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         });
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityManager entityManager) {
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-        return entityManager.createQuery(qlString, entityGraph)
+        return entityManager.createQuery(qlString, eg)
                 .setParameter(1, actorId)
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
@@ -689,10 +689,10 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         });
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityAgent entityAgent) {
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
-        return entityAgent.createQuery(qlString, entityGraph)
+        return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, actorId)
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());

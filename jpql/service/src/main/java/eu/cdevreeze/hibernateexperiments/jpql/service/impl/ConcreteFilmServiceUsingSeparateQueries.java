@@ -115,33 +115,33 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         });
     }
 
-    private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> entityGraph, EntityAgent entityAgent) {
+    private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
         String qlString = "select f from Film f";
 
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
-        return entityAgent.createQuery(qlString, entityGraph)
+        return entityAgent.createQuery(qlString, eg)
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }
 
-    private Optional<FilmEntity> findFilm(long filmId, EntityGraph<FilmEntity> entityGraph, EntityAgent entityAgent) {
+    private Optional<FilmEntity> findFilm(long filmId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
         String qlString = "select f from Film f where f.id = ?1";
 
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
-        return entityAgent.createQuery(qlString, entityGraph)
+        return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, filmId)
                 .getResultStream()
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> entityGraph, EntityAgent entityAgent) {
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
-        return entityAgent.createQuery(qlString, entityGraph)
+        return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, actorId)
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
