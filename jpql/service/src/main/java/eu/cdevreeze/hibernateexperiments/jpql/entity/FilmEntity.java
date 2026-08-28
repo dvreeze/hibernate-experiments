@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Film JPA {@link Entity}.
  *
@@ -203,25 +205,25 @@ public class FilmEntity {
     // May cause LazyInitializationException
     public Film toModelObject() {
         return new Film(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(title),
+                requireNonNull(id),
+                requireNonNull(title),
                 description,
                 releaseYear,
-                Objects.requireNonNull(language).toModelObject(),
+                requireNonNull(language).toModelObject(),
                 Optional.ofNullable(originalLanguage).map(LanguageEntity::toModelObject).orElse(null),
-                Objects.requireNonNull(rentalDuration),
+                requireNonNull(rentalDuration),
                 rentalRate,
                 Optional.ofNullable(length).map(Short::intValue).orElse(null),
-                Objects.requireNonNull(replacementCost),
+                requireNonNull(replacementCost),
                 rating,
-                Objects.requireNonNull(lastUpdate),
+                requireNonNull(lastUpdate),
                 ImmutableList.of(),
                 "",
-                Objects.requireNonNull(filmActors).stream()
+                requireNonNull(filmActors).stream()
                         .map(FilmActorEntity::getActor)
                         .map(ActorEntity::toModelObject)
                         .collect(ImmutableList.toImmutableList()),
-                Objects.requireNonNull(filmCategories).stream()
+                requireNonNull(filmCategories).stream()
                         .map(FilmCategoryEntity::getCategory)
                         .map(CategoryEntity::toModelObject)
                         .collect(ImmutableList.toImmutableList())

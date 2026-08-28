@@ -395,6 +395,8 @@ public record Film(
 Enhance the JPA entities with (trivial) conversion methods to that model:
 
 ```java
+import static java.util.Objects.requireNonNull;
+
 @Entity(name = "Actor")
 @Table(name = "Actor")
 public class ActorEntity {
@@ -403,10 +405,10 @@ public class ActorEntity {
 
     public Actor toModelObject() {
         return new Actor(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(firstName),
-                Objects.requireNonNull(lastName),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(id),
+                requireNonNull(firstName),
+                requireNonNull(lastName),
+                requireNonNull(lastUpdate)
         );
     }
 }
@@ -418,7 +420,7 @@ public class CategoryEntity {
     // ...
 
     public Category toModelObject() {
-        return new Category(Objects.requireNonNull(id), Objects.requireNonNull(name), Objects.requireNonNull(lastUpdate));
+        return new Category(requireNonNull(id), requireNonNull(name), requireNonNull(lastUpdate));
     }
 }
 
@@ -429,7 +431,7 @@ public class LanguageEntity {
     // ...
 
     public Language toModelObject() {
-        return new Language(Objects.requireNonNull(id), Objects.requireNonNull(name), Objects.requireNonNull(lastUpdate));
+        return new Language(requireNonNull(id), requireNonNull(name), requireNonNull(lastUpdate));
     }
 }
 ```
@@ -446,25 +448,25 @@ public class FilmEntity {
     // May cause LazyInitializationException
     public Film toModelObject() {
         return new Film(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(title),
+                requireNonNull(id),
+                requireNonNull(title),
                 description,
                 releaseYear,
-                Objects.requireNonNull(language).toModelObject(),
+                requireNonNull(language).toModelObject(),
                 Optional.ofNullable(originalLanguage).map(LanguageEntity::toModelObject).orElse(null),
-                Objects.requireNonNull(rentalDuration),
+                requireNonNull(rentalDuration),
                 rentalRate,
                 Optional.ofNullable(length).map(Short::intValue).orElse(null),
-                Objects.requireNonNull(replacementCost),
+                requireNonNull(replacementCost),
                 rating,
-                Objects.requireNonNull(lastUpdate),
+                requireNonNull(lastUpdate),
                 ImmutableList.of(),
                 "",
-                Objects.requireNonNull(filmActors).stream()
+                requireNonNull(filmActors).stream()
                         .map(FilmActorEntity::getActor)
                         .map(ActorEntity::toModelObject)
                         .collect(ImmutableList.toImmutableList()),
-                Objects.requireNonNull(filmCategories).stream()
+                requireNonNull(filmCategories).stream()
                         .map(FilmCategoryEntity::getCategory)
                         .map(CategoryEntity::toModelObject)
                         .collect(ImmutableList.toImmutableList())

@@ -21,6 +21,8 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Country;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Country JPA {@link Entity}.
  *
@@ -72,9 +74,9 @@ public class CountryEntity {
 
     public Country toModelObject() {
         return new Country(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(country),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(id),
+                requireNonNull(country),
+                requireNonNull(lastUpdate)
         );
     }
 }

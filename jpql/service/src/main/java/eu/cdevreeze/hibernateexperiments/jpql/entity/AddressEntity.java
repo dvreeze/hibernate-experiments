@@ -21,6 +21,8 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Address;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Address JPA {@link Entity}.
  *
@@ -128,14 +130,14 @@ public class AddressEntity {
     // May cause LazyInitializationException
     public Address toModelObject() {
         return new Address(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(address),
+                requireNonNull(id),
+                requireNonNull(address),
                 address2,
-                Objects.requireNonNull(district),
-                Objects.requireNonNull(city).toModelObject(),
+                requireNonNull(district),
+                requireNonNull(city).toModelObject(),
                 postalCode,
-                Objects.requireNonNull(phone),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(phone),
+                requireNonNull(lastUpdate)
         );
     }
 }

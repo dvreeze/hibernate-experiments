@@ -21,6 +21,8 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Language;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Language JPA {@link Entity}.
  *
@@ -73,9 +75,9 @@ public class LanguageEntity {
 
     public Language toModelObject() {
         return new Language(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(name),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(id),
+                requireNonNull(name),
+                requireNonNull(lastUpdate)
         );
     }
 }

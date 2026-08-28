@@ -21,6 +21,8 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.criteria.model.City;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * City JPA {@link Entity}.
  *
@@ -85,10 +87,10 @@ public class CityEntity {
     // May cause LazyInitializationException
     public City toModelObject() {
         return new City(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(city),
-                Objects.requireNonNull(country).toModelObject(),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(id),
+                requireNonNull(city),
+                requireNonNull(country).toModelObject(),
+                requireNonNull(lastUpdate)
         );
     }
 }

@@ -21,6 +21,8 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Category;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Category JPA {@link Entity}.
  *
@@ -72,9 +74,9 @@ public class CategoryEntity {
 
     public Category toModelObject() {
         return new Category(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(name),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(id),
+                requireNonNull(name),
+                requireNonNull(lastUpdate)
         );
     }
 }

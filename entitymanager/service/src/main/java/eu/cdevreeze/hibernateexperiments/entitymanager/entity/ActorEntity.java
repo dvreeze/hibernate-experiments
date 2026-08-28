@@ -21,6 +21,8 @@ import module java.base;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Actor;
 import jakarta.persistence.Entity;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Actor JPA {@link Entity}.
  *
@@ -85,10 +87,10 @@ public class ActorEntity {
 
     public Actor toModelObject() {
         return new Actor(
-                Objects.requireNonNull(id),
-                Objects.requireNonNull(firstName),
-                Objects.requireNonNull(lastName),
-                Objects.requireNonNull(lastUpdate)
+                requireNonNull(id),
+                requireNonNull(firstName),
+                requireNonNull(lastName),
+                requireNonNull(lastUpdate)
         );
     }
 }
