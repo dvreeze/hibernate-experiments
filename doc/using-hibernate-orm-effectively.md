@@ -601,7 +601,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
-            java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
+            java.util.List<FilmEntity> filmEntities =
+                    findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
 
             java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
                     findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager)
@@ -614,15 +615,15 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                             .orElse(java.util.Set.of())
             ));
 
-            return filmEntities
-                    .stream()
+            return filmEntities.stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
+    private ImmutableList<FilmEntity> findFilmsByActorId(
+            long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
         return entityManager.createQuery(qlString, eg)
@@ -668,7 +669,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
-            java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityAgent);
+            java.util.List<FilmEntity> filmEntities =
+                    findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityAgent);
 
             java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
                     findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityAgent)
@@ -681,15 +683,15 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                             .orElse(java.util.Set.of())
             ));
 
-            return filmEntities
-                    .stream()
+            return filmEntities.stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
+    private ImmutableList<FilmEntity> findFilmsByActorId(
+            long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
         return entityAgent.createQuery(qlString, eg)
