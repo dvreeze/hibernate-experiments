@@ -775,7 +775,7 @@ public final class ConcreteFilmService implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))

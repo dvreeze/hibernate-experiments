@@ -267,7 +267,7 @@ public final class AlternativeAddressService implements AddressService {
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, entityGraph) // Not type-safe
                 .getSingleResult();
     }
 

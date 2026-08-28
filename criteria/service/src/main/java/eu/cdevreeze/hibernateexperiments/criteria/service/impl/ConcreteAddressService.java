@@ -51,7 +51,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
@@ -72,7 +72,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -93,7 +93,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -113,7 +113,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -134,7 +134,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCityEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCityEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -154,7 +154,7 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCountryEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCountryEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -192,7 +192,7 @@ public final class ConcreteAddressService implements AddressService {
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCityEntityGraph())
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCityEntityGraph()) // Not type-safe
                 .getSingleResult();
     }
 

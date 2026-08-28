@@ -53,7 +53,7 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .findFirst();
@@ -81,7 +81,7 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -103,7 +103,7 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());

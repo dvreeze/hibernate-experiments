@@ -53,7 +53,7 @@ public final class ConcreteFilmService implements FilmService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
@@ -73,7 +73,7 @@ public final class ConcreteFilmService implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
@@ -95,7 +95,7 @@ public final class ConcreteFilmService implements FilmService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
-                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph())
+                    .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
                     .getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))

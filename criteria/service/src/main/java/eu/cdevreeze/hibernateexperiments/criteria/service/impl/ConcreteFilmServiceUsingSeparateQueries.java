@@ -129,7 +129,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg) // Not type-safe
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }
@@ -145,7 +145,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg) // Not type-safe
                 .getResultStream()
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
@@ -162,7 +162,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(cq)
-                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg)
+                .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg) // Not type-safe
                 .getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }
