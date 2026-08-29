@@ -633,8 +633,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
 #### Per-query fetching
 
-Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-many associations to film
-actors and film categories had been Lists instead of Sets, we would have gotten this exception.
+Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-many associations to film actors and film categories had been Lists instead of Sets, we would have gotten this exception.
 
 See [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/).
 
