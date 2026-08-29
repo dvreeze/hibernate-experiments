@@ -551,7 +551,7 @@ There is also a more hidden problem ("flushing overhead").
 
 We fix these problems (`LazyInitializationException` and 1 + N select issue) by specifying *what data to fetch at the query level*.
 
-See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype), [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/) and [Hibernate performance tuning](https://thorben-janssen.com/hibernate-performance-tuning/).
+See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
 
 Again, at the *entity level*, all associations should use *lazy fetching*. Unfortunately, EAGER is the default for to-one associations (but mind Jakarta Persistence 4.0's fix for this).
 
