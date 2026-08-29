@@ -349,7 +349,7 @@ Jakarta Persistence *entities* pull us back into "old school" Java.
 
 Yet they are great in JPQL queries, and for synchronizing Java object state with the database.
 
-But they make very poor DTOs to pass across application layers, with lots of hidden state.
+But they make very poor DTOs to pass across application layers, with lots of hidden state. (The Hibernate team will not tell you this.)
 
 *Immutable Java records* make far better DTOs.
 
