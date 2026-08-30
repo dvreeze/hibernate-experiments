@@ -1023,3 +1023,70 @@ public final class ConcreteFilmService implements FilmService {
     }
 }
 ```
+
+---
+
+#### Unit testing
+
+How can we best unit test code using Hibernate ORM?
+- Mocking does not get us very far
+- [Testcontainers](https://testcontainers.com/) is a bit "heavy" for unit tests
+- Testing against an in-memory [H2](https://h2database.com/html/main.html) is an attractive option
+
+The latter option works well, to a large extent due to Hibernate ORM successfully abstracting away SQL dialect differences.
+
+We might need an `orm.xml` file to override some entity mappings (next slide):
+
+---
+
+#### Unit testing
+
+```xml
+<entity-mappings xmlns="https://jakarta.ee/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence/orm
+          https://jakarta.ee/xml/ns/persistence/orm/orm_4_0.xsd" version="4.0">
+    <entity class="com.example.hibernateexperiments.jpql.entity.LanguageEntity">
+        <attribute-override name="name">
+            <column column-definition="text"/>
+        </attribute-override>
+    </entity>
+    <entity class="com.example.hibernateexperiments.jpql.entity.FilmEntity">
+        <attribute-override name="releaseYear">
+            <column name="release_year" column-definition="integer"/>
+        </attribute-override>
+    </entity>
+</entity-mappings>
+```
+
+---
+
+#### Unit testing
+
+If need be, we can programmatically create an `EntityManagerFactory`:
+
+```java
+private static EntityManagerFactory createEntityManagerFactory() {
+    String persistenceUnitName = "pagilatestH2";
+    return new PersistenceConfiguration(persistenceUnitName)
+            .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
+            .defaultToOneFetchType(FetchType.LAZY)
+            .provider("org.hibernate.jpa.HibernatePersistenceProvider")
+            .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
+            .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
+            .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE) // instead of VALIDATE
+            .managedClass(ActorEntity.class)
+            .managedClass(CategoryEntity.class)
+            .managedClass(LanguageEntity.class)
+            .managedClass(FilmActorEntity.class)
+            .managedClass(FilmCategoryEntity.class)
+            .managedClass(FilmEntity.class)
+            .createEntityManagerFactory();
+}
+```
+
+---
+
+#### Conclusion
+
+TODO
