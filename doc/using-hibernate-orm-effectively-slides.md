@@ -824,4 +824,88 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
 #### Exploiting richness of HQL
 
-TODO
+Sometimes it pays off to use a Hibernate-specific API instead of strictly limiting ourselves to the Jakarta Persistence API.
+
+For example, using `StatelessSession`/`Session` instead of supertype `EntityAgent`/`EntityManager`.
+
+This enables us to use more advanced HQL features, corresponding to advanced SQL features, such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON Types](https://www.postgresql.org/docs/18/datatype-json.html).
+
+Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON types (even if the result is a bit verbose).
+
+---
+
+#### Exploiting richness of HQL
+
+```java
+public final class AlternativeFilmService implements FilmService {
+
+    private final JsonMapper jsonMapper = JsonMapper.builder().addModule(new GuavaModule()).build();
+
+    private final EntityManagerFactory emf;
+
+    public AlternativeFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        return emf.callInTransaction(StatelessSession.class, statelessSession -> {
+            HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
+            JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class);
+
+            JpaRoot<? extends FilmEntity> filmRoot = cq.getRoot(0, FilmEntity.class);
+
+            JpaSubQuery<Integer> subquery = cq.subquery(Integer.class);
+            JpaRoot<FilmActorEntity> subqueryRoot = subquery.from(FilmActorEntity.class);
+            subquery.where(cb.equal(subqueryRoot.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
+            subquery.select(subqueryRoot.get(FilmActorEntity_.film).get(FilmEntity_.id));
+
+            cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
+
+            return statelessSession.createQuery(cq).getResultStream()
+                    .map(v -> jsonMapper.readValue(v, Film.class))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    // Continued below ...
+}
+```
+
+---
+
+#### Exploiting richness of HQL
+
+```java
+public final class AlternativeFilmService implements FilmService {
+
+    // Continued ...
+
+    private static final String QL_STRING = """
+                    select json_object(
+                               'id': f.id,
+                               // ...
+                               'language': json_object('id': l1.id, 'name': l1.name, 'lastUpdate': l1.lastUpdate),
+                               'originalLanguage':
+                                   case
+                                       when f.originalLanguage.id is null
+                                       then null
+                                       else json_object('id': l2.id, 'name': l2.name, 'lastUpdate': l2.lastUpdate)
+                                   end,
+                               // ...
+                               'actors':
+                                   (select json_arrayagg(
+                                              json_object('id': a.id, 'firstName': a.firstName, 'lastName': a.lastName, 'lastUpdate': a.lastUpdate)
+                                          )
+                                     from FilmActor fa inner join fa.actor as a
+                                    where fa.film.id = f.id
+                               ),
+                               'categories':
+                                   (select json_arrayagg(json_object('id': c.id, 'name': c.name, 'lastUpdate': c.lastUpdate))
+                                     from FilmCategory fc inner join fc.category as c
+                                    where fc.film.id = f.id
+                               )
+                           )
+                      from Film f
+                      left join f.language l1
+                      left join f.originalLanguage l2
+            """;
+}
