@@ -128,8 +128,7 @@ public final class AlternativeFilmService implements FilmService {
         // See https://thorben-janssen.com/hibernate-tip-subquery-criteriaquery/
         JpaSubQuery<String> actorsSubquery = cq.subquery(String.class);
         JpaRoot<FilmActorEntity> filmActorRoot = actorsSubquery.from(FilmActorEntity.class);
-        JpaJoin<FilmActorEntity, ActorEntity> actorJoin = filmActorRoot.join(ActorEntity.class);
-        actorJoin.on(cb.equal(filmActorRoot.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorJoin.get(ActorEntity_.id)));
+        JpaJoin<FilmActorEntity, ActorEntity> actorJoin = filmActorRoot.join(FilmActorEntity_.actor, JoinType.INNER);
         actorsSubquery.where(cb.equal(filmActorRoot.get(FilmActorEntity_.film).get(FilmEntity_.id), filmRoot.get(FilmEntity_.id)));
 
         actorsSubquery.select(
@@ -148,8 +147,7 @@ public final class AlternativeFilmService implements FilmService {
         // See https://thorben-janssen.com/hibernate-tip-subquery-criteriaquery/
         JpaSubQuery<String> categoriesSubquery = cq.subquery(String.class);
         JpaRoot<FilmCategoryEntity> filmCategoryRoot = categoriesSubquery.from(FilmCategoryEntity.class);
-        JpaJoin<FilmCategoryEntity, CategoryEntity> categoryJoin = filmCategoryRoot.join(CategoryEntity.class);
-        categoryJoin.on(cb.equal(filmCategoryRoot.get(FilmCategoryEntity_.category).get(CategoryEntity_.id), categoryJoin.get(CategoryEntity_.id)));
+        JpaJoin<FilmCategoryEntity, CategoryEntity> categoryJoin = filmCategoryRoot.join(FilmCategoryEntity_.category, JoinType.INNER);
         categoriesSubquery.where(cb.equal(filmCategoryRoot.get(FilmCategoryEntity_.film).get(FilmEntity_.id), filmRoot.get(FilmEntity_.id)));
 
         categoriesSubquery.select(
@@ -184,7 +182,7 @@ public final class AlternativeFilmService implements FilmService {
                                         )),
                                 Map.entry("originalLanguage",
                                         cb.selectCase()
-                                                .when(cb.isNull(filmRoot.get(FilmEntity_.originalLanguage).get(LanguageEntity_.id)), cb.literal(null))
+                                                .when(cb.isNull(filmRoot.get(FilmEntity_.originalLanguage).get(LanguageEntity_.id)), cb.nullLiteral(String.class))
                                                 .otherwise(
                                                         cb.jsonObject(
                                                                 Map.of(

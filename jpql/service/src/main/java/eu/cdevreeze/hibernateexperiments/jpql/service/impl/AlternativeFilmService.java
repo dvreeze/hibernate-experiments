@@ -163,7 +163,7 @@ public final class AlternativeFilmService implements FilmService {
                                               )
                                           )
                                      from FilmActor fa
-                                    inner join Actor a on (fa.actor.id = a.id)
+                                    inner join fa.actor as a
                                     where fa.film.id = f.id
                                ),
                                'categories':
@@ -175,7 +175,7 @@ public final class AlternativeFilmService implements FilmService {
                                                )
                                            )
                                      from FilmCategory fc
-                                    inner join Category c on (fc.category.id = c.id)
+                                    inner join fc.category as c
                                     where fc.film.id = f.id
                                )
                            )
