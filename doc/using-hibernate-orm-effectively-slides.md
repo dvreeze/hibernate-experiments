@@ -1091,6 +1091,6 @@ private static EntityManagerFactory createEntityManagerFactory() {
 #### Conclusion
 
 - By following some known best practices, a lot of "Hibernate ORM magic" disappears
-- In particular, use *lazy fetching* at the entity level, and use *per query fetching*
+- In particular, use *lazy fetching* at the entity level, and use *per query fetching*; see for example [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
 - We do not have to use `Session`/`EntityManager`, but can use the more predictable `StatelessSession`/`EntityAgent` instead
 - Hibernate ORM 8 (and Jakarta Persistence 4.0) is an important release, e.g. by fixing some old "mistakes"
