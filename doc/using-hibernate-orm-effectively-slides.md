@@ -343,7 +343,7 @@ we no longer have a persistence context when it is tried to lazily load the asso
 #### Querying for custom projections
 
 Side step: compare "old school" Java with modern Java:
-- imperative versus more functional
+- imperative ("how") versus more functional ("what")
 - *statement-oriented* versus *expression-oriented*
 - *mutability* versus more *immutability*
 - (mutable) *JavaBeans* versus (immutable) *Java records*
