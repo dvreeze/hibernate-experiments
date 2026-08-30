@@ -925,7 +925,7 @@ Using the Hibernate *annotation processor* a type-safe *static metamodel* can be
 
 The static metamodel can be used with the *Criteria API* in order to query in a compile-time type-safe way.
 
-The Criteria API can also be useful for assembling queries from their parts, in a controlled manner.
+The Criteria API can also be useful for assembling queries from their (reusable) parts, in a controlled manner.
 
 ---
 
