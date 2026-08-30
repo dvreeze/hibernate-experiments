@@ -57,7 +57,7 @@ Java Developer
 - Don't use *eager loading* of associations at the entity level (we'll get into that)
 - Don't leak a Session *across threads or concurrent transactions*
 - Don't use "infrastructural" *state* (such as a Session) *in a JPA entity*
-- Etc.
+- Etc. See for example [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice)
 
 ---
 
@@ -326,7 +326,7 @@ var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next(
 Question: what happens when trying to run the code above?
 
 Indeed, a Hibernate `LazyInitializationException` is thrown, because
-we no longer have a persistence context when lazily loading the associations.
+we no longer have a persistence context when it is tried to lazily load the associations.
 
 ---
 
@@ -498,6 +498,7 @@ Let's now have the `FilmService` interface return immutable `Film` DTOs.
 ```java
 public interface FilmService {
 
+    // Returning immutable Guava List of immutable Film DTOs
     ImmutableList<Film> findFilmsByActorId(long actorId);
 }
 ```
@@ -549,9 +550,9 @@ There is also a more hidden problem ("flushing overhead").
 
 #### Per-query fetching
 
-We fix these problems (`LazyInitializationException` and 1 + N select issue) by specifying *what data to fetch at the query level*.
+We fix these problems (`LazyInitializationException` and N + 1 select issue) by specifying *what data to fetch at the query level*.
 
-See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
+See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype), [Use query-specific fetching](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--use-queryspecific-fetching) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
 
 Again, at the *entity level*, all associations should use *lazy fetching*. Unfortunately, EAGER is the default for to-one associations (but mind Jakarta Persistence 4.0's fix for this).
 
