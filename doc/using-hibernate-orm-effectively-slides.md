@@ -43,10 +43,10 @@ Java Developer
 - This presentation is full of code snippets
 - These code snippets concern a query for films and associated data
 - The examples use Hibernate ORM 8, through the Jakarta Persistence (4.0) API
-- The code uses programmatic (bootstrapping and) transaction demarcation, not annotations
-- In practice (e.g. Spring Boot, Quarkus) annotations are used
+- The code uses programmatic (bootstrapping and) transaction demarcation, not annotations, and no dependency injection
+- In practice (e.g. Spring Boot, Quarkus) annotations and DI are used
 - The code does not deal with database updates
-- Fortunately, Hibernate ORM can be used well even without persistence context
+- Fortunately, Hibernate ORM can be used well even without persistence context, simplifying reasoning about code
 
 ---
 
@@ -71,6 +71,16 @@ The relevant database tables are:
 - Language
 - Film
 - Film_Actor and Film_Category
+
+---
+
+#### Example used in this presentation
+
+Before showing the entity classes, note that there are 2 categories of *JPA annotations* on entities:
+- *logical mapping annotations*, concerning the Java object model
+  - e.g. `Entity`, `Id`, `ManyToOne`, `Basic` etc.
+- *physical mapping annotations*, concerning the underlying relational database schema
+  - e.g. `Table`, `Column`, `JoinTable`, `GeneratedValue` etc.
 
 ---
 
@@ -880,32 +890,137 @@ public final class AlternativeFilmService implements FilmService {
     // Continued ...
 
     private static final String QL_STRING = """
-                    select json_object(
-                               'id': f.id,
-                               // ...
-                               'language': json_object('id': l1.id, 'name': l1.name, 'lastUpdate': l1.lastUpdate),
-                               'originalLanguage':
-                                   case
-                                       when f.originalLanguage.id is null
-                                       then null
-                                       else json_object('id': l2.id, 'name': l2.name, 'lastUpdate': l2.lastUpdate)
-                                   end,
-                               // ...
-                               'actors':
-                                   (select json_arrayagg(
-                                              json_object('id': a.id, 'firstName': a.firstName, 'lastName': a.lastName, 'lastUpdate': a.lastUpdate)
-                                          )
-                                     from FilmActor fa inner join fa.actor as a
-                                    where fa.film.id = f.id
-                               ),
-                               'categories':
-                                   (select json_arrayagg(json_object('id': c.id, 'name': c.name, 'lastUpdate': c.lastUpdate))
-                                     from FilmCategory fc inner join fc.category as c
-                                    where fc.film.id = f.id
-                               )
-                           )
-                      from Film f
-                      left join f.language l1
-                      left join f.originalLanguage l2
+            select json_object(
+                       'id': f.id,
+                       // ...
+                       'language': json_object('id': l1.id, 'name': l1.name, 'lastUpdate': l1.lastUpdate),
+                       'originalLanguage':
+                           case
+                               when f.originalLanguage.id is null
+                               then null
+                               else json_object('id': l2.id, 'name': l2.name, 'lastUpdate': l2.lastUpdate)
+                           end,
+                       // ...
+                       'actors':
+                           (select json_arrayagg(
+                                      json_object('id': a.id, 'firstName': a.firstName, 'lastName': a.lastName, 'lastUpdate': a.lastUpdate)
+                                  )
+                             from FilmActor fa inner join fa.actor as a where fa.film.id = f.id
+                       ),
+                       'categories':
+                           (select json_arrayagg(json_object('id': c.id, 'name': c.name, 'lastUpdate': c.lastUpdate))
+                             from FilmCategory fc inner join fc.category as c where fc.film.id = f.id
+                       )
+                   )
+              from Film f left join f.language l1 left join f.originalLanguage l2
             """;
 }
+```
+
+---
+
+#### Type-safe metamodel
+
+Using the Hibernate *annotation processor* a type-safe *static metamodel* can be generated from the entities (and related classes).
+
+The static metamodel can be used with the *Criteria API* in order to query in a compile-time type-safe way.
+
+The Criteria API can also be useful for assembling queries from their parts, in a controlled manner.
+
+---
+
+#### Type-safe metamodel
+
+```java
+public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmServiceUsingFetchJoin(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
+            CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
+
+            Root<FilmEntity> film = cq.from(FilmEntity.class);
+            SetJoin<FilmEntity, FilmActorEntity> filmActor = film.join(FilmEntity_.filmActors, JoinType.LEFT);
+            cq.where(cb.equal(filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
+
+            film.fetch(FilmEntity_.filmActors, JoinType.LEFT).fetch(FilmActorEntity_.actor);
+            film.fetch(FilmEntity_.filmCategories, JoinType.LEFT).fetch(FilmCategoryEntity_.category);
+            film.fetch(FilmEntity_.language, JoinType.LEFT);
+            film.fetch(FilmEntity_.originalLanguage, JoinType.LEFT);
+            cq.select(film);
+
+            return entityAgent.createQuery(cq)
+                    .getResultStream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+}
+```
+
+---
+
+#### Type-safe metamodel
+
+The Criteria API is a bit verbose, though.
+
+What if we could write a JPQL query string and have it parsed and validated at compile-time?
+
+The Hibernate annotation processor can indeed do this.
+
+Let's show *Hibernate Data Repositories* (through the *Jakarta Data 1.1* standard) in action, exploiting query parsing/validation at compile-time.
+
+---
+
+#### Type-safe metamodel
+
+```java
+@Repository
+public interface FilmRepository {
+
+    // At the moment of this writing, I still needed a Hibernate-specific HQL annotation
+    @HQL("""
+            select f from Film f
+              left join fetch f.filmActors fac
+              left join fetch fac.actor
+              left join fetch f.filmCategories fca
+              left join fetch fca.category
+              left join fetch f.language
+              left join fetch f.originalLanguage
+              left join f.filmActors fa
+             where fa.actor.id = :actorId""")
+    List<FilmEntity> findFilmsByActorId(int actorId);
+}
+```
+
+---
+
+#### Type-safe metamodel
+
+```java
+public final class ConcreteFilmService implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmService(EntityManagerFactory emf) { this.emf = emf; }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> {
+            FilmRepository filmRepository = new _FilmRepository(entityAgent); // generated
+            return filmRepository.findFilmsByActorId((int) actorId)
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+}
+```
