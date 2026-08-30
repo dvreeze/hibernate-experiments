@@ -20,7 +20,7 @@ Java Developer
     - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/)
     - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/)
 - How can we combine Hibernate ORM with modern (Java) functional programming practices?
-- What does Hibernate 8 bring to the table?
+- What does Hibernate 8 (and Jakarta Persistence 4.0) bring to the table?
 
 ---
 
@@ -940,7 +940,6 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
             CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
