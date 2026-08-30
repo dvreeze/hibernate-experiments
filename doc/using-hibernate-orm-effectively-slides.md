@@ -566,7 +566,7 @@ See for example [Choose the right fetch type](https://thorben-janssen.com/hibern
 
 Again, at the *entity level*, all associations should use *lazy fetching*. Unfortunately, EAGER is the default for to-one associations (but mind Jakarta Persistence 4.0's fix for this).
 
-Below, we use 2 different techniques to specify fetching behavior at the query level: *load graphs* and *fetch joins*.
+Below, we use 2 techniques to specify fetching behavior at the query level: *load graphs* and *fetch joins* (both generating only 1 SQL query).
 
 ---
 
@@ -648,7 +648,7 @@ Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-ma
 
 See [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/).
 
-Possibly the best way to fix this is splitting the JPQL query into 2 queries. See the code below.
+Possibly the best way to fix this is splitting the JPQL query into 2 queries. See the code below (which leads to only 2 generated SQL queries).
 
 ---
 
@@ -984,7 +984,8 @@ Let's show *Hibernate Data Repositories* (through the *Jakarta Data 1.1* standar
 @Repository
 public interface FilmRepository {
 
-    // At the moment of this writing, I still needed a Hibernate-specific HQL annotation
+    // At the moment of this writing, a Hibernate-specific HQL annotation was still needed
+    // Again, only 1 SQL query is generated from this JPQL query
     @HQL("""
             select f from Film f
               left join fetch f.filmActors fac
@@ -1089,4 +1090,7 @@ private static EntityManagerFactory createEntityManagerFactory() {
 
 #### Conclusion
 
-TODO
+- By following some known best practices, a lot of "Hibernate ORM magic" disappears
+- In particular, use *lazy fetching* at the entity level, and use *per query fetching*
+- We do not have to use `Session`/`EntityManager`, but can use the more predictable `StatelessSession`/`EntityAgent` instead
+- Hibernate ORM 8 (and Jakarta Persistence 4.0) is an important release, e.g. by fixing some old "mistakes"
