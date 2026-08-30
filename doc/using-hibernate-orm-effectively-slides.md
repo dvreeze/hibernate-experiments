@@ -838,7 +838,7 @@ Sometimes it is needed to use a Hibernate-specific API instead of just the (stan
 
 For example, using `StatelessSession`/`Session` instead of supertype `EntityAgent`/`EntityManager`.
 
-Thus, we can use more advanced HQL (and SQL) features, such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON support](https://www.postgresql.org/docs/18/datatype-json.html).
+Thus, we can use more advanced HQL features, corresponding to SQL features such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON support](https://www.postgresql.org/docs/18/datatype-json.html).
 
 Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON results, while preventing the fetching of any (intermediate) entities.
 
