@@ -834,13 +834,13 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
 #### Exploiting richness of HQL
 
-Sometimes it pays off to use a Hibernate-specific API instead of strictly limiting ourselves to the Jakarta Persistence API.
+Sometimes it is needed to use a Hibernate-specific API instead of just the (standard) Jakarta Persistence API.
 
 For example, using `StatelessSession`/`Session` instead of supertype `EntityAgent`/`EntityManager`.
 
-This enables us to use more advanced HQL features, corresponding to advanced SQL features, such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON Types](https://www.postgresql.org/docs/18/datatype-json.html).
+Thus, we can use more advanced HQL (and SQL) features, such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON support](https://www.postgresql.org/docs/18/datatype-json.html).
 
-Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON results (even if the result is a bit verbose).
+Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON results, while preventing the fetching of any (intermediate) entities.
 
 ---
 
