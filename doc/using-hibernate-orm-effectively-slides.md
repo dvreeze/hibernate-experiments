@@ -840,7 +840,7 @@ For example, using `StatelessSession`/`Session` instead of supertype `EntityAgen
 
 This enables us to use more advanced HQL features, corresponding to advanced SQL features, such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON Types](https://www.postgresql.org/docs/18/datatype-json.html).
 
-Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON types (even if the result is a bit verbose).
+Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON results (even if the result is a bit verbose).
 
 ---
 
@@ -1064,14 +1064,14 @@ We might need an `orm.xml` file to override some entity mappings (next slide):
 
 #### Unit testing
 
-If need be, we can programmatically create an `EntityManagerFactory`:
+If needed, we can programmatically create an `EntityManagerFactory`:
 
 ```java
 private static EntityManagerFactory createEntityManagerFactory() {
     String persistenceUnitName = "pagilatestH2";
     return new PersistenceConfiguration(persistenceUnitName)
             .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
-            .defaultToOneFetchType(FetchType.LAZY)
+            .defaultToOneFetchType(FetchType.LAZY) // since Jakarta Persistence 4.0!
             .provider("org.hibernate.jpa.HibernatePersistenceProvider")
             .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
             .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
