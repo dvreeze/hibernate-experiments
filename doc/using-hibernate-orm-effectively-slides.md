@@ -454,6 +454,15 @@ Side step: compare "old school" Java with modern Java:
 - nullability versus `Optional` and JSpecify-marked (non)nullability
 - e.g. `Date`/`Calendar` versus `java.time` API
 
+<!--
+Statement-oriented means: lots of loops, if-else statements etc.
+Modern expression-oriented Java code contains Stream pipelines, modern switch expressions, etc.
+
+Note that the "java.time" API is an executable (immutable) model of date/time concepts. Using some common sense,
+these concepts and their corresponding public APIs make perfect sense. The legacy Date/Calendar API
+does not even come close to that.
+-->
+
 ---
 
 #### Querying for custom projections
@@ -467,6 +476,18 @@ But they make very poor DTOs to pass across application layers, with lots of hid
 *Immutable Java records* make far better DTOs.
 
 Let's explore *combining the strengths of both*.
+
+<!--
+Jakarta Persistence entities are annotated old school JavaBeans with getters and setters (and a
+no-arg default constructor).
+
+They carry a lot of implicit state, w.r.t. the extent to which associations have been loaded, the
+absence or presence of a persistence context (i.e. Session) etc. So when looking at such an entity
+in isolation, there is a lot we can not say about its state.
+
+Immutable Java records have no implicit state. They even have only one state, the state established
+by the constructor. That makes them very easy to reason about.
+-->
 
 ---
 
@@ -517,6 +538,11 @@ public record Film(
 }
 ```
 
+<!--
+The Nullable annotations are assumed to be JSpecify annotations.
+Assume a NullMarked annotation at the package level, in package-info.java, so non-nullability is the default.
+-->
+
 ---
 
 #### Querying for custom projections
@@ -551,6 +577,11 @@ public class CategoryEntity {
     }
 }
 ```
+
+<!--
+Methods to convert entities into corresponding immutable model objects.
+They belong here and not in the immutable model classes themselves, because the latter are technology-agnostic.
+-->
 
 ---
 
@@ -602,11 +633,17 @@ public class FilmEntity {
 }
 ```
 
+<!--
+Here the toModelObject method may cause a LazyInitializationException, if an association has not been
+loaded, and there currently is no persistence context. If an association has not been loaded and there
+is currently a persistence context, too many queries may be executed to lazily load the association(s).
+-->
+
 ---
 
 #### Querying for custom projections
 
-Let's now have the `FilmService` interface return immutable `Film` DTOs.
+Let's now have the `FilmService` interface return immutable `Film` DTOs. This Java interface is now *technology-agnostic*.
 
 ```java
 public interface FilmService {
@@ -615,6 +652,10 @@ public interface FilmService {
     ImmutableList<Film> findFilmsByActorId(long actorId);
 }
 ```
+
+<!--
+Such a Java-interface-based "service API" is very easy to mock in unit tests of the presentation/network layer.
+-->
 
 ---
 
@@ -643,6 +684,10 @@ public final class InefficientFilmService implements FilmService {
 }
 ```
 
+<!--
+Note that in this code at least there is a persistence context while converting film entities to immutable DTOs.
+-->
+
 ---
 
 #### Querying for custom projections
@@ -670,6 +715,13 @@ See for example [Choose the right fetch type](https://thorben-janssen.com/hibern
 Again, at the *entity level*, all associations should use *lazy fetching*. Unfortunately, EAGER is the default for to-one associations (but mind Jakarta Persistence 4.0's fix for this).
 
 Below, we use 2 techniques to specify fetching behavior at the query level: *load graphs* and *fetch joins* (both generating only 1 SQL query).
+
+<!--
+Jakarta Persistence 4.0 enables globally setting the default fetch type for to-one associations to LAZY.
+This fixes an old wart in the specification. The Hibernate ORM team strongly recommends using this setting.
+According to them (and to Thorben Janssen) all associations should use fetch type LAZY. Fetching should
+be specified at the level of individual queries.
+-->
 
 ---
 
@@ -707,6 +759,14 @@ public final class ConcreteFilmService implements FilmService {
 }
 ```
 
+<!--
+Using per-query fetching through a load graph. There is also the possibility to use a fetch graph instead
+of load graph, but in this case both solutions achieve the same since all associations had been set to
+lazy fetching at the entity level.
+
+Note the use of the type-safe static metamodel while creating the EntityGraph.
+-->
+
 ---
 
 #### Per-query fetching
@@ -742,6 +802,10 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
     }
 }
 ```
+
+<!--
+Using per-query fetching through "fetch joins".
+-->
 
 ---
 
@@ -826,6 +890,12 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 }
 ```
 
+<!--
+Here we split the query just be using the same query with different load graphs.
+This is a practical way of "splitting the query" in order to solve the MultipleBagFetchException in
+a convincing way.
+-->
+
 ---
 
 #### Using Hibernate ORM without persistence context
@@ -859,6 +929,19 @@ Both `EntityManager` and `EntityAgent` extend interface `EntityHandler`, offerin
 In many projects, using `EntityAgent` would make more sense than using `EntityManager`, making reasoning about code much easier.
 
 Below, we replace `EntityManager` by `EntityAgent` in the previous example, thus preventing any "dirty checking".
+
+<!--
+The Hibernate StatelessSession requires all database access to be explicit. There is no dirty checking
+and automatic flushing, no cascading behavior, etc. This makes it much easier to reason about the code,
+since all complexities of the persistence context are gone. This can make a big difference for code
+performing many updates to the database, and that's something that is not shown in this presentation.
+
+Probably many projects would be more successful with Hibernate ORM if they used StatelessSession rather
+than Session.
+
+The Hibernate ORM team feels the same. Finally, in Jakarta Persistence 4.0, the stateless session has
+been adopted by the standard, as interface EntityAgent.
+-->
 
 ---
 
