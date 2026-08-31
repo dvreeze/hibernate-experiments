@@ -891,7 +891,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 ```
 
 <!--
-Here we split the query just be using the same query with different load graphs.
+Here we split the query just by using the same query with different load graphs.
 This is a practical way of "splitting the query" in order to solve the MultipleBagFetchException in
 a convincing way.
 -->
