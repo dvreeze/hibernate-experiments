@@ -23,14 +23,11 @@ Java Developer
 - What does Hibernate 8 (and Jakarta Persistence 4.0) bring to the table?
 
 <!--
-Hibernate ORM may feel like "magic", but we need to look at the generated SQL.
-Taking away magic in this case means being able to predict the generated SQL.
+Hibernate ORM may feel like "magic", but we need to look at the generated SQL. Taking away magic in this case means being able to predict the generated SQL.
 
 It makes sense to read "No-nonsense guide to Hibern8" from beginning to end.
 
-The Hibernate team does not talk that much about combining Hibernate with modern Java functional
-programming practices. By FP, "FP light" is meant, not category theory, Haskell etc., but just "modern Java".
-We'll get into that later.
+The Hibernate team does not talk that much about combining Hibernate with modern Java functional programming practices. By FP, "FP light" is meant, not category theory, Haskell etc., but just "modern Java". We'll get into that later.
 
 At the time of this writing, Hibernate ORM and the Jakarta Persistence 4.0 standard are still in beta.
 -->
@@ -69,8 +66,8 @@ The example used in this presentation is just one query for films of a given act
 By not using bootstrapping/transaction annotations and dependency injection we can concentrate on Hibernate ORM (and Jakarta Persistence) itself.
 
 The code only shows querying and not updates, simply because there is no time for the latter.
-Interesting and relevant as it may be to talk about updates and the "persistence context", it is good to know
-that Hibernate ORM can also be used without "persistence context". We'll get into that.
+
+Interesting and relevant as it may be to talk about updates and the "persistence context", it is good to know that Hibernate ORM can also be used without "persistence context". We'll get into that.
 -->
 
 ---
@@ -85,21 +82,17 @@ that Hibernate ORM can also be used without "persistence context". We'll get int
 - Etc. See for example [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice)
 
 <!--
-Pretending to deal only with Java objects is naive when using Hibernate ORM, but it seems so easy and
-comfortable to start out that way in a new project. Quite soon, this will get quite painful.
+Pretending to deal only with Java objects is naive when using Hibernate ORM, but it seems so easy and comfortable to start out that way in a new project. Quite soon, this will get quite painful.
 
 Don't ignore performance, so log the generated SQL.
-Yet I really hope that it does not end there, and we are able to even predict the generated SQL.
-That's what this presentation hopes to contribute to.
 
-If nearly everything is forgotten about this presentation, I hope the best practice of using lazy loading at
-the entity level combined with per-query fetching is the only take-away point from this presentation.
+Yet I really hope that it does not end there, and we are able to even predict the generated SQL. That's what this presentation hopes to contribute to.
 
-Sessions typically contain thread-bound state, just like the underlying JDBC connections.
-These are not thread-safe objects.
+If nearly everything is forgotten about this presentation, I hope the best practice of using lazy loading at the entity level combined with per-query fetching is the only take-away point from this presentation.
 
-Using a Session in a JPA entity would introduce spaghetti code, where reasoning about performance becomes
-very hard. It would also lead to code that is hard to maintain, mixing data with "expensive" runtime behavior.
+Sessions typically contain thread-bound state, just like the underlying JDBC connections. These are not thread-safe objects.
+
+Using a Session in a JPA entity would introduce spaghetti code, where reasoning about performance becomes very hard. It would also lead to code that is hard to maintain, mixing data with "expensive" runtime behavior.
 -->
 
 ---
@@ -164,6 +157,8 @@ public class ActorEntity { // Not serializable
 Mind the entity name which differs from the entity class name in this case.
 
 Note how this entity class definition to a large extent shows the structure of the Actor table.
+
+By the way, it makes sense to bootstrap Hibernate ORM in such a way that the entities are validated against the database (schema).
 -->
 
 ---
@@ -265,16 +260,13 @@ public class FilmActorEntity { // Not serializable
 ```
 
 <!--
-Film_Actor is the table representing the many-to-many association between films and actors.
-It is perfectly ok to define an entity class corresponding to this table.
+Film_Actor is the table representing the many-to-many association between films and actors. It is perfectly ok to define an entity class corresponding to this table.
 
-The compound primary key has been represented as an EmbeddedId-annotated (Java record) field, corresponding to 2 table columns,
-that happen to be foreign keys to the Film and Actor tables.
+The compound primary key has been represented as an EmbeddedId-annotated (Java record) field, corresponding to 2 table columns, that happen to be foreign keys to the Film and Actor tables.
 
 With the MapsId annotations we map the actor and film associations to one field/column of that compound key.
 
-Note that the ManyToOne associations are explicitly set to FetchType.LAZY, as recommended by e.g.
-the Hibernate ORM team and Hibernate expert Thorben Janssen.
+Note that the ManyToOne associations are explicitly set to FetchType.LAZY, as recommended by e.g. the Hibernate ORM team and Hibernate expert Thorben Janssen.
 -->
 
 ---
@@ -357,14 +349,11 @@ public class FilmEntity { // Not serializable
 <!--
 Again, the ManyToOne associations are set to FetchType.LAZY.
 
-The 2 OneToMany associations are the "other" side of bidirectional assocations between films and actors,
-and between films and categories, respectively. They are the non-owning side.
+The 2 OneToMany associations are the "other" side of bidirectional assocations between films and actors, and between films and categories, respectively. They are the non-owning side.
 
-The OneToMany associations use FetchType.LAZY, which is the default for to-many associations. Note that
-so far all associations have been chosen to use FetchType.LAZY, which is intentional.
+The OneToMany associations use FetchType.LAZY, which is the default for to-many associations. Note that so far all associations have been chosen to use FetchType.LAZY, which is intentional.
 
-Being Sets, these "one-to-many fields" depend on well-defined "equals" methods for "film actors" and "film categories",
-which is surprisingly hard to achieve if there is no obvious natural key not depending on any generated technical key.
+Being Sets, these "one-to-many fields" depend on well-defined "equals" methods for "film actors" and "film categories", which is surprisingly hard to achieve if there is no obvious natural key not depending on any generated technical key.
 
 Methods to add an actor etc. (keeping the Film and FilmActor entities mutually consistent) are left out.
 -->
@@ -401,11 +390,9 @@ public final class NaiveFilmService implements FilmService {
 ```
 
 <!--
-The first FilmService API and implementation. The immutable Guava collection of mutable FilmEntity
-entities does not seem to be very useful, but later on this immutable Guava collection type will make more sense.
+The first FilmService API and implementation. The immutable Guava collection of mutable FilmEntity entities does not seem to be very useful, but later on this immutable Guava collection type will make more sense.
 
-For now, keep in mind that all entity associations are lazy, and that the JPQL query does not seem
-to fetch any associated data. This is important for the question below.
+For now, keep in mind that all entity associations are lazy, and that the JPQL query does not seem to fetch any associated data. This is important for the question below.
 -->
 
 ---
@@ -456,11 +443,10 @@ Side step: compare "old school" Java with modern Java:
 
 <!--
 Statement-oriented means: lots of loops, if-else statements etc.
+
 Modern expression-oriented Java code contains Stream pipelines, modern switch expressions, etc.
 
-Note that the "java.time" API is an executable (immutable) model of date/time concepts. Using some common sense,
-these concepts and their corresponding public APIs make perfect sense. The legacy Date/Calendar API
-does not even come close to that.
+Note that the "java.time" API is an executable (immutable) model of date/time concepts. Using some common sense, these concepts and their corresponding public APIs make perfect sense. The legacy Date/Calendar API does not even come close to that.
 -->
 
 ---
@@ -478,15 +464,11 @@ But they make very poor DTOs to pass across application layers, due to their hid
 Let's explore *combining the strengths of both*.
 
 <!--
-Jakarta Persistence entities are annotated old school JavaBeans with getters and setters (and a
-no-arg default constructor).
+Jakarta Persistence entities are annotated old school JavaBeans with getters and setters (and a no-arg default constructor).
 
-They carry a lot of implicit state, w.r.t. the extent to which associations have been loaded, the
-absence or presence of a persistence context (i.e. Session) etc. So when looking at such an entity
-in isolation, there is a lot we can not say about its state.
+They carry a lot of implicit state, w.r.t. the extent to which associations have been loaded, the absence or presence of a persistence context (i.e. Session) etc. So when looking at such an entity in isolation, there is a lot we can not say about its state.
 
-Immutable Java records have no implicit state. They even have only one state, the state established
-by the constructor. That makes them very easy to reason about.
+Immutable Java records have no implicit state. They even have only one state, the state established by the constructor. That makes them very easy to reason about.
 -->
 
 ---
@@ -540,6 +522,7 @@ public record Film(
 
 <!--
 The Nullable annotations are assumed to be JSpecify annotations.
+
 Assume a NullMarked annotation at the package level, in package-info.java, so non-nullability is the default.
 -->
 
@@ -580,8 +563,10 @@ public class CategoryEntity {
 
 <!--
 Methods to convert entities into corresponding immutable model objects.
+
 They belong here and not in the immutable model classes themselves, because the latter are technology-agnostic.
-Hence, these immutable model classes do not depend on (entity) classes with Jakarta Persistence annotations.
+
+Hence, these immutable model classes should not and indeed do not depend on (entity) classes with Jakarta Persistence annotations.
 -->
 
 ---
@@ -635,9 +620,9 @@ public class FilmEntity {
 ```
 
 <!--
-Here the toModelObject method may cause a LazyInitializationException, if an association has not been
-loaded, and there currently is no persistence context. If an association has not been loaded and there
-is currently a persistence context, too many queries may be executed to lazily load the association(s).
+Here the toModelObject method may cause a LazyInitializationException, if an association has not been loaded, and there currently is no persistence context.
+
+If an association has not been loaded and there is currently a persistence context, too many queries may be executed to lazily load the association(s).
 -->
 
 ---
@@ -689,6 +674,7 @@ public final class InefficientFilmService implements FilmService {
 Note that in this code at least there is a persistence context while converting film entities to immutable DTOs.
 
 So a LazyInitializationException will not be thrown inside method "findFilmsByActorId".
+
 Outside that method it will also not be thrown, simply because the film entities are scoped within the Session.
 -->
 
@@ -724,9 +710,8 @@ Below, we use 2 techniques to specify fetching behavior at the query level: *loa
 
 <!--
 Jakarta Persistence 4.0 enables globally setting the default fetch type for to-one associations to LAZY.
-This fixes an old wart in the specification. The Hibernate ORM team strongly recommends using this setting.
-According to them (and to Thorben Janssen) all associations should use fetch type LAZY. Fetching should
-be specified at the level of individual queries.
+
+This fixes an old wart in the specification. The Hibernate ORM team strongly recommends using this setting. According to them (and to Thorben Janssen) all associations should use fetch type LAZY. Fetching should be specified at the level of individual queries.
 -->
 
 ---
@@ -766,9 +751,9 @@ public final class ConcreteFilmService implements FilmService {
 ```
 
 <!--
-Using per-query fetching through a load graph. There is also the possibility to use a fetch graph instead
-of load graph, but in this case both solutions achieve the same since all associations had been set to
-lazy fetching at the entity level.
+Using per-query fetching through a load graph.
+
+There is also the possibility to use a fetch graph instead of load graph, but in this case both solutions achieve the same since all associations had been set to lazy fetching at the entity level.
 
 Note the use of the type-safe static metamodel while creating the EntityGraph.
 -->
@@ -898,8 +883,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
 <!--
 Here we split the query just by using the same query with different load graphs.
-This is a practical way of "splitting the query" in order to solve the MultipleBagFetchException in
-a convincing way.
+
+This is a practical way of "splitting the query" in order to solve the MultipleBagFetchException in a convincing way.
 -->
 
 ---
@@ -937,16 +922,11 @@ In many projects, using EntityAgent would make more sense than using EntityManag
 Below, we replace `EntityManager` by `EntityAgent` in the previous example, thus preventing any "dirty checking".
 
 <!--
-The Hibernate StatelessSession requires all database access to be explicit. There is no dirty checking
-and automatic flushing, no cascading behavior, etc. This makes it much easier to reason about the code,
-since all complexities of the persistence context are gone. This can make a big difference for code
-performing many updates to the database, and that's something that is not shown in this presentation.
+The Hibernate StatelessSession requires all database access to be explicit. There is no dirty checking and automatic flushing, no cascading behavior, etc. This makes it much easier to reason about the code, since all complexities of the persistence context are gone. This can make a big difference for code performing many updates to the database, and that's something that is not shown in this presentation.
 
-Probably many projects would be more successful with Hibernate ORM if they used StatelessSession rather
-than Session.
+Probably many projects would be more successful with Hibernate ORM if they used StatelessSession rather than Session.
 
-The Hibernate ORM team feels the same. Finally, in Jakarta Persistence 4.0, the stateless session has
-been adopted by the standard, as interface EntityAgent.
+The Hibernate ORM team feels the same. Finally, in Jakarta Persistence 4.0, the stateless session has been adopted by the standard, as interface EntityAgent.
 -->
 
 ---
