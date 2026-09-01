@@ -18,7 +18,7 @@ Java Developer
 - Still, Hibernate ORM often may feel like "magic"
 - Where can we find help to use this powerful library effectively, reducing the amount of "magic"?
     - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/)
-    - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/)
+    - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/) (< Hibernate 6.0)
 - How can we combine Hibernate ORM with modern (Java) functional programming practices?
 - What does Hibernate 8 (and Jakarta Persistence 4.0) bring to the table?
 
@@ -702,7 +702,7 @@ Also note that "querying for custom projections" typically implies not retrievin
 
 We fix these problems (`LazyInitializationException` and N + 1 select issue) by specifying *what data to fetch at the query level*.
 
-See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype), [Use query-specific fetching](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--use-queryspecific-fetching) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/).
+See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype), [Use query-specific fetching](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--use-queryspecific-fetching) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/) (note: < Hibernate 6).
 
 Again, at the *entity level*, all associations should use *lazy fetching*. Unfortunately, EAGER is the default for to-one associations (but mind Jakarta Persistence 4.0's fix for this).
 
@@ -804,7 +804,7 @@ Using per-query fetching through "fetch joins".
 
 Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-many associations to film actors and film categories had been Lists instead of Sets, we would have gotten this exception.
 
-See [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/).
+See [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/) (but mind [DISTINCT](https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#query-sqm-distinct)).
 
 Possibly the best way to fix this is splitting the JPQL query into 2 queries. See the code below (which leads to only 2 generated SQL queries).
 
