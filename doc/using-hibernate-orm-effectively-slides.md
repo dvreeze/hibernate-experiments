@@ -29,7 +29,7 @@ Taking away magic in this case means being able to predict the generated SQL.
 It makes sense to read "No-nonsense guide to Hibern8" from beginning to end.
 
 The Hibernate team does not talk that much about combining Hibernate with modern Java functional
-programming practices. By FP, "FP light" is meant, not category theory, Haskell etc.
+programming practices. By FP, "FP light" is meant, not category theory, Haskell etc., but just "modern Java".
 We'll get into that later.
 
 At the time of this writing, Hibernate ORM and the Jakarta Persistence 4.0 standard are still in beta.
@@ -271,7 +271,7 @@ It is perfectly ok to define an entity class corresponding to this table.
 The compound primary key has been represented as an EmbeddedId-annotated (Java record) field, corresponding to 2 table columns,
 that happen to be foreign keys to the Film and Actor tables.
 
-With the MapsId annotations we map the actor and film associations to one column of that compound key.
+With the MapsId annotations we map the actor and film associations to one field/column of that compound key.
 
 Note that the ManyToOne associations are explicitly set to FetchType.LAZY, as recommended by e.g.
 the Hibernate ORM team and Hibernate expert Thorben Janssen.
@@ -418,7 +418,7 @@ FilmService filmService = new NaiveFilmService(emf);
 ImmutableList<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
 
 // Outside any transaction/Session:
-var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
+FilmCategoryEntity firstFilmCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
 ```
 
 Question: what happens when trying to run the code above?
@@ -433,7 +433,7 @@ FilmService filmService = new NaiveFilmService(emf);
 ImmutableList<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
 
 // Outside any transaction/Session:
-var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
+FilmCategoryEntity firstFilmCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
 ```
 
 Question: what happens when trying to run the code above?
@@ -467,11 +467,11 @@ does not even come close to that.
 
 #### Querying for custom projections
 
-Jakarta Persistence *entities* pull us back into "old school" Java.
+Jakarta Persistence *entities* pull us back into "old school" Java(Beans).
 
 Yet they are great in JPQL queries, and for synchronizing Java object state with the database.
 
-But they make very poor DTOs to pass across application layers, with lots of hidden state. (The Hibernate team will not tell you this.)
+But they make very poor DTOs to pass across application layers, due to their hidden state. (The Hibernate team will not tell you this.)
 
 *Immutable Java records* make far better DTOs.
 
@@ -581,6 +581,7 @@ public class CategoryEntity {
 <!--
 Methods to convert entities into corresponding immutable model objects.
 They belong here and not in the immutable model classes themselves, because the latter are technology-agnostic.
+Hence, these immutable model classes do not depend on (entity) classes with Jakarta Persistence annotations.
 -->
 
 ---
@@ -686,6 +687,9 @@ public final class InefficientFilmService implements FilmService {
 
 <!--
 Note that in this code at least there is a persistence context while converting film entities to immutable DTOs.
+
+So a LazyInitializationException will not be thrown inside method "findFilmsByActorId".
+Outside that method it will also not be thrown, simply because the film entities are scoped within the Session.
 -->
 
 ---
@@ -703,6 +707,8 @@ Question: what is wrong with the code above?
 Indeed, far too many SQL queries are generated (for lazily loading associated data).
 
 There is also a more hidden problem ("flushing overhead").
+
+Also note that "querying for custom projections" typically implies not retrieving any entities at all, but directly *creating DTOs through constructor calls* in the JPQL query itself. In our example, it is practical to populate the DTOs from retrieved (nested) entities, though.
 
 ---
 
@@ -902,9 +908,9 @@ a convincing way.
 
 In the preceding code, we still have the issue that entities are retrieved and the persistence context performs "dirty checking".
 
-There are several ways to prevent "dirty checking" overhead, but they all affect the persistence context. There is no silver bullet here.
+There are several ways to prevent "dirty checking" overhead (while still retrieving entities), but they all affect the persistence context. There is no silver bullet here.
 
-Question: is it possible to use Hibernate ORM without any persistence context?
+Question: is it possible to use Hibernate ORM without any Session?
 
 ---
 
@@ -912,9 +918,9 @@ Question: is it possible to use Hibernate ORM without any persistence context?
 
 In the preceding code, we still have the issue that entities are retrieved and the persistence context performs "dirty checking".
 
-There are several ways to prevent "dirty checking" overhead, but they all affect the persistence context. There is no silver bullet here.
+There are several ways to prevent "dirty checking" overhead (while still retrieving entities), but they all affect the persistence context. There is no silver bullet here.
 
-Question: is it possible to use Hibernate ORM without any persistence context?
+Question: is it possible to use Hibernate ORM without any Session?
 
 Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a long time, for direct explicit interaction with the database.
 
@@ -922,11 +928,11 @@ Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a lo
 
 #### Using Hibernate ORM without persistence context
 
-Starting with Jakarta Persistence 4.0 (and Hibernate ORM 8), the `StatelessSession` is standardized as `EntityAgent`.
+Starting with Jakarta Persistence 4.0 (and Hibernate ORM 8), the `StatelessSession` is standardized as interface `EntityAgent`.
 
 Both `EntityManager` and `EntityAgent` extend interface `EntityHandler`, offering the shared API.
 
-In many projects, using `EntityAgent` would make more sense than using `EntityManager`, making reasoning about code much easier.
+In many projects, using EntityAgent would make more sense than using EntityManager, making reasoning about code much easier.
 
 Below, we replace `EntityManager` by `EntityAgent` in the previous example, thus preventing any "dirty checking".
 
@@ -1111,7 +1117,7 @@ Using the Hibernate *annotation processor* a type-safe *static metamodel* can be
 
 The static metamodel can be used with the *Criteria API* in order to query in a compile-time type-safe way.
 
-The Criteria API can also be useful for assembling queries from their (reusable) parts, in a controlled manner.
+The Criteria API can also be useful for assembling queries from their (reusable) parts, in a much more controlled and type-safe manner than string concatenation.
 
 ---
 
@@ -1279,4 +1285,5 @@ private static EntityManagerFactory createEntityManagerFactory() {
 - By following some known best practices, a lot of "Hibernate ORM magic" disappears
 - In particular, use *lazy fetching* at the entity level, and use *per query fetching*; see for example [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
 - We do not have to use `Session`/`EntityManager`, but can use the more predictable `StatelessSession`/`EntityAgent` instead
-- Hibernate ORM 8 (and Jakarta Persistence 4.0) is an important release, e.g. by fixing some old "mistakes"
+- Hibernate ORM 8 (and Jakarta Persistence 4.0) is an important release, e.g. because it fixes some old "mistakes"
+- Consider keeping entities local to sessions (or retrieve no entities at all), having queries return *immutable DTOs* instead
