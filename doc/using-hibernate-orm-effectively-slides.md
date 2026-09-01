@@ -1052,6 +1052,14 @@ public final class AlternativeFilmService implements FilmService {
 }
 ```
 
+<!--
+Note that there is no error-prone query string concatenation here. The bulk of the query (i.e. the query string constant) is parsed into a JpaCriteriaQuery, after which the "where" clause is added using the Criteria API.
+
+Just like HQL is a superset of JPQL, the Hibernate Criteria API is a "superset" of the Jakarta Persistence Criteria API.
+
+At the time of this writing, JSON support in the Hibernate HQL/Criteria API is still experimental.
+-->
+
 ---
 
 #### Exploiting richness of HQL
@@ -1099,6 +1107,12 @@ The static metamodel can be used with the *Criteria API* in order to query in a 
 
 The Criteria API can also be useful for assembling queries from their (reusable) parts, in a much more controlled and type-safe manner than string concatenation.
 
+<!--
+We have already seen examples of how the static metamodel allows us to navigate associations without using string literals.
+
+Taken together with the type-safety of the Criteria API, this gives us a lot of compile-time type-safety when using the Criteria API.
+-->
+
 ---
 
 #### Type-safe metamodel
@@ -1136,6 +1150,10 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 }
 ```
 
+<!--
+Clearly, this code is quite type-safe, due to the combination of the Criteria API and the static metamodel.
+-->
+
 ---
 
 #### Type-safe metamodel
@@ -1147,6 +1165,10 @@ What if we could write a JPQL query string and have it parsed and validated at c
 The Hibernate annotation processor can indeed do this.
 
 Let's show *Hibernate Data Repositories* (through the *Jakarta Data 1.1* standard) in action, exploiting query parsing/validation at compile-time.
+
+<!--
+At the time of this writing, the Jakarta Data 1.1 standard is not yet final.
+-->
 
 ---
 
@@ -1197,6 +1219,10 @@ public final class ConcreteFilmService implements FilmService {
 }
 ```
 
+<!--
+In reality, we would use dependency injection (e.g. CDI) here for the generated film repository. But, as said before, in this presentation no dependency injection is used.
+-->
+
 ---
 
 #### Unit testing
@@ -1206,7 +1232,7 @@ How can we best unit test code using Hibernate ORM?
 - [Testcontainers](https://testcontainers.com/) is a bit "heavy" for unit tests
 - Testing against an in-memory [H2](https://h2database.com/html/main.html) is an attractive option
 
-The latter option works well, to a large extent due to Hibernate ORM successfully abstracting away SQL dialect differences.
+The latter option works well, to a large extent due to the fact that Hibernate ORM successfully abstracts away SQL dialect differences.
 
 We might need an `orm.xml` file to override some entity mappings (next slide):
 
@@ -1231,6 +1257,10 @@ We might need an `orm.xml` file to override some entity mappings (next slide):
     </entity>
 </entity-mappings>
 ```
+
+<!--
+Remember the PostgreSQL-specific bpchar type for the language name. This is overridden for the in-memory H2 test database.
+-->
 
 ---
 
@@ -1257,6 +1287,10 @@ private static EntityManagerFactory createEntityManagerFactory() {
             .createEntityManagerFactory();
 }
 ```
+
+<!--
+For the "real" database it would make sense to use SchemaManagementAction VALIDATE (or equivalent, depending on how Hibernate ORM is bootstrapped).
+-->
 
 ---
 
