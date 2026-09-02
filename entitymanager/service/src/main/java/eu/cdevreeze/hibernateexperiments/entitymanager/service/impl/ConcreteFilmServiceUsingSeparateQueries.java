@@ -126,7 +126,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(qlString, eg)
-                .getResultStream()
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
                 .collect(ImmutableList.toImmutableList());
     }
 
@@ -137,7 +138,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(qlString, eg)
                 .setParameter(1, filmId)
-                .getResultStream()
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
@@ -148,7 +150,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityManager.createQuery(qlString, eg)
                 .setParameter(1, actorId)
-                .getResultStream()
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
                 .collect(ImmutableList.toImmutableList());
     }
 
