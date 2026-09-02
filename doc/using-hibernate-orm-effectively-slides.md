@@ -20,7 +20,7 @@ paginate: true
     - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/)
     - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/) (< Hibernate 6.0)
 - How can we combine Hibernate ORM with modern (Java) functional programming practices?
-- What does Hibernate 8 (and Jakarta Persistence 4.0) bring to the table?
+- What does Hibernate ORM 8 (and Jakarta Persistence 4.0) bring to the table?
 
 <!--
 Hibernate ORM may feel like "magic", but we need to look at the generated SQL. Taking away magic in this case means being able to predict the generated SQL.
@@ -29,7 +29,11 @@ It makes sense to read "No-nonsense guide to Hibern8" from beginning to end.
 
 The Hibernate team does not talk that much about combining Hibernate with modern Java functional programming practices. By FP, "FP light" is meant, not category theory, Haskell etc., but just "modern Java". We'll get into that later.
 
-At the time of this writing, Hibernate ORM and the Jakarta Persistence 4.0 standard are still in beta.
+At the time of this writing, Hibernate ORM and the Jakarta Persistence 4.0 standard that it implements are still in beta.
+
+By the way, much of what Thorben Janssen writes about Hibernate ORM predates Hibernate 6.0. Note that Hibernate 5 still uses the "javax" namespace instead of "jakarta" namespace. This material from Thorben Janssen is still very useful, but keep in mind that some details no longer apply in Hibernate ORM 6+.
+
+Another Hibernate ORM expert (and committer) to pay attention to is Vlad Mihalcea.
 -->
 
 ---
@@ -449,6 +453,8 @@ Statement-oriented means: lots of loops, if-else statements etc.
 Modern expression-oriented Java code contains Stream pipelines, modern switch expressions, etc.
 
 Note that the "java.time" API is an executable (immutable) model of date/time concepts. Using some common sense, these concepts and their corresponding public APIs make perfect sense. The legacy Date/Calendar API does not even come close to that.
+
+Also recall the book Effective Java, 3rd Edition, by Joshua Bloch, with advice like "Minimize mutability" and "Favor composition over inheritance".
 -->
 
 ---
@@ -471,6 +477,8 @@ Jakarta Persistence entities are annotated old school JavaBeans with getters and
 They carry a lot of implicit state, w.r.t. the extent to which associations have been loaded, the absence or presence of a persistence context (i.e. Session) etc. So when looking at such an entity in isolation, there is a lot we can not say about its state.
 
 Immutable Java records have no implicit state. They even have only one state, the state established by the constructor. That makes them very easy to reason about.
+
+As an example of how passing entities to/from "service" methods can lead to unclarity, consider a "deliver" method taking an "Order" entity, where this method updates the Order Java object in-place. What is the effect on the database? It depends. Is the Order object managed by a Session or not?
 -->
 
 ---
@@ -714,6 +722,8 @@ Below, we use 2 techniques to specify fetching behavior at the query level: *loa
 Jakarta Persistence 4.0 enables globally setting the default fetch type for to-one associations to LAZY.
 
 This fixes an old wart in the specification. The Hibernate ORM team strongly recommends using this setting. According to them (and to Thorben Janssen) all associations should use fetch type LAZY. Fetching should be specified at the level of individual queries.
+
+Note that this approach (fetch type LAZY at the entity level, combined with per-query fetching) is in spirit how we used to query with native SQL. Per SQL query we chose what data to "fetch join" (and turn into Java objects).
 -->
 
 ---
