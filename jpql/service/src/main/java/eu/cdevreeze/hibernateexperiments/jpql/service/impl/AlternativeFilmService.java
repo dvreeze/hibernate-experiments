@@ -65,7 +65,8 @@ public final class AlternativeFilmService implements FilmService {
             // Hibernate HQL, which extends JPQL
 
             return entityAgent.createQuery(QL_STRING, String.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -89,7 +90,8 @@ public final class AlternativeFilmService implements FilmService {
             cq.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
 
             return statelessSession.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .findFirst();
         });
@@ -118,7 +120,8 @@ public final class AlternativeFilmService implements FilmService {
             cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
             return statelessSession.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });

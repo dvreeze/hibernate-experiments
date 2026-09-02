@@ -55,7 +55,8 @@ public final class AlternativeFilmService implements FilmService {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent ->
                 entityAgent.createNativeQuery(SQL_STRING, String.class)
-                        .getResultStream()
+                        .getResultList() // works better than getResultStream (no duplicates)
+                        .stream()
                         .map(v -> jsonMapper.readValue(v, Film.class))
                         .collect(ImmutableList.toImmutableList())
         );
@@ -70,7 +71,8 @@ public final class AlternativeFilmService implements FilmService {
         return emf.callInTransaction(EntityAgent.class, entityAgent ->
                 entityAgent.createNativeQuery(sqlString, String.class)
                         .setParameter(1, filmId)
-                        .getResultStream()
+                        .getResultList() // works better than getResultStream (no duplicates)
+                        .stream()
                         .map(v -> jsonMapper.readValue(v, Film.class))
                         .findFirst()
         );
@@ -91,7 +93,8 @@ public final class AlternativeFilmService implements FilmService {
         return emf.callInTransaction(EntityAgent.class, entityAgent ->
                 entityAgent.createNativeQuery(sqlString, String.class)
                         .setParameter(1, actorId)
-                        .getResultStream()
+                        .getResultList() // works better than getResultStream (no duplicates)
+                        .stream()
                         .map(v -> jsonMapper.readValue(v, Film.class))
                         .collect(ImmutableList.toImmutableList())
         );

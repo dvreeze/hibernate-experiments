@@ -18,14 +18,15 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity_;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmCategoryEntity_;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
 import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManagerFactory;
-
-import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.

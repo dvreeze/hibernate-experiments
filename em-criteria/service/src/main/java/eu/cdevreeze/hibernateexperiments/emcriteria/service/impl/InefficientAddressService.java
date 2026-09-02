@@ -52,7 +52,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
         });
@@ -72,7 +73,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -92,7 +94,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -111,7 +114,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -131,7 +135,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -150,7 +155,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });

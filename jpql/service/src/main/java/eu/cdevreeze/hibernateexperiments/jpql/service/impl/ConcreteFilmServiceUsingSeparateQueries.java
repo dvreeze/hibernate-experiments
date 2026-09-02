@@ -18,12 +18,15 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity_;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmCategoryEntity_;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
-import jakarta.persistence.*;
-
-import java.util.Optional;
+import jakarta.persistence.EntityAgent;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManagerFactory;
 
 /**
  * Concrete {@link FilmService} implementation that uses multiple JPQL queries in order to prevent
@@ -121,7 +124,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(qlString, eg)
-                .getResultStream()
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
                 .collect(ImmutableList.toImmutableList());
     }
 
@@ -132,7 +136,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, filmId)
-                .getResultStream()
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
@@ -143,7 +148,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
         return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, actorId)
-                .getResultStream()
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
                 .collect(ImmutableList.toImmutableList());
     }
 

@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
 import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
-import jakarta.persistence.criteria.JoinType;
-
-import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.
@@ -55,7 +52,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -79,7 +77,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -103,7 +102,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

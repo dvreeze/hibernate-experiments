@@ -51,7 +51,8 @@ public final class InefficientAddressService implements AddressService {
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, id)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .findFirst();
@@ -68,7 +69,8 @@ public final class InefficientAddressService implements AddressService {
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, cityId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -85,7 +87,8 @@ public final class InefficientAddressService implements AddressService {
 
             return entityManager.createQuery(qlString, AddressEntity.class)
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -101,7 +104,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, AddressEntity.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .peek(addrEntity -> Preconditions.checkState(addrEntity.getCity() instanceof HibernateProxy))
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
@@ -118,7 +122,8 @@ public final class InefficientAddressService implements AddressService {
 
             return entityManager.createQuery(qlString, CityEntity.class)
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -133,7 +138,8 @@ public final class InefficientAddressService implements AddressService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(qlString, CountryEntity.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });

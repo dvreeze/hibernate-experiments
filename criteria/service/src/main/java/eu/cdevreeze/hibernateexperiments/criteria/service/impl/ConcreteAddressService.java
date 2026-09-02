@@ -52,7 +52,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
         });
@@ -73,7 +74,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -94,7 +96,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -114,7 +117,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getAddressEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -135,7 +139,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCityEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -155,7 +160,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getCountryEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });

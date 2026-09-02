@@ -58,7 +58,8 @@ public final class ConcreteAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .setParameter(1, id)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .findFirst();
         });
     }
@@ -83,7 +84,8 @@ public final class ConcreteAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .setParameter(1, cityId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -108,7 +110,8 @@ public final class ConcreteAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -131,7 +134,8 @@ public final class ConcreteAddressService implements AddressService {
             ResultSetMapping<Address> rsMapping = getAddressResultSetMapping();
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -153,7 +157,8 @@ public final class ConcreteAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -167,7 +172,8 @@ public final class ConcreteAddressService implements AddressService {
             ResultSetMapping<Country> rsMapping = getCountryResultSetMapping();
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }

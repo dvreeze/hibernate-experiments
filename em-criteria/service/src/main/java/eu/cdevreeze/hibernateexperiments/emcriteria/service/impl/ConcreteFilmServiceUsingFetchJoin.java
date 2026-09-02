@@ -22,9 +22,6 @@ import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emcriteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.emcriteria.model.Film;
 import eu.cdevreeze.hibernateexperiments.emcriteria.service.FilmService;
-import jakarta.persistence.criteria.JoinType;
-
-import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.
@@ -57,7 +54,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -83,7 +81,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -109,7 +108,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
             return entityManager.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

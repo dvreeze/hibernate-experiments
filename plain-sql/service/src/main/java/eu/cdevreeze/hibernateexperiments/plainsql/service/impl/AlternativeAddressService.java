@@ -87,7 +87,8 @@ public final class AlternativeAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, String.class)
                     .setParameter(1, id)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .findFirst();
         });
@@ -136,7 +137,8 @@ public final class AlternativeAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, String.class)
                     .setParameter(1, cityId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -185,7 +187,8 @@ public final class AlternativeAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, String.class)
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -232,7 +235,8 @@ public final class AlternativeAddressService implements AddressService {
                     """;
 
             return entityAgent.createNativeQuery(sqlString, String.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -263,7 +267,8 @@ public final class AlternativeAddressService implements AddressService {
 
             return entityAgent.createNativeQuery(sqlString, String.class)
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, City.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -286,7 +291,8 @@ public final class AlternativeAddressService implements AddressService {
                     """;
 
             return entityAgent.createNativeQuery(sqlString, String.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());
         });

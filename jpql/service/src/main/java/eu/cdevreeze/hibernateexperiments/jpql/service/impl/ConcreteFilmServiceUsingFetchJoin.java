@@ -18,13 +18,11 @@ package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.jpql.entity.*;
+import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
 import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
-
-import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation.
@@ -53,7 +51,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.originalLanguage""";
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -76,7 +75,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, filmId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -99,7 +99,8 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

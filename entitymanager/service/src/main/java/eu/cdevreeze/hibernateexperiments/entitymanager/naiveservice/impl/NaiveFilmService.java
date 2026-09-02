@@ -22,8 +22,6 @@ import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice.FilmService;
 import jakarta.persistence.EntityManagerFactory;
 
-import java.util.Optional;
-
 /**
  * Naive {@link FilmService} implementation.
  *
@@ -44,7 +42,8 @@ public final class NaiveFilmService implements FilmService {
             String qlString = "select f from Film f";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -58,7 +57,8 @@ public final class NaiveFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, filmId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .min(Comparator.comparingLong(FilmEntity::getId));
         });
     }
@@ -71,7 +71,8 @@ public final class NaiveFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });

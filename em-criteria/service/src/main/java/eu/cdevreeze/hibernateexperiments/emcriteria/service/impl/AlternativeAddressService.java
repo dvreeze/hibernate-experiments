@@ -69,7 +69,8 @@ public final class AlternativeAddressService implements AddressService {
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
             return session.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .findFirst();
         });
@@ -94,7 +95,8 @@ public final class AlternativeAddressService implements AddressService {
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
             return session.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -119,7 +121,8 @@ public final class AlternativeAddressService implements AddressService {
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
             return session.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -143,7 +146,8 @@ public final class AlternativeAddressService implements AddressService {
             JpaCriteriaQuery<String> resultQuery = createAddressResultQuery(cb, tupleQuery);
 
             return session.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -191,7 +195,8 @@ public final class AlternativeAddressService implements AddressService {
             );
 
             return session.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, City.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -227,7 +232,8 @@ public final class AlternativeAddressService implements AddressService {
             );
 
             return session.createQuery(cq)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Country.class))
                     .collect(ImmutableList.toImmutableList());
         });

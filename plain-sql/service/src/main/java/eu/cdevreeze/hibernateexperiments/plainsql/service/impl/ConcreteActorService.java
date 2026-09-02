@@ -52,7 +52,8 @@ public final class ConcreteActorService implements ActorService {
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .setParameter(1, id)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .findFirst();
         });
     }
@@ -72,7 +73,8 @@ public final class ConcreteActorService implements ActorService {
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .setParameter(1, filmId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -89,7 +91,8 @@ public final class ConcreteActorService implements ActorService {
             ResultSetMapping<Actor> rsMapping = getActorResultSetMapping();
 
             return entityAgent.createNativeQuery(sqlString, rsMapping)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .collect(ImmutableList.toImmutableList());
         });
     }

@@ -18,14 +18,15 @@ package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
 import module java.base;
 import com.google.common.collect.ImmutableList;
-import eu.cdevreeze.hibernateexperiments.entitymanager.entity.*;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmActorEntity_;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmCategoryEntity_;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity_;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Film;
 import eu.cdevreeze.hibernateexperiments.entitymanager.service.FilmService;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-
-import java.util.Optional;
 
 /**
  * Concrete {@link FilmService} implementation that uses multiple JPQL queries in order to prevent

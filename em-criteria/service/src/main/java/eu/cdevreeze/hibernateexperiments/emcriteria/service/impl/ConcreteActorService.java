@@ -54,7 +54,8 @@ public final class ConcreteActorService implements ActorService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(ActorEntity::toModelObject)
                     .findFirst();
         });
@@ -82,7 +83,8 @@ public final class ConcreteActorService implements ActorService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -104,7 +106,8 @@ public final class ConcreteActorService implements ActorService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getActorEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });

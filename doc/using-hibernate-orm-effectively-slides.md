@@ -381,7 +381,7 @@ public final class NaiveFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultStream()
+                    .getResultList().stream() // not getResultStream()
                     .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -661,7 +661,7 @@ public final class InefficientFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultStream()
+                    .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -732,7 +732,7 @@ public final class ConcreteFilmService implements FilmService {
 
             return entityManager.createQuery(qlString, getEntityGraph())
                     .setParameter(1, actorId)
-                    .getResultStream()
+                    .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -785,7 +785,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
-                    .getResultStream()
+                    .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -861,7 +861,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
         return entityManager.createQuery(qlString, eg)
                 .setParameter(1, actorId)
-                .getResultStream()
+                .getResultList().stream() // not getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }
 
@@ -982,7 +982,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
         return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, actorId)
-                .getResultStream()
+                .getResultList().stream() // not getResultStream()
                 .collect(ImmutableList.toImmutableList());
     }
 
@@ -1042,7 +1042,7 @@ public final class AlternativeFilmService implements FilmService {
 
             cq.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
-            return statelessSession.createQuery(cq).getResultStream()
+            return statelessSession.createQuery(cq).getResultList().stream() // not getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -1141,7 +1141,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             cq.select(film);
 
             return entityAgent.createQuery(cq)
-                    .getResultStream()
+                    .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

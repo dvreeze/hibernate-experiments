@@ -46,7 +46,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, id)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .findFirst();
         });
@@ -62,7 +63,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, cityId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -78,7 +80,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getAddressEntityGraph())
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -93,7 +96,8 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getAddressEntityGraph())
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(AddressEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -109,7 +113,8 @@ public final class ConcreteAddressService implements AddressService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getCityEntityGraph())
                     .setParameter(1, countryId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CityEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -124,7 +129,8 @@ public final class ConcreteAddressService implements AddressService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getCountryEntityGraph())
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(CountryEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });

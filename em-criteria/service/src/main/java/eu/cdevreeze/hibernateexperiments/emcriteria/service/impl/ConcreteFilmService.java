@@ -56,7 +56,8 @@ public final class ConcreteFilmService implements FilmService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
@@ -78,7 +79,8 @@ public final class ConcreteFilmService implements FilmService {
 
             return entityManager.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .min(Comparator.comparingLong(Film::id));
         });
@@ -102,7 +104,8 @@ public final class ConcreteFilmService implements FilmService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityManager.createQuery(cq)
                     .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, getEntityGraph()) // Not type-safe
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(FilmEntity::toModelObject)
                     .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());

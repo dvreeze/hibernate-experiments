@@ -68,7 +68,8 @@ public final class AlternativeFilmService implements FilmService {
             JpaCriteriaQuery<String> resultQuery = createFilmQuery(cb);
 
             return statelessSession.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });
@@ -88,7 +89,8 @@ public final class AlternativeFilmService implements FilmService {
             resultQuery.where(cb.equal(filmRoot.get(FilmEntity_.id), filmId));
 
             return statelessSession.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .findFirst();
         });
@@ -113,7 +115,8 @@ public final class AlternativeFilmService implements FilmService {
             resultQuery.where(cb.in(filmRoot.get(FilmEntity_.id), List.of(subquery)));
 
             return statelessSession.createQuery(resultQuery)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
                     .collect(ImmutableList.toImmutableList());
         });

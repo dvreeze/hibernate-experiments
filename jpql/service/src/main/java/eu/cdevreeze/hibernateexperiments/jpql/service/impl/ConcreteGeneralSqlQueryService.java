@@ -45,7 +45,8 @@ public final class ConcreteGeneralSqlQueryService implements GeneralSqlQueryServ
 
             IntStream.range(0, args.size()).forEach(idx -> query.setParameter(1 + idx, args.get(idx)));
 
-            return query.getResultStream().collect(ImmutableList.toImmutableList());
+            return query.getResultList() // works better than getResultStream (no duplicates)
+                    .stream().collect(ImmutableList.toImmutableList());
         });
     }
 }

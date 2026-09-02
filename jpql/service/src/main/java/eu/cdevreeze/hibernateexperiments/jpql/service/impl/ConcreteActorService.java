@@ -47,7 +47,8 @@ public final class ConcreteActorService implements ActorService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getActorEntityGraph())
                     .setParameter(1, id)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(ActorEntity::toModelObject)
                     .findFirst();
         });
@@ -70,7 +71,8 @@ public final class ConcreteActorService implements ActorService {
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getActorEntityGraph())
                     .setParameter(1, filmId)
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
@@ -85,7 +87,8 @@ public final class ConcreteActorService implements ActorService {
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
             return entityAgent.createQuery(qlString, getActorEntityGraph())
-                    .getResultStream()
+                    .getResultList() // works better than getResultStream (no duplicates)
+                    .stream()
                     .map(ActorEntity::toModelObject)
                     .collect(ImmutableList.toImmutableList());
         });
