@@ -72,6 +72,8 @@ By not using bootstrapping/transaction annotations and dependency injection we c
 The code only shows querying and not updates, simply because there is no time for the latter.
 
 Interesting and relevant as it may be to talk about updates and the "persistence context", it is good to know that Hibernate ORM can also be used without "persistence context". We'll get into that.
+
+To a large extent, this presentation is about a mind set, not about details (that can be looked up).
 -->
 
 ---
@@ -1026,6 +1028,10 @@ Thus, we can use more advanced HQL features, corresponding to SQL features such 
 
 Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON results, while preventing the fetching of any (intermediate) entities.
 
+<!--
+If needed, we can always fall back to native SQL. Hibernate ORM 8 has excellent support for native SQL as well.
+-->
+
 ---
 
 #### Exploiting richness of HQL
@@ -1313,3 +1319,58 @@ For the "real" database it would make sense to use SchemaManagementAction VALIDA
 - We do not have to use `Session`/`EntityManager`, but can use the more predictable `StatelessSession`/`EntityAgent` instead
 - Hibernate ORM 8 (and Jakarta Persistence 4.0) is an important release, e.g. because it fixes some old "mistakes"
 - Consider keeping entities local to sessions (or retrieve no entities at all), having queries return *immutable DTOs* instead
+
+---
+
+## Questions?
+
+---
+
+#### References
+
+Jakarta Persistence standard (as reference material):
+
+- [Jakarta Persistence specification](https://jakarta.ee/specifications/persistence/)
+- [Jakarta Persistence 4.0 Specification](https://jakarta.ee/specifications/persistence/4.0/jakarta-persistence-spec-4.0-m4)
+- [Jakarta Persistence 4.0 API documentation](https://jakarta.ee/specifications/persistence/4.0/apidocs/jakarta.persistence/module-summary.html)
+
+---
+
+#### References
+
+From the Hibernate team:
+
+- [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice)
+- [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/) (should probably be read from beginning to end)
+- [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) as reference material
+- [Hibernate ORM 8.0 API documentation](https://docs.hibernate.org/orm/8.0/javadocs/)
+- [Many-to-one associations](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one)
+
+---
+
+#### References
+
+From Hibernate expert Thorben Janssen (mostly < Hibernate 6):
+
+- [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/)
+- [Hibernate performance tuning](https://thorben-janssen.com/hibernate-performance-tuning/)
+- [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/)
+- [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype)
+- [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/)
+- [Cascade type remove issues](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
+- [Hibernate query spaces](https://thorben-janssen.com/hibernate-query-spaces/)
+- [Read-only query hint](https://thorben-janssen.com/read-only-query-hint/)
+
+---
+
+#### References
+
+Other links:
+
+- [Hibernate ORM pitfalls or difficulties](https://www.quora.com/What-are-pitfalls-or-difficulties-in-using-Hibernate-as-ORM)
+- [Stop using JPA/Hibernate](https://www.stemlaur.com/blog/2021/03/30/tech-hibern-hate/), in order to learn what critics have to say about Hibernate ORM
+
+What is new in Hibernate ORM 8:
+
+- [Jakarta Persistence 4.0 Milestone 1](https://in.relation.to/2026/01/20/JPA-4-M1/)
+- [Jakarta Persistence 4.0 Milestone 2](https://in.relation.to/2026/04/23/JPA-4-M2/)
