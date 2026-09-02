@@ -392,6 +392,8 @@ public final class NaiveFilmService implements FilmService {
 <!--
 The first FilmService API and implementation. The immutable Guava collection of mutable FilmEntity entities does not seem to be very useful, but later on this immutable Guava collection type will make more sense.
 
+Note the use of method "getResultList" rather than "getResultStream". The latter does not do de-duplication, and should not be used unless needed. See https://discourse.hibernate.org/t/difference-between-query-getresultstream-query-getresultlist-and-join-fetch/7109/2.
+
 For now, keep in mind that all entity associations are lazy, and that the JPQL query does not seem to fetch any associated data. This is important for the question below.
 -->
 
