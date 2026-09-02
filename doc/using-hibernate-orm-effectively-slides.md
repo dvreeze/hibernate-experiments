@@ -6,9 +6,9 @@ paginate: true
 
 # **Using Hibernate ORM effectively**
 
-Chris de Vreeze
+**Chris de Vreeze**
 
-Java Developer
+**Java Developer**
 
 ---
 
