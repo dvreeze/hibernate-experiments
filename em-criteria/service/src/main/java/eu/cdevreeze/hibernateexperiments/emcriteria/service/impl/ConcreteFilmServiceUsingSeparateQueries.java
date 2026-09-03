@@ -49,7 +49,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findAllFilms(getFilmActorsEntityGraph(), entityManager);
 
-            // TODO Not like this!
+            // Naive implementation ("merge" should not be needed)
             java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
                     findAllFilms(getFilmCategoriesEntityGraph(), entityManager)
                             .stream()
@@ -77,7 +77,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                     .stream()
                     .toList();
 
-            // TODO Not like this!
+            // Naive implementation ("merge" should not be needed)
             java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
                     findFilm(filmId, getFilmCategoriesEntityGraph(), entityManager)
                             .stream()
@@ -102,7 +102,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
 
-            // TODO Not like this!
+            // Naive implementation ("merge" should not be needed)
             java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
                     findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager)
                             .stream()

@@ -837,8 +837,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        return emf.callInTransaction(entityManager -> { // TODO Not like this!
-          java.util.List<FilmEntity> filmEntities =
+        return emf.callInTransaction(entityManager -> { // Naive implementation ("merge" should not be needed)
+            java.util.List<FilmEntity> filmEntities =
                     findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
 
             java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
@@ -958,7 +958,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
-        return emf.callInTransaction(EntityAgent.class, entityAgent -> { // TODO Not like this!
+        return emf.callInTransaction(EntityAgent.class, entityAgent -> { // Here we have no persistence context
             java.util.List<FilmEntity> filmEntities =
                     findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityAgent);
 
