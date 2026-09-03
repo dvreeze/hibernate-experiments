@@ -124,7 +124,7 @@ The Film_Actor and Film_Category tables have compound primary keys, each consist
 
 Before showing the entity classes, note that there are 2 categories of *JPA annotations* on entities:
 - *logical mapping annotations*, concerning the Java object model
-  - e.g. `Entity`, `Id`, `ManyToOne`, `Basic` etc.
+  - e.g. `Entity`, `Id`, `ManyToOne`, `Basic`, `EmbeddedId`, `MapsId` etc.
 - *physical mapping annotations*, concerning the underlying relational database schema
   - e.g. `Table`, `Column`, `JoinTable`, `GeneratedValue` etc.
 
@@ -456,6 +456,8 @@ Statement-oriented means: lots of loops, if-else statements etc.
 Modern expression-oriented Java code contains Stream pipelines, modern switch expressions, etc.
 
 Note that the "java.time" API is an executable (immutable) model of date/time concepts. Using some common sense, these concepts and their corresponding public APIs make perfect sense. The legacy Date/Calendar API does not even come close to that.
+
+For example, the "java.time" can perfectly express that at a certain `Instant` it is already the new year in Sydney (as `ZonedDateTime`) but still the old year in Chicago (as another `ZonedDateTime` for the same `Instant`).
 
 Also recall the book Effective Java, 3rd Edition, by Joshua Bloch, with advice like "Minimize mutability" and "Favor composition over inheritance".
 -->
