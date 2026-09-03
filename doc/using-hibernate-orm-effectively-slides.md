@@ -19,8 +19,9 @@ paginate: true
 - Where can we find help to use this powerful library effectively, reducing the amount of "magic"?
     - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/)
     - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/) (< Hibernate 6.0)
-- How can we combine Hibernate ORM with modern (Java) functional programming practices?
-- What does Hibernate ORM 8 (and Jakarta Persistence 4.0) bring to the table?
+    - Or [Hibernate tutorials by Vlad Mihalcea](https://vladmihalcea.com/tutorials/hibernate/)
+- How to combine Hibernate ORM with modern Java FP practices?
+- What does Hibernate ORM 8 (and Jakarta Persistence 4.0) bring?
 
 <!--
 Hibernate ORM may feel like "magic", but we need to look at the generated SQL. Taking away magic in this case means being able to predict the generated SQL.
@@ -32,8 +33,6 @@ The Hibernate team does not talk that much about combining Hibernate with modern
 At the time of this writing, Hibernate ORM and the Jakarta Persistence 4.0 standard that it implements are still in beta.
 
 By the way, much of what Thorben Janssen writes about Hibernate ORM predates Hibernate 6.0. Note that Hibernate 5 still uses the "javax" namespace instead of "jakarta" namespace. This material from Thorben Janssen is still very useful, but keep in mind that some details no longer apply in Hibernate ORM 6+.
-
-Another Hibernate ORM expert (and committer) to pay attention to is Vlad Mihalcea.
 -->
 
 ---
@@ -1348,6 +1347,7 @@ From the Hibernate team:
 - [Hibernate ORM user guide](https://docs.hibernate.org/orm/8.0/userguide/html_single/) as reference material
 - [Hibernate ORM 8.0 API documentation](https://docs.hibernate.org/orm/8.0/javadocs/)
 - [Many-to-one associations](https://docs.hibernate.org/orm/8.0/introduction/html_single/#many-to-one)
+- [Hibernate tutorials](https://vladmihalcea.com/tutorials/hibernate/) by (Hibernate ORM committer) Vlad Mihalcea
 
 ---
 
