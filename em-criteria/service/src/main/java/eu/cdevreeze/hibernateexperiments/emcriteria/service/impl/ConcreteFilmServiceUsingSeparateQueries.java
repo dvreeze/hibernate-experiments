@@ -49,17 +49,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findAllFilms(getFilmActorsEntityGraph(), entityManager);
 
-            // Naive implementation ("merge" should not be needed)
-            java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
-                    findAllFilms(getFilmCategoriesEntityGraph(), entityManager)
-                            .stream()
-                            .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
-
-            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
-                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
-                            .map(FilmEntity::getFilmCategories)
-                            .orElse(java.util.Set.of())
-            ));
+            // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/
+            findAllFilms(getFilmCategoriesEntityGraph(), entityManager);
 
             return filmEntities
                     .stream()
@@ -77,17 +68,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                     .stream()
                     .toList();
 
-            // Naive implementation ("merge" should not be needed)
-            java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
-                    findFilm(filmId, getFilmCategoriesEntityGraph(), entityManager)
-                            .stream()
-                            .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
-
-            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
-                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
-                            .map(FilmEntity::getFilmCategories)
-                            .orElse(java.util.Set.of())
-            ));
+            // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/
+            findFilm(filmId, getFilmCategoriesEntityGraph(), entityManager);
 
             return filmEntities
                     .stream()
@@ -102,17 +84,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
 
-            // Naive implementation ("merge" should not be needed)
-            java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
-                    findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager)
-                            .stream()
-                            .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
-
-            filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
-                    Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
-                            .map(FilmEntity::getFilmCategories)
-                            .orElse(java.util.Set.of())
-            ));
+            // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/
+            findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager);
 
             return filmEntities
                     .stream()
