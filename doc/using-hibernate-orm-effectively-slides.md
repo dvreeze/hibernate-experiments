@@ -90,9 +90,9 @@ To a large extent, this presentation is about a mind set, not about details (tha
 <!--
 Pretending to deal only with Java objects is naive when using Hibernate ORM, but it seems so easy and comfortable to start out that way in a new project. Quite soon, this will get quite painful.
 
-Don't ignore performance, so log the generated SQL.
+Don't ignore performance, so log the generated SQL. In particular, the number of generated SQL statements should more or less be a small constant, and not "N + 1" (which may grow to hundreds or thousands).
 
-Yet I really hope that it does not end there, and we are able to even predict the generated SQL. That's what this presentation hopes to contribute to.
+Yet I really hope that it does not end there (with logging the generated SQL), and we are able to even predict the generated SQL. That's what this presentation hopes to contribute to.
 
 If nearly everything is forgotten about this presentation, I hope the best practice of using lazy loading at the entity level combined with per-query fetching is the only take-away point from this presentation.
 
@@ -444,6 +444,7 @@ Side step: compare "old school" Java with modern Java:
 - imperative ("how") versus more functional ("what")
 - *statement-oriented* versus *expression-oriented*
 - *mutability* versus more *immutability*
+- *in-place updates* versus *functional updates*
 - (mutable) *JavaBeans* versus (immutable) *Java records*
 - side effects versus data transformations and `Stream` pipelines
 - nullability versus `Optional` and JSpecify-marked (non)nullability
@@ -933,7 +934,7 @@ Both `EntityManager` and `EntityAgent` extend interface `EntityHandler`, offerin
 
 In many projects, using EntityAgent would make more sense than using EntityManager, making reasoning about code much easier.
 
-Below, we replace `EntityManager` by `EntityAgent` in the previous example, thus preventing any "dirty checking".
+Below, we replace `EntityManager` by `EntityAgent` in the previous example, thus preventing any "dirty checking". (Again, there are only 2 generated SQL queries.)
 
 <!--
 The Hibernate StatelessSession requires all database access to be explicit. There is no dirty checking and automatic flushing, no cascading behavior, etc. This makes it much easier to reason about the code, since all complexities of the persistence context are gone. This can make a big difference for code performing many updates to the database, and that's something that is not shown in this presentation.
@@ -1026,7 +1027,7 @@ For example, using `StatelessSession`/`Session` instead of supertype `EntityAgen
 
 Thus, we can use more advanced HQL features, corresponding to SQL features such as [CTEs](https://www.postgresql.org/docs/current/queries-with.html) and [JSON support](https://www.postgresql.org/docs/18/datatype-json.html).
 
-Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now rewrite a previous example using JSON results, while preventing the fetching of any (intermediate) entities.
+Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now retrieve the films as JSON results, without needing to fetch any (intermediate) entities. (Only 1 SQL query is generated.)
 
 <!--
 If needed, we can always fall back to native SQL. Hibernate ORM 8 has excellent support for native SQL as well.
@@ -1123,7 +1124,7 @@ Using the Hibernate *annotation processor* a type-safe *static metamodel* can be
 
 The static metamodel can be used with the *Criteria API* in order to query in a compile-time type-safe way.
 
-The Criteria API can also be useful for assembling queries from their (reusable) parts, in a much more controlled and type-safe manner than string concatenation.
+The Criteria API can also be useful for assembling queries from their (reusable) parts, in a much more controlled and type-safe manner than string concatenation. (Only 1 SQL query is generated.)
 
 <!--
 We have already seen examples of how the static metamodel allows us to navigate associations without using string literals.
@@ -1182,7 +1183,7 @@ What if we could write a JPQL query string and have it parsed and validated at c
 
 The Hibernate annotation processor can indeed do this.
 
-Let's show *Hibernate Data Repositories* (through the *Jakarta Data 1.1* standard) in action, exploiting query parsing/validation at compile-time.
+Let's show *Hibernate Data Repositories* (through the *Jakarta Data 1.1* standard) in action, exploiting query parsing/validation at compile-time. (Only 1 SQL query is generated.)
 
 <!--
 At the time of this writing, the Jakarta Data 1.1 standard is not yet final.
