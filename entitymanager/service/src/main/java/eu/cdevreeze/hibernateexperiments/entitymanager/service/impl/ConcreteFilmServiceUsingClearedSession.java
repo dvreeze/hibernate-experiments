@@ -26,6 +26,7 @@ import eu.cdevreeze.hibernateexperiments.entitymanager.model.Film;
 import eu.cdevreeze.hibernateexperiments.entitymanager.service.FilmService;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.FlushModeType;
 
 /**
  * Concrete {@link FilmService} implementation, clearing the session to prevent flushing data.
@@ -44,6 +45,8 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
     public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
+            entityManager.addOption(FlushModeType.EXPLICIT); // strictly not needed, but does not hurt
+
             String qlString = "select f from Film f";
 
             // This sets the load graph, not the fetch graph
@@ -63,6 +66,8 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
     public Optional<Film> findFilm(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
+            entityManager.addOption(FlushModeType.EXPLICIT); // strictly not needed, but does not hurt
+
             String qlString = "select f from Film f where f.id = ?1";
 
             // This sets the load graph, not the fetch graph
@@ -82,6 +87,8 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
+            entityManager.addOption(FlushModeType.EXPLICIT); // strictly not needed, but does not hurt
+
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
 
             // This sets the load graph, not the fetch graph
