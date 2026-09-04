@@ -103,7 +103,7 @@ To a large extent, this presentation is about a mind set, not about details (tha
 - Don't leak a Session *across threads or concurrent transactions*
 - Don't use "infrastructural" *state* (such as a Session) *in a JPA entity*
 - Etc. See for example [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice)
-- Try not to keep a (possibly partly "hidden") transactional Session open across large (service/DAO) method call chains
+- For maintainability and performance, try not to keep a (possibly partly "hidden") transactional Session open across large (service/DAO) method call chains
 
 <!--
 Pretending to deal only with Java objects is naive when using Hibernate ORM, but it seems so easy and comfortable to start out that way in a new project. Quite soon, this will get quite painful.
