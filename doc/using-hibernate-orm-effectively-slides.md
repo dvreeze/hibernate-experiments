@@ -85,6 +85,7 @@ To a large extent, this presentation is about a mind set, not about details (tha
 - Don't leak a Session *across threads or concurrent transactions*
 - Don't use "infrastructural" *state* (such as a Session) *in a JPA entity*
 - Etc. See for example [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice)
+- Try not to keep a (possibly partly "hidden") transactional Session open across large (service/DAO) method call chains
 
 <!--
 Pretending to deal only with Java objects is naive when using Hibernate ORM, but it seems so easy and comfortable to start out that way in a new project. Quite soon, this will get quite painful.
@@ -473,7 +474,7 @@ But they make very poor DTOs to pass across application layers, due to their hid
 
 *Immutable Java records* make far better DTOs.
 
-Let's explore *combining the strengths of both*.
+Let's explore *combining the strengths of both* (and some pitfalls).
 
 <!--
 Jakarta Persistence entities are annotated old school JavaBeans with getters and setters (and a no-arg default constructor).
@@ -901,7 +902,7 @@ This is a practical way of "splitting the query" in order to solve the MultipleB
 
 In the preceding code, we still have the issue that entities are retrieved and the persistence context performs "dirty checking".
 
-There are several ways to prevent "dirty checking" overhead (while still retrieving entities), but they all affect the persistence context. There is no silver bullet here.
+There are several ways to prevent "dirty checking" overhead (while still retrieving entities), but they all affect the persistence context. There is no silver bullet here. E.g., we might clear the Session (just in time).
 
 Question: is it possible to use Hibernate ORM without any Session?
 
@@ -911,7 +912,7 @@ Question: is it possible to use Hibernate ORM without any Session?
 
 In the preceding code, we still have the issue that entities are retrieved and the persistence context performs "dirty checking".
 
-There are several ways to prevent "dirty checking" overhead (while still retrieving entities), but they all affect the persistence context. There is no silver bullet here.
+There are several ways to prevent "dirty checking" overhead (while still retrieving entities), but they all affect the persistence context. There is no silver bullet here. E.g., we might clear the Session (just in time).
 
 Question: is it possible to use Hibernate ORM without any Session?
 
@@ -927,7 +928,7 @@ Both `EntityManager` and `EntityAgent` extend interface `EntityHandler`, offerin
 
 In many projects, using EntityAgent would make more sense than using EntityManager, making reasoning about code much easier.
 
-Below, we replace `EntityManager` by `EntityAgent` in the previous example, thus preventing any "dirty checking". (Again, there are only 2 generated SQL queries.)
+Below, we replace `EntityManager` by `EntityAgent` in the previous example (and make some needed changes), thus preventing any "dirty checking". (Again, there are only 2 generated SQL queries.)
 
 <!--
 The Hibernate StatelessSession requires all database access to be explicit. There is no dirty checking and automatic flushing, no cascading behavior, etc. This makes it much easier to reason about the code, since all complexities of the persistence context are gone. This can make a big difference for code performing many updates to the database, and that's something that is not shown in this presentation.
