@@ -1179,6 +1179,8 @@ The Hibernate annotation processor can indeed do this.
 
 Let's show *Hibernate Data Repositories* (through the *Jakarta Data 1.1* standard) in action, exploiting query parsing/validation at compile-time. (Only 1 SQL query is generated.)
 
+Note: Hibernate Data Repositories 8 uses a `StatelessSession` underneath, not a `Session`. So this API feels like the use of an `EntityAgent` and not like the use of an `EntityManager`.
+
 <!--
 At the time of this writing, the Jakarta Data 1.1 standard is not yet final.
 -->
