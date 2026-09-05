@@ -19,9 +19,8 @@ package eu.cdevreeze.hibernateexperiments.repository.repo;
 import module java.base;
 import eu.cdevreeze.hibernateexperiments.repository.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.repository.model.Film;
+import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
-import jakarta.persistence.EntityAgent;
-import org.hibernate.annotations.processing.HQL;
 
 /**
  * {@link Film}-related Jakarta Data Repository.
@@ -31,10 +30,8 @@ import org.hibernate.annotations.processing.HQL;
 @Repository
 public interface FilmRepository {
 
-    EntityAgent entityAgent(); // Just in case we need it
-
     // In reality this would return too many results
-    @HQL("""
+    @Query("""
             select f from Film f
               left join fetch f.filmActors fac
               left join fetch fac.actor
@@ -44,7 +41,7 @@ public interface FilmRepository {
               left join fetch f.originalLanguage""")
     List<FilmEntity> findAllFilms();
 
-    @HQL("""
+    @Query("""
             select f from Film f
               left join fetch f.filmActors fac
               left join fetch fac.actor
@@ -55,7 +52,7 @@ public interface FilmRepository {
              where f.id = :filmId""")
     Optional<FilmEntity> findFilm(int filmId);
 
-    @HQL("""
+    @Query("""
             select f from Film f
               left join fetch f.filmActors fac
               left join fetch fac.actor

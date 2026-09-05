@@ -21,6 +21,7 @@ import eu.cdevreeze.hibernateexperiments.repository.entity.*;
 import eu.cdevreeze.hibernateexperiments.repository.model.Address;
 import eu.cdevreeze.hibernateexperiments.repository.model.City;
 import eu.cdevreeze.hibernateexperiments.repository.model.Country;
+import eu.cdevreeze.hibernateexperiments.repository.repo.AddressRepository;
 import eu.cdevreeze.hibernateexperiments.repository.service.AddressService;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.AfterEach;
@@ -164,6 +165,7 @@ abstract class AbstractAddressServiceH2Test {
                 .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
+                .managedClass(AddressRepository.class) // Important!
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)

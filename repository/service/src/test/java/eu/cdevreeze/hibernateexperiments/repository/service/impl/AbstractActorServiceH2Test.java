@@ -19,6 +19,7 @@ package eu.cdevreeze.hibernateexperiments.repository.service.impl;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.repository.entity.*;
 import eu.cdevreeze.hibernateexperiments.repository.model.Actor;
+import eu.cdevreeze.hibernateexperiments.repository.repo.ActorRepository;
 import eu.cdevreeze.hibernateexperiments.repository.service.ActorService;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.AfterEach;
@@ -110,6 +111,7 @@ abstract class AbstractActorServiceH2Test {
                 .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
+                .managedClass(ActorRepository.class) // Important!
                 .managedClass(ActorEntity.class)
                 .managedClass(FilmEntity.class)
                 .managedClass(FilmActorEntity.class)

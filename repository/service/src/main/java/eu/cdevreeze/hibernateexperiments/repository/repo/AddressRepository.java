@@ -22,9 +22,8 @@ import eu.cdevreeze.hibernateexperiments.repository.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.repository.entity.CountryEntity;
 import jakarta.data.repository.Find;
 import jakarta.data.repository.Insert;
+import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
-import jakarta.persistence.EntityAgent;
-import org.hibernate.annotations.processing.HQL;
 
 /**
  * {@link AddressEntity}-related Jakarta Data Repository.
@@ -34,31 +33,29 @@ import org.hibernate.annotations.processing.HQL;
 @Repository
 public interface AddressRepository {
 
-    EntityAgent entityAgent(); // Just in case we need it
-
     // Query annotation not yet working as advertised?
-    @HQL("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = :id")
+    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = :id")
     Optional<AddressEntity> findById(Integer id);
 
     // Query annotation not yet working as advertised?
-    @HQL("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ct.id = :cityId")
+    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ct.id = :cityId")
     List<AddressEntity> findByCityId(Integer cityId);
 
     // Query annotation not yet working as advertised?
-    @HQL("select ad from Address ad join fetch ad.city ct join fetch ct.country co where co.id = :countryId")
+    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co where co.id = :countryId")
     List<AddressEntity> findByCountryId(Integer countryId);
 
     // Query annotation not yet working as advertised?
     // In reality this would return too many results
-    @HQL("select ad from Address ad join fetch ad.city ct join fetch ct.country co")
+    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co")
     List<AddressEntity> findAllAddresses();
 
     // Query annotation not yet working as advertised?
-    @HQL("select ci from City ci join fetch ci.country co where co.id = :countryId")
+    @Query("select ci from City ci join fetch ci.country co where co.id = :countryId")
     List<CityEntity> findCitiesByCountryId(Integer countryId);
 
     // Query annotation not yet working as advertised?
-    @HQL("select ci from City ci join fetch ci.country co where ci.id = :id")
+    @Query("select ci from City ci join fetch ci.country co where ci.id = :id")
     Optional<CityEntity> findCityById(Integer id);
 
     @Find

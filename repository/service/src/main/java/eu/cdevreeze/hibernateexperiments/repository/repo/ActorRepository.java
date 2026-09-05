@@ -19,9 +19,8 @@ package eu.cdevreeze.hibernateexperiments.repository.repo;
 import module java.base;
 import eu.cdevreeze.hibernateexperiments.repository.entity.ActorEntity;
 import jakarta.data.repository.Find;
+import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
-import jakarta.persistence.EntityAgent;
-import org.hibernate.annotations.processing.HQL;
 
 /**
  * {@link ActorEntity}-related Jakarta Data Repository.
@@ -31,13 +30,10 @@ import org.hibernate.annotations.processing.HQL;
 @Repository
 public interface ActorRepository {
 
-    EntityAgent entityAgent(); // Just in case we need it
-
     @Find
     Optional<ActorEntity> findById(Integer id);
 
-    // Query annotation not yet working as advertised?
-    @HQL("select a from Actor a join FilmActor fa on (fa.actor.id = a.id) where fa.film.id = :filmId")
+    @Query("select a from Actor a join FilmActor fa on (fa.actor.id = a.id) where fa.film.id = :filmId")
     List<ActorEntity> findByFilmId(Integer filmId);
 
     @Find

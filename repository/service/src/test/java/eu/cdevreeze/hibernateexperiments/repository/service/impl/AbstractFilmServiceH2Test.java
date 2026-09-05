@@ -21,6 +21,7 @@ import eu.cdevreeze.hibernateexperiments.repository.entity.*;
 import eu.cdevreeze.hibernateexperiments.repository.model.Actor;
 import eu.cdevreeze.hibernateexperiments.repository.model.Category;
 import eu.cdevreeze.hibernateexperiments.repository.model.Film;
+import eu.cdevreeze.hibernateexperiments.repository.repo.FilmRepository;
 import eu.cdevreeze.hibernateexperiments.repository.service.FilmService;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.AfterEach;
@@ -125,6 +126,7 @@ abstract class AbstractFilmServiceH2Test {
                 .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
+                .managedClass(FilmRepository.class) // Important!
                 .managedClass(ActorEntity.class)
                 .managedClass(FilmActorEntity.class)
                 .managedClass(CategoryEntity.class)

@@ -18,6 +18,9 @@ package eu.cdevreeze.hibernateexperiments.repository.bootstrap;
 
 import com.google.common.base.Preconditions;
 import eu.cdevreeze.hibernateexperiments.repository.entity.*;
+import eu.cdevreeze.hibernateexperiments.repository.repo.ActorRepository;
+import eu.cdevreeze.hibernateexperiments.repository.repo.AddressRepository;
+import eu.cdevreeze.hibernateexperiments.repository.repo.FilmRepository;
 import jakarta.persistence.*;
 
 /**
@@ -41,6 +44,9 @@ public class EntityManagerFactories {
                 .property(Persistence.ConnectionProperties.JDBC_USER, "postgres")
                 .property(Persistence.ConnectionProperties.JDBC_PASSWORD, "postgres") // don't do this in production!
                 .schemaManagementDatabaseAction(SchemaManagementAction.VALIDATE)
+                .managedClass(AddressRepository.class) // Important!
+                .managedClass(ActorRepository.class) // Important!
+                .managedClass(FilmRepository.class) // Important!
                 .managedClass(AddressEntity.class)
                 .managedClass(CityEntity.class)
                 .managedClass(CountryEntity.class)
