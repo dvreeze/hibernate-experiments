@@ -139,7 +139,7 @@ abstract class AbstractFilmServiceH2Test {
                 .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
                 .defaultToOneFetchType(FetchType.LAZY)
                 .provider("org.hibernate.jpa.HibernatePersistenceProvider")
-                .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
+                .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver")
                 .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
                 .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE)
                 .managedClass(ActorEntity.class)

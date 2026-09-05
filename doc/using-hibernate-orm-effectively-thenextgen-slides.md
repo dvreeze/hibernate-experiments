@@ -1394,7 +1394,7 @@ private static EntityManagerFactory createEntityManagerFactory() {
             .transactionType(PersistenceUnitTransactionType.RESOURCE_LOCAL)
             .defaultToOneFetchType(FetchType.LAZY) // since Jakarta Persistence 4.0!
             .provider("org.hibernate.jpa.HibernatePersistenceProvider")
-            .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver") // no connection pooling, of course
+            .property(PersistenceConfiguration.JDBC_DRIVER, "org.h2.Driver")
             .property(Persistence.ConnectionProperties.JDBC_URL, "jdbc:h2:mem:test_db")
             .schemaManagementDatabaseAction(SchemaManagementAction.DROP_AND_CREATE) // instead of VALIDATE
             .managedClass(ActorEntity.class)
