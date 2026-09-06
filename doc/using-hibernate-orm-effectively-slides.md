@@ -18,7 +18,7 @@ paginate: true
 - Still, Hibernate ORM often may feel like "magic"
 - Where can we find help to use this powerful library effectively, reducing the amount of "magic"?
     - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/)
-    - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/) (< Hibernate 6.0)
+    - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/) (mostly < Hibernate 6.0)
     - Or [Hibernate tutorials by Vlad Mihalcea](https://vladmihalcea.com/tutorials/hibernate/)
 - How to combine Hibernate ORM with modern Java FP practices?
 - What does Hibernate ORM 8 (and Jakarta Persistence 4.0) bring?
@@ -58,11 +58,12 @@ The example used in this presentation is just one query for films of a given act
 #### Introductory remarks
 
 - This presentation is full of code snippets
-- These code snippets concern a query for films and associated data
+- These code snippets concern a query for films of an actor and associated data
 - The examples use Hibernate ORM 8, through the Jakarta Persistence (4.0) API
 - The code uses programmatic (bootstrapping and) transaction demarcation, not annotations, and no dependency injection
 - In practice (e.g. Spring Boot, Quarkus) annotations and DI are used
 - The code does not deal with database updates
+- But see [Hibernate tutorials by Vlad Mihalcea](https://vladmihalcea.com/tutorials/hibernate/), section "Persistence Context", for a good explanation
 - Fortunately, Hibernate ORM can be used well even without persistence context, simplifying reasoning about code
 
 <!--
@@ -508,10 +509,11 @@ public record Language(long id, String name, Instant lastUpdate) {
 #### Querying for custom projections
 
 ```java
+// Assume org.jspecify.annotations.NullMarked annotation in package-info.java
 public record Film(
         long id,
         String title,
-        @Nullable String description,
+        @Nullable String description, // org.jspecify.annotations.Nullable
         @Nullable Year releaseYear,
         Language language,
         @Nullable Language originalLanguage,
@@ -527,19 +529,11 @@ public record Film(
         ImmutableList<Category> categories
 ) {
 
-    public Optional<String> descriptionOption() {
-        return Optional.ofNullable(description);
-    }
+    public Optional<String> descriptionOption() { return Optional.ofNullable(description); }
 
     // ...
 }
 ```
-
-<!--
-The Nullable annotations are assumed to be JSpecify annotations.
-
-Assume a NullMarked annotation at the package level, in package-info.java, so non-nullability is the default.
--->
 
 ---
 
@@ -717,7 +711,7 @@ Also note that "querying for custom projections" typically implies not retrievin
 
 We fix these problems (`LazyInitializationException` and N + 1 select issue) by specifying *what data to fetch at the query level*.
 
-See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype), [Use query-specific fetching](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--use-queryspecific-fetching) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/) (note: < Hibernate 6).
+See for example [Choose the right fetch type](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--choose-the-right-fetchtype), [Use query-specific fetching](https://thorben-janssen.com/hibernate-performance-tuning/#avoid-unnecessary-queries--use-queryspecific-fetching) and [LazyInitializationException](https://thorben-janssen.com/lazyinitializationexception/) (note: mostly < Hibernate 6).
 
 Again, at the *entity level*, all associations should use *lazy fetching*. Unfortunately, EAGER is the default for to-one associations (but mind Jakarta Persistence 4.0's fix for this).
 
@@ -823,7 +817,7 @@ Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-ma
 
 See [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/) (but mind [DISTINCT](https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#query-sqm-distinct)).
 
-Possibly the best way to fix this is splitting the JPQL query into 2 queries. See the code below (which leads to only 2 generated SQL queries).
+Possibly the best way to fix this is splitting the JPQL query into 2 queries, because that prevents the Cartesian product. See the code below (which leads to only 2 generated SQL queries).
 
 ---
 
@@ -916,7 +910,7 @@ There are several ways to prevent "dirty checking" overhead (while still retriev
 
 Question: is it possible to use Hibernate ORM without any Session?
 
-Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a long time, for direct explicit interaction with the database.
+Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a long time, for direct explicit interaction with the database. In a StatelessSession, there is no such notion as a "persistence context".
 
 ---
 
@@ -1023,9 +1017,7 @@ Thus, we can use more advanced HQL features, corresponding to SQL features such 
 
 Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now retrieve the films as JSON results, without needing to fetch any (intermediate) entities. (Only 1 SQL query is generated.)
 
-<!--
 If needed, we can always fall back to native SQL. Hibernate ORM 8 has excellent support for native SQL as well.
--->
 
 ---
 
