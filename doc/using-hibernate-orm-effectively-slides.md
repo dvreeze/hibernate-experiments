@@ -1188,12 +1188,13 @@ At the time of this writing, the Jakarta Data 1.1 standard is not yet final.
 #### Type-safe metamodel
 
 ```java
-@Repository
-public interface FilmRepository {
+import jakarta.data.repository.Query;
+import jakarta.data.repository.Repository;
 
-    // At the moment of this writing, a Hibernate-specific HQL annotation was still needed
-    // Again, only 1 SQL query is generated from this JPQL query
-    @HQL("""
+@Repository
+public interface FilmRepository { // Register as managed class (just like entities)!
+
+    @Query("""
             select f from Film f
               left join fetch f.filmActors fac
               left join fetch fac.actor

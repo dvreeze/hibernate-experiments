@@ -1,0 +1,28 @@
+/*
+ * Copyright 2026-2026 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Module descriptor of the immutable data model. This module enforces the property that the data model
+ * does not depend on any services and/or "infrastructure objects".
+ *
+ * @author Chris de Vreeze
+ */
+module eu.cdevreeze.hibernateexperiments.emrepository.model {
+    requires com.google.common;
+    requires org.jspecify;
+
+    exports eu.cdevreeze.hibernateexperiments.emrepository.model;
+}

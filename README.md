@@ -200,6 +200,7 @@ The subprojects in this project are:
 * entitymanager
 * em-criteria
 * repository
+* em-repository
 
 Subproject *plain-sql* explores the use of native SQL queries in JPA 4.0. Compared to previous
 versions of JPA, its support for type-safe native SQL querying has advanced quite a lot. Also,
@@ -224,6 +225,8 @@ string literal values of annotations that are parsed at compile-time by the Hibe
 processor. That is, JDQL parsing errors are found at compile-time! Repositories are Java interfaces with
 annotated abstract methods; implementations of those interfaces are compile-time generated readable
 classes that add the `EntityAgent`/`EntityManager` boilerplate that we used to write by hand.
+
+Subproject *em-repository* is like *repository*, but uses stateful repositories instead of stateless ones.
 
 It has become easier than ever to keep Java code using Hibernate/JPA up-to-date with a changing database
 schema. Most subprojects in this repository bootstrap Hibernate in such a way that the database schema

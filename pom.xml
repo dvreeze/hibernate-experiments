@@ -45,6 +45,7 @@
         <module>entitymanager</module>
         <module>em-criteria</module>
         <module>repository</module>
+        <module>em-repository</module>
     </modules>
 
     <dependencyManagement>
@@ -57,7 +58,12 @@
             <dependency>
                 <groupId>jakarta.data</groupId>
                 <artifactId>jakarta.data-api</artifactId>
-                <version>1.1.0-M3</version>
+                <version>1.1.0-M4</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.data</groupId>
+                <artifactId>jakarta.data.stateful-api</artifactId>
+                <version>1.1.0-M4</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
