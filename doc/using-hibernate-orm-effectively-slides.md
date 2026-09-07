@@ -1020,7 +1020,7 @@ Thus, we can use more advanced HQL features, corresponding to SQL features such 
 
 Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now retrieve the films as JSON results, without needing to fetch any (intermediate) entities. (Only 1 SQL query is generated.)
 
-If needed, we can always fall back to native SQL. Hibernate ORM 8 has excellent support for native SQL as well.
+Note: if needed, we can always fall back to native SQL. Hibernate ORM 8 has excellent support for native SQL as well.
 
 ---
 
