@@ -63,7 +63,7 @@ The example used in this presentation is just one query for films of a given act
 - The code uses programmatic (bootstrapping and) transaction demarcation, not annotations (other than on entities), and no dependency injection
 - In practice (e.g. Spring Boot, Quarkus) annotations and DI are used
 - The code does not deal with database updates
-- But see [Hibernate tutorials by Vlad Mihalcea](https://vladmihalcea.com/tutorials/hibernate/), section "Persistence Context", for a good explanation
+- But see [Hibernate tutorials by Vlad Mihalcea](https://vladmihalcea.com/tutorials/hibernate/), section "Persistence Context", for a good explanation; roughly, `Session` = `EntityManager` = "persistence context" = "1st level cache"
 - Fortunately, Hibernate ORM can be used well even without persistence context, simplifying reasoning about code
 
 <!--
@@ -86,7 +86,7 @@ To a large extent, this presentation is about a mind set, not about details (tha
 - Don't leak a Session *across threads or concurrent transactions*
 - Don't use "infrastructural" *state* (such as a Session) *in a JPA entity*
 - Etc. See for example [Hibernate ORM advice](https://docs.hibernate.org/orm/8.0/introduction/html_single/#advice)
-- For maintainability and performance, try not to keep a (possibly partly "hidden") transactional Session open across large (service/DAO) method call chains
+- For maintainability/performance, try not to keep a (possibly partly "hidden") transactional Session open across large (service/DAO) method call chains
 
 <!--
 Pretending to deal only with Java objects is naive when using Hibernate ORM, but it seems so easy and comfortable to start out that way in a new project. Quite soon, this will get quite painful.
@@ -921,7 +921,7 @@ Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a lo
 
 Starting with Jakarta Persistence 4.0 (and Hibernate ORM 8), the `StatelessSession` is standardized as interface `EntityAgent`.
 
-Both `EntityManager` and `EntityAgent` extend interface `EntityHandler`, offering the shared API.
+Both `EntityManager` and `EntityAgent` extend interface `EntityHandler`, offering the shared API. (Session extends EntityManager, StatelessSession extends EntityAgent.)
 
 In many projects, using EntityAgent would make more sense than using EntityManager, making reasoning about code much easier.
 
@@ -1243,7 +1243,7 @@ How can we best unit test code using Hibernate ORM?
 
 The latter option works well, to a large extent due to the fact that Hibernate ORM successfully abstracts away SQL dialect differences.
 
-We might need an `orm.xml` file to override some entity mappings (next slide):
+We might need an `META-INF/orm.xml` file to override some entity mappings (next slide):
 
 ---
 
@@ -1256,11 +1256,13 @@ We might need an `orm.xml` file to override some entity mappings (next slide):
           https://jakarta.ee/xml/ns/persistence/orm/orm_4_0.xsd" version="4.0">
     <entity class="com.example.hibernateexperiments.jpql.entity.LanguageEntity">
         <attribute-override name="name">
+            <!-- Recall the PostgreSQL-specific bpchar type -->
             <column column-definition="text"/>
         </attribute-override>
     </entity>
     <entity class="com.example.hibernateexperiments.jpql.entity.FilmEntity">
         <attribute-override name="releaseYear">
+            <!-- Overriding type year -->
             <column name="release_year" column-definition="integer"/>
         </attribute-override>
     </entity>
