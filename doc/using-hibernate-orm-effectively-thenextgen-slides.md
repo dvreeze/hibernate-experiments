@@ -185,6 +185,8 @@ public class ActorEntity { // Not serializable
 ```
 
 <!--
+Note: explain the entities in 3 steps: the Java without annotations, the logical mapping annotations, and then the physical mapping annotations!
+
 Mind the entity name which differs from the entity class name in this case.
 
 Note how this entity class definition to a large extent shows the structure of the Actor table.
@@ -1107,6 +1109,10 @@ Thus, we can use more advanced HQL features, corresponding to SQL features such 
 Indeed, the *HQL superset of JPQL is an extremely powerful OO SQL dialect*! Let's now retrieve the films as JSON results, without needing to fetch any (intermediate) entities. (Only 1 SQL query is generated.)
 
 Note: if needed, we can always fall back to native SQL. Hibernate ORM 8 has excellent support for native SQL as well.
+
+<!--
+Note: from this point on, go much quicker through the rest of the presentation, touching on the subjects, in order to finish the presentation in time!
+-->
 
 ---
 
