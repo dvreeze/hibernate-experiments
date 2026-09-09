@@ -24,10 +24,9 @@ import eu.cdevreeze.hibernateexperiments.emrepository.model.Country;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo.AddressRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.service.AddressService;
 import jakarta.persistence.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.sql.Connection;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -47,14 +46,14 @@ abstract class AbstractAddressServiceH2Test {
 
     protected abstract AddressService addressService(EntityManagerFactory emf);
 
-    @BeforeEach
-    void beforeEach() {
+    @BeforeAll
+    static void beforeAll() {
         emf = createEntityManagerFactory();
         fillInitialTestData(emf);
     }
 
-    @AfterEach
-    void afterEach() {
+    @AfterAll
+    static void afterAll() {
         emf.close();
     }
 
@@ -135,25 +134,29 @@ abstract class AbstractAddressServiceH2Test {
 
     @Test
     void testAddAddress() {
-        Address.NewAddress newAddress = new Address.NewAddress(
-                "250 Ulitsa Kirovo",
-                null,
-                "Yaroslavl",
-                235, // Yaroslavl
-                "41777",
-                "904253967172",
-                Instant.now()
-        );
+        try {
+            Address.NewAddress newAddress = new Address.NewAddress(
+                    "250 Ulitsa Kirovo",
+                    null,
+                    "Yaroslavl",
+                    235, // Yaroslavl
+                    "41777",
+                    "904253967172",
+                    Instant.now()
+            );
 
-        Address address = addressService(emf).add(newAddress);
+            Address address = addressService(emf).add(newAddress);
 
-        assertNotNull(address);
-        assertEquals("250 Ulitsa Kirovo", address.address1());
-        assertNull(address.address2());
-        assertEquals("Yaroslavl", address.district());
-        assertEquals(235L, address.city().id());
-        assertEquals("41777", address.postalCode());
-        assertEquals("904253967172", address.phone());
+            assertNotNull(address);
+            assertEquals("250 Ulitsa Kirovo", address.address1());
+            assertNull(address.address2());
+            assertEquals("Yaroslavl", address.district());
+            assertEquals(235L, address.city().id());
+            assertEquals("41777", address.postalCode());
+            assertEquals("904253967172", address.phone());
+        } finally {
+            fillInitialTestData(emf); // Reset to original data
+        }
     }
 
     private static EntityManagerFactory createEntityManagerFactory() {
@@ -179,6 +182,12 @@ abstract class AbstractAddressServiceH2Test {
 
     private static void fillInitialTestData(EntityManagerFactory emf) {
         emf.runInTransaction(EntityAgent.class, eh -> {
+            eh.runWithConnection((Connection connection) -> {
+                connection.prepareStatement("delete from Address").execute();
+                connection.prepareStatement("delete from City").execute();
+                connection.prepareStatement("delete from Country").execute();
+            });
+
             CountryEntity countryEntity = new CountryEntity();
             countryEntity.setId(80);
             countryEntity.setCountry("Russian Federation");

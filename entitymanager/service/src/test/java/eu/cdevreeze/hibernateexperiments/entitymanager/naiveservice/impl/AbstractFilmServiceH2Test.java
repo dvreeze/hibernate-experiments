@@ -21,11 +21,10 @@ import eu.cdevreeze.hibernateexperiments.entitymanager.entity.*;
 import eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice.FilmService;
 import jakarta.persistence.*;
 import org.hibernate.LazyInitializationException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.Instant;
 import java.time.Year;
 import java.util.List;
@@ -48,14 +47,14 @@ abstract class AbstractFilmServiceH2Test {
 
     protected abstract FilmService filmService(EntityManagerFactory emf);
 
-    @BeforeEach
-    void beforeEach() {
+    @BeforeAll
+    static void beforeAll() {
         emf = createEntityManagerFactory();
         fillInitialTestData(emf);
     }
 
-    @AfterEach
-    void afterEach() {
+    @AfterAll
+    static void afterAll() {
         emf.close();
     }
 
@@ -153,6 +152,15 @@ abstract class AbstractFilmServiceH2Test {
 
     private static void fillInitialTestData(EntityManagerFactory emf) {
         emf.runInTransaction(EntityAgent.class, eh -> {
+            eh.runWithConnection((Connection connection) -> {
+                connection.prepareStatement("delete from Film_Actor").execute();
+                connection.prepareStatement("delete from Film_Category").execute();
+                connection.prepareStatement("delete from Film").execute();
+                connection.prepareStatement("delete from Actor").execute();
+                connection.prepareStatement("delete from Category").execute();
+                connection.prepareStatement("delete from Language").execute();
+            });
+
             ActorEntity john = new ActorEntity();
             john.setId(1);
             john.setFirstName("John");

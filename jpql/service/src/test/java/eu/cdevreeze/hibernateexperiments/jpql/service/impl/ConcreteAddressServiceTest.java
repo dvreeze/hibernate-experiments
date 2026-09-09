@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.sql.Connection;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -129,6 +130,12 @@ class ConcreteAddressServiceTest {
 
     private static void fillInitialTestData(EntityManagerFactory emf) {
         emf.runInTransaction(EntityAgent.class, eh -> {
+            eh.runWithConnection((Connection connection) -> {
+                connection.prepareStatement("delete from Address").execute();
+                connection.prepareStatement("delete from City").execute();
+                connection.prepareStatement("delete from Country").execute();
+            });
+
             CountryEntity countryEntity = new CountryEntity();
             countryEntity.setId(80);
             countryEntity.setCountry("Russian Federation");
