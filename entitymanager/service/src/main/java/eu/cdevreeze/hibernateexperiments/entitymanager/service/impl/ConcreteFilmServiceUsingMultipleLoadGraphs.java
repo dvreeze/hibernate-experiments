@@ -1,0 +1,145 @@
+/*
+ * Copyright 2026-2026 Chris de Vreeze
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
+
+import module java.base;
+import com.google.common.collect.ImmutableList;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmActorEntity_;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmCategoryEntity_;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
+import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity_;
+import eu.cdevreeze.hibernateexperiments.entitymanager.model.Film;
+import eu.cdevreeze.hibernateexperiments.entitymanager.service.FilmService;
+import jakarta.persistence.EntityGraph;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+
+/**
+ * Concrete {@link FilmService} implementation that uses multiple load graphs in order to prevent
+ * a {@link org.hibernate.loader.MultipleBagFetchException} in an effective way.
+ *
+ * @author Chris de Vreeze
+ */
+public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmService {
+
+    private final EntityManagerFactory emf;
+
+    public ConcreteFilmServiceUsingMultipleLoadGraphs(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
+    @Override
+    public ImmutableList<Film> findAllFilms() {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            List<FilmEntity> filmEntities = findAllFilms(entityManager);
+
+            // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/ for the general idea
+            entityManager.getMultiple(getFilmCategoriesEntityGraph(), filmEntities.stream().map(FilmEntity::getId).toList());
+
+            return filmEntities
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    @Override
+    public Optional<Film> findFilm(long filmId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            List<FilmEntity> filmEntities = findFilm(filmId, entityManager)
+                    .stream()
+                    .toList();
+
+            // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/ for the general idea
+            entityManager.getMultiple(getFilmCategoriesEntityGraph(), filmEntities.stream().map(FilmEntity::getId).toList());
+
+            return filmEntities
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .min(Comparator.comparingLong(Film::id));
+        });
+    }
+
+    @Override
+    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+        // This starts a new transaction in our case of resource-local transactions
+        return emf.callInTransaction(entityManager -> {
+            List<FilmEntity> filmEntities = findFilmsByActorId(actorId, entityManager);
+
+            // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/ for the general idea
+            entityManager.getMultiple(getFilmCategoriesEntityGraph(), filmEntities.stream().map(FilmEntity::getId).toList());
+
+            return filmEntities
+                    .stream()
+                    .map(FilmEntity::toModelObject)
+                    .sorted(Comparator.comparingLong(Film::id))
+                    .collect(ImmutableList.toImmutableList());
+        });
+    }
+
+    private ImmutableList<FilmEntity> findAllFilms(EntityManager entityManager) {
+        String qlString = "select f from Film f";
+
+        // This sets the load graph, not the fetch graph
+        // Yet that makes no difference here since we configured lazy fetching for all entity associations
+        return entityManager.createQuery(qlString, getFilmActorsEntityGraph())
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    private Optional<FilmEntity> findFilm(long filmId, EntityManager entityManager) {
+        String qlString = "select f from Film f where f.id = ?1";
+
+        // This sets the load graph, not the fetch graph
+        // Yet that makes no difference here since we configured lazy fetching for all entity associations
+        return entityManager.createQuery(qlString, getFilmActorsEntityGraph())
+                .setParameter(1, filmId)
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
+                .min(Comparator.comparingLong(FilmEntity::getId));
+    }
+
+    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityManager entityManager) {
+        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+
+        // This sets the load graph, not the fetch graph
+        // Yet that makes no difference here since we configured lazy fetching for all entity associations
+        return entityManager.createQuery(qlString, getFilmActorsEntityGraph())
+                .setParameter(1, actorId)
+                .getResultList() // works better than getResultStream (no duplicates)
+                .stream()
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
+        EntityGraph<FilmEntity> eg = FilmEntity_.class_.createEntityGraph();
+        eg.addElementSubgraph(FilmEntity_.filmActors).addAttributeNode(FilmActorEntity_.actor);
+        eg.addAttributeNode(FilmEntity_.language);
+        eg.addAttributeNode(FilmEntity_.originalLanguage);
+        return eg;
+    }
+
+    private EntityGraph<FilmEntity> getFilmCategoriesEntityGraph() {
+        EntityGraph<FilmEntity> eg = FilmEntity_.class_.createEntityGraph();
+        eg.addElementSubgraph(FilmEntity_.filmCategories).addAttributeNode(FilmCategoryEntity_.category);
+        return eg;
+    }
+}
