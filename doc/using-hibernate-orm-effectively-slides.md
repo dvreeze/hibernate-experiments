@@ -915,7 +915,7 @@ There are several ways to prevent "dirty checking" overhead (while still retriev
 
 Question: is it possible to use Hibernate ORM without any Session?
 
-Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a long time, for direct explicit interaction with the database. In a StatelessSession, there is no such notion as a "persistence context".
+Certainly, Hibernate ORM has offered the notion of a `StatelessSession` for a long time, for direct explicit interaction with the database. In a StatelessSession, there is no such notion as a "persistence context". A StatelessSession works with *detached entities*.
 
 ---
 
