@@ -479,7 +479,7 @@ Yet they are great in JPQL queries, and for synchronizing Java object state with
 
 But they make very poor DTOs to pass across application layers, due to their hidden state. (The Hibernate team will not emphasize this.)
 
-*Immutable Java records* make far better DTOs.
+*Immutable Java records* make far better DTOs. (No hidden state. Only 1 state, established by the constructor. No proxying.)
 
 Let's explore *combining the strengths of both* (and some pitfalls).
 
