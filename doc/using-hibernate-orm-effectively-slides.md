@@ -59,7 +59,7 @@ The example used in this presentation is just one query for films of a given act
 
 - This presentation is full of code snippets
 - These code snippets concern a query for films of an actor and associated data
-- The examples use Hibernate ORM 8, through the Jakarta Persistence (4.0) API
+- Hibernate ORM 8 is used, through the Jakarta Persistence (4.0) API ("JPA 4.0")
 - The code uses programmatic (bootstrapping and) transaction demarcation, not annotations (other than on entities), and no dependency injection
 - In practice (e.g. Spring Boot, Quarkus) annotations and DI are used
 - The code does not deal with database updates
@@ -125,10 +125,12 @@ The Film_Actor and Film_Category tables have compound primary keys, each consist
 #### Example used in this presentation
 
 Before showing the entity classes, note that there are 2 categories of *JPA annotations* on entities:
-- *logical mapping annotations*, concerning the Java object model
+- *logical mapping annotations*, concerning the Java object model (and Java class/object relationships)
   - e.g. `Entity`, `Id`, `ManyToOne`, `Basic`, `EmbeddedId`, `MapsId` etc.
 - *physical mapping annotations*, concerning the underlying relational database schema
   - e.g. `Table`, `Column`, `JoinTable`, `GeneratedValue` etc.
+
+Logical mapping annotations influence physical mapping annotations, but not the other way around.
 
 ---
 
