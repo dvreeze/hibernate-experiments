@@ -450,7 +450,7 @@ we no longer have a persistence context when it is tried to lazily load the asso
 Side step: compare "old school" Java with modern Java:
 - imperative ("how") versus more functional ("what")
 - *statement-oriented* versus *expression-oriented*
-- *mutability* versus more *immutability*
+- *mutability* versus more *immutability* (and *thread-safety*)
 - *in-place updates* versus *functional updates*
 - (mutable) *JavaBeans* versus (immutable) *Java records*
 - side effects versus data transformations and `Stream` pipelines
