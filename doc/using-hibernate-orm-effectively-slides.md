@@ -383,7 +383,7 @@ public interface FilmService {
 
 public final class NaiveFilmService implements FilmService {
 
-    private final EntityManagerFactory emf;
+    private final EntityManagerFactory emf; // Thread-safe Hibernate SessionFactory
 
     public NaiveFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
@@ -665,7 +665,7 @@ Such a Java-interface-based "service API" is very easy to mock in unit tests of 
 ```java
 public final class InefficientFilmService implements FilmService {
 
-    private final EntityManagerFactory emf;
+    private final EntityManagerFactory emf; // Thread-safe Hibernate SessionFactory
 
     public InefficientFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
