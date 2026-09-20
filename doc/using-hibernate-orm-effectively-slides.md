@@ -361,7 +361,7 @@ public class FilmEntity { // Not serializable
 <!--
 Again, the ManyToOne associations are set to FetchType.LAZY.
 
-The 2 OneToMany associations are the "other" side of bidirectional assocations between films and actors, and between films and categories, respectively. They are the non-owning side.
+The 2 OneToMany associations are the "other" (inverse) side of bidirectional assocations between films and actors, and between films and categories, respectively. They are the non-owning side. They are ignored by Hibernate when flushing to the database.
 
 The OneToMany associations use FetchType.LAZY, which is the default for to-many associations. Note that so far all associations have been chosen to use FetchType.LAZY, which is intentional.
 
@@ -612,7 +612,7 @@ public class FilmEntity {
 
     // ...
 
-    // May cause LazyInitializationException (or N + 1 select issue)
+    // May cause LazyInitializationException (or "N + 1 select issue" if called N times)
     public Film toModelObject() {
         return new Film(
                 requireNonNull(id),
@@ -823,7 +823,7 @@ Using per-query fetching through "fetch joins".
 
 #### Per-query fetching
 
-Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-many associations to film actors and film categories had been Lists instead of Sets, we would have gotten this exception.
+Above, we "narrowly escaped" getting a `MultipleBagFetchException`. If our to-many associations to film actors and film categories had been Lists instead of Sets, we would have gotten this exception, but with Sets we don't. After all, Sets have unique elements, thus not breaking Hibernate's deduplication.
 
 See [MultipleBagFetchException](https://thorben-janssen.com/hibernate-tips-how-to-avoid-hibernates-multiplebagfetchexception/) and [fix MultipleBagFetchException](https://thorben-janssen.com/fix-multiplebagfetchexception-hibernate/) (but mind [DISTINCT](https://github.com/hibernate/hibernate-orm/blob/6.0/migration-guide.adoc#query-sqm-distinct)).
 
