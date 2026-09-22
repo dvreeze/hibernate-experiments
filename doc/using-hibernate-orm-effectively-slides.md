@@ -6,6 +6,10 @@ paginate: true
 
 # **Using Hibernate ORM effectively**
 
+### **Hibernate practices I wish I knew much earlier**
+
+<br>
+
 **Chris de Vreeze**
 
 **Java Developer**
@@ -16,8 +20,8 @@ paginate: true
 
 - Most Java projects use Hibernate ORM to access the database
 - Still, Hibernate ORM often may feel like "magic" (in terms of generated SQL)
-- Where can we find help to use this powerful library effectively, reducing the amount of "magic"?
-    - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/)
+- Where can we find ("big picture") help to use this powerful library effectively, reducing the amount of "magic"?
+    - E.g. [No-nonsense guide to Hibern8](https://docs.hibernate.org/orm/8.0/introduction/html_single/) (from the Hibernate team)
     - Or [Hibernate tutorials by Thorben Janssen](https://thorben-janssen.com/tutorials/) (mostly < Hibernate 6.0)
     - Or [Hibernate tutorials by Vlad Mihalcea](https://vladmihalcea.com/tutorials/hibernate/)
 - How to combine Hibernate ORM with modern Java FP practices?
@@ -44,9 +48,9 @@ By the way, much of what Thorben Janssen writes about Hibernate ORM predates Hib
 - Querying for custom projections
 - Per-query fetching
 - Using Hibernate ORM without persistence context
-- Exploiting richness of HQL
-- Type-safe metamodel
-- Unit testing
+- Exploiting richness of HQL (briefly)
+- Type-safe metamodel (briefly)
+- Unit testing (briefly)
 - Conclusion
 
 <!--
