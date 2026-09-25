@@ -184,5 +184,6 @@ public final class AlternativeFilmService implements FilmService {
                       from Film f
                       left join f.language l1
                       left join f.originalLanguage l2
+                     order by f.id
             """;
 }

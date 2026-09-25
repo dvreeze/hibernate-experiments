@@ -127,6 +127,7 @@ public final class AlternativeFilmService implements FilmService {
         JpaRoot<FilmEntity> filmRoot = cq.from(FilmEntity.class);
         JpaJoin<FilmEntity, LanguageEntity> filmLanguage = filmRoot.join(FilmEntity_.language, JoinType.LEFT);
         JpaJoin<FilmEntity, LanguageEntity> filmOriginalLanguage = filmRoot.join(FilmEntity_.originalLanguage, JoinType.LEFT);
+        cq.orderBy(cb.asc(filmRoot.get(FilmEntity_.id)));
 
         // See https://thorben-janssen.com/hibernate-tip-subquery-criteriaquery/
         JpaSubQuery<String> actorsSubquery = cq.subquery(String.class);
