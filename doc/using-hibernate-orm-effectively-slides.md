@@ -394,12 +394,12 @@ public final class NaiveFilmService implements FilmService {
     @Override
     public ImmutableList<FilmEntity> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+            String qlString =
+                    "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
-                    .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -513,6 +513,8 @@ public record Category(long id, String name, Instant lastUpdate) {
 public record Language(long id, String name, Instant lastUpdate) {
 }
 ```
+
+Next slide: the `Film` DTO, with all associated data. Of course, we could have multiple "projections" on that DTO, as separate (smaller) DTOs.
 
 ---
 
@@ -676,13 +678,13 @@ public final class InefficientFilmService implements FilmService {
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+            String qlString =
+                    "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -753,13 +755,13 @@ public final class ConcreteFilmService implements FilmService {
     @Override
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+            String qlString =
+                    "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
             return entityManager.createQuery(qlString, getEntityGraph()) // load graph
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -806,13 +808,13 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.language
                       left join fetch f.originalLanguage
                       left join f.filmActors fa
-                     where fa.actor.id = ?1""";
+                     where fa.actor.id = ?1
+                     order by f.id""";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -854,7 +856,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager);
 
             return filmEntities.stream().map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -874,7 +875,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     private ImmutableList<FilmEntity> findFilmsByActorId(
             long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
-        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+        String qlString =
+                "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
         return entityManager.createQuery(qlString, eg)
                 .setParameter(1, actorId)
@@ -975,7 +977,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             ));
 
             return filmEntities.stream().map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -995,7 +996,8 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     private ImmutableList<FilmEntity> findFilmsByActorId(
             long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
-        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+        String qlString =
+                "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
         return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, actorId)
@@ -1161,12 +1163,12 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             film.fetch(FilmEntity_.filmCategories, JoinType.LEFT).fetch(FilmCategoryEntity_.category);
             film.fetch(FilmEntity_.language, JoinType.LEFT);
             film.fetch(FilmEntity_.originalLanguage, JoinType.LEFT);
+            cq.orderBy(cb.asc(film.get(FilmEntity_.id)));
             cq.select(film);
 
             return entityAgent.createQuery(cq)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -1213,7 +1215,8 @@ public interface FilmRepository { // Register as managed class (just like entiti
               left join fetch f.language
               left join fetch f.originalLanguage
               left join f.filmActors fa
-             where fa.actor.id = :actorId""")
+             where fa.actor.id = :actorId
+             order by f.id""")
     List<FilmEntity> findFilmsByActorId(int actorId);
 }
 ```
@@ -1236,7 +1239,6 @@ public final class ConcreteFilmService implements FilmService {
             return filmRepository.findFilmsByActorId((int) actorId)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
