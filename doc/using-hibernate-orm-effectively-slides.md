@@ -1117,7 +1117,7 @@ public final class AlternativeFilmService implements FilmService {
                              from FilmCategory fc inner join fc.category as c where fc.film.id = f.id
                        )
                    )
-              from Film f left join f.language l1 left join f.originalLanguage l2
+              from Film f left join f.language l1 left join f.originalLanguage l2 order by f.id
             """;
 }
 ```
