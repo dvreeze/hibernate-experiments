@@ -21,7 +21,6 @@ import module jakarta.persistence;
 import module java.base;
 import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.FilmEntity;
-import eu.cdevreeze.hibernateexperiments.emrepository.model.Film;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo.FilmRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo._FilmRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.service.FilmService;
@@ -47,7 +46,6 @@ public final class ConcreteFilmService implements FilmService {
             return filmRepository.findAllFilms()
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -69,7 +67,6 @@ public final class ConcreteFilmService implements FilmService {
             return filmRepository.findFilmsByActorId((int) actorId)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }

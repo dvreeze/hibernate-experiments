@@ -62,7 +62,6 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -113,13 +112,12 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
 
     private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
-        String qlString = "select f from Film f";
+        String qlString = "select f from Film f order by f.id";
 
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations
@@ -142,7 +140,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     }
 
     private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
-        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+        String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
         // This sets the load graph, not the fetch graph
         // Yet that makes no difference here since we configured lazy fetching for all entity associations

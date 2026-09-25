@@ -49,13 +49,13 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             film.fetch(FilmEntity_.filmCategories, JoinType.LEFT).fetch(FilmCategoryEntity_.category);
             film.fetch(FilmEntity_.language, JoinType.LEFT);
             film.fetch(FilmEntity_.originalLanguage, JoinType.LEFT);
+            cq.orderBy(cb.asc(film.get(FilmEntity_.id)));
             cq.select(film);
 
             return entityAgent.createQuery(cq)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -99,13 +99,13 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             film.fetch(FilmEntity_.filmCategories, JoinType.LEFT).fetch(FilmCategoryEntity_.category);
             film.fetch(FilmEntity_.language, JoinType.LEFT);
             film.fetch(FilmEntity_.originalLanguage, JoinType.LEFT);
+            cq.orderBy(cb.asc(film.get(FilmEntity_.id)));
             cq.select(film);
 
             return entityAgent.createQuery(cq)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }

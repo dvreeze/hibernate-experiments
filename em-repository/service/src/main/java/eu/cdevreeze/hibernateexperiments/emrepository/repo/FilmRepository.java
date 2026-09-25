@@ -43,7 +43,8 @@ public interface FilmRepository {
               left join fetch f.filmCategories fca
               left join fetch fca.category
               left join fetch f.language
-              left join fetch f.originalLanguage""")
+              left join fetch f.originalLanguage
+             order by f.id""")
     List<FilmEntity> findAllFilms();
 
     @Query("""
@@ -66,6 +67,7 @@ public interface FilmRepository {
               left join fetch f.language
               left join fetch f.originalLanguage
               left join f.filmActors fa
-             where fa.actor.id = :actorId""")
+             where fa.actor.id = :actorId
+             order by f.id""")
     List<FilmEntity> findFilmsByActorId(int actorId);
 }

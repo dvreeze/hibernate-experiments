@@ -44,7 +44,7 @@ public final class ConcreteFilmService implements FilmService {
     public ImmutableList<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f";
+            String qlString = "select f from Film f order by f.id";
 
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
@@ -54,7 +54,6 @@ public final class ConcreteFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -82,7 +81,7 @@ public final class ConcreteFilmService implements FilmService {
     public ImmutableList<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
 
@@ -93,7 +92,6 @@ public final class ConcreteFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }

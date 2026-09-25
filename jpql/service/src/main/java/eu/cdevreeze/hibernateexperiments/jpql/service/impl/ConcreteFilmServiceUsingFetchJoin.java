@@ -48,13 +48,13 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.filmCategories fca
                       left join fetch fca.category
                       left join fetch f.language
-                      left join fetch f.originalLanguage""";
+                      left join fetch f.originalLanguage
+                     order by f.id""";
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -95,14 +95,14 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                       left join fetch f.language
                       left join fetch f.originalLanguage
                       left join f.filmActors fa
-                     where fa.actor.id = ?1""";
+                     where fa.actor.id = ?1
+                     order by f.id""";
 
             return entityAgent.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }

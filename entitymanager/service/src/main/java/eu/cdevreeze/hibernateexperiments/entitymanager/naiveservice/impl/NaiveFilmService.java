@@ -39,12 +39,11 @@ public final class NaiveFilmService implements FilmService {
     public ImmutableList<FilmEntity> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f";
+            String qlString = "select f from Film f order by f.id";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -67,13 +66,12 @@ public final class NaiveFilmService implements FilmService {
     public ImmutableList<FilmEntity> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
-            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1";
+            String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .sorted(Comparator.comparingLong(FilmEntity::getId))
                     .collect(ImmutableList.toImmutableList());
         });
     }

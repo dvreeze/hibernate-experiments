@@ -45,6 +45,7 @@ public final class InefficientFilmService implements FilmService {
             CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
 
             Root<FilmEntity> film = cq.from(FilmEntity.class);
+            cq.orderBy(cb.asc(film.get(FilmEntity_.id)));
             cq.select(film);
 
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
@@ -53,7 +54,6 @@ public final class InefficientFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
@@ -89,6 +89,7 @@ public final class InefficientFilmService implements FilmService {
             Root<FilmEntity> film = cq.from(FilmEntity.class);
             SetJoin<FilmEntity, FilmActorEntity> filmActor = film.join(FilmEntity_.filmActors, JoinType.LEFT);
             cq.where(cb.equal(filmActor.get(FilmActorEntity_.actor).get(ActorEntity_.id), actorId));
+            cq.orderBy(cb.asc(film.get(FilmEntity_.id)));
             cq.select(film);
 
             // Note that the retrieval of managed JPA entities below causes "flushing" overhead, although there is no dirty state to flush
@@ -97,7 +98,6 @@ public final class InefficientFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .sorted(Comparator.comparingLong(Film::id))
                     .collect(ImmutableList.toImmutableList());
         });
     }
