@@ -18,6 +18,8 @@ package eu.cdevreeze.hibernateexperiments.emrepository.repo;
 
 import module java.base;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.ActorEntity;
+import eu.cdevreeze.hibernateexperiments.emrepository.entity._ActorEntity;
+import jakarta.data.repository.By;
 import jakarta.data.repository.Find;
 import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
@@ -36,7 +38,7 @@ public interface ActorRepository {
     void refresh(ActorEntity actor);
 
     @Find
-    Optional<ActorEntity> findById(Integer id);
+    Optional<ActorEntity> findById(@By(_ActorEntity.ID) Integer id);
 
     @Query("select a from Actor a join FilmActor fa on (fa.actor.id = a.id) where fa.film.id = :filmId")
     List<ActorEntity> findByFilmId(Integer filmId);

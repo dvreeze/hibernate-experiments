@@ -30,39 +30,22 @@ import jakarta.data.repository.Repository;
 @Repository
 public interface FilmRepository {
 
-    // In reality this would return too many results
-    @Query("""
+    String BASE_QUERY = """
             select f from Film f
               left join fetch f.filmActors fac
               left join fetch fac.actor
               left join fetch f.filmCategories fca
               left join fetch fca.category
               left join fetch f.language
-              left join fetch f.originalLanguage
-             order by f.id""")
+              left join fetch f.originalLanguage""";
+
+    // In reality this would return too many results
+    @Query(BASE_QUERY + " order by f.id")
     List<FilmEntity> findAllFilms();
 
-    @Query("""
-            select f from Film f
-              left join fetch f.filmActors fac
-              left join fetch fac.actor
-              left join fetch f.filmCategories fca
-              left join fetch fca.category
-              left join fetch f.language
-              left join fetch f.originalLanguage
-             where f.id = :filmId""")
+    @Query(BASE_QUERY + " where f.id = :filmId")
     Optional<FilmEntity> findFilm(int filmId);
 
-    @Query("""
-            select f from Film f
-              left join fetch f.filmActors fac
-              left join fetch fac.actor
-              left join fetch f.filmCategories fca
-              left join fetch fca.category
-              left join fetch f.language
-              left join fetch f.originalLanguage
-              left join f.filmActors fa
-             where fa.actor.id = :actorId
-             order by f.id""")
+    @Query(BASE_QUERY + " left join f.filmActors fa where fa.actor.id = :actorId order by f.id")
     List<FilmEntity> findFilmsByActorId(int actorId);
 }

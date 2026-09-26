@@ -34,33 +34,30 @@ import jakarta.data.repository.stateful.Refresh;
 @Repository
 public interface AddressRepository {
 
+    String BASE_QUERY = "select ad from Address ad join fetch ad.city ct join fetch ct.country co";
+    String BASE_CITY_QUERY = "select ci from City ci join fetch ci.country co";
+
     // This makes the repository a stateful one
     @Refresh
     void refresh(AddressEntity address);
 
-    // Query annotation not yet working as advertised?
-    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ad.id = :id")
+    @Query(BASE_QUERY + " where ad.id = :id")
     Optional<AddressEntity> findById(Integer id);
 
-    // Query annotation not yet working as advertised?
-    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co where ct.id = :cityId")
+    @Query(BASE_QUERY + " where ct.id = :cityId")
     List<AddressEntity> findByCityId(Integer cityId);
 
-    // Query annotation not yet working as advertised?
-    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co where co.id = :countryId")
+    @Query(BASE_QUERY + " where co.id = :countryId")
     List<AddressEntity> findByCountryId(Integer countryId);
 
-    // Query annotation not yet working as advertised?
     // In reality this would return too many results
-    @Query("select ad from Address ad join fetch ad.city ct join fetch ct.country co")
+    @Query(BASE_QUERY)
     List<AddressEntity> findAllAddresses();
 
-    // Query annotation not yet working as advertised?
-    @Query("select ci from City ci join fetch ci.country co where co.id = :countryId")
+    @Query(BASE_CITY_QUERY + " where co.id = :countryId")
     List<CityEntity> findCitiesByCountryId(Integer countryId);
 
-    // Query annotation not yet working as advertised?
-    @Query("select ci from City ci join fetch ci.country co where ci.id = :id")
+    @Query(BASE_CITY_QUERY + " where ci.id = :id")
     Optional<CityEntity> findCityById(Integer id);
 
     @Find
