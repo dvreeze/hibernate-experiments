@@ -31,8 +31,6 @@ public class FindAddressesByCityIdUsingCtes {
         Objects.checkIndex(0, args.length);
         long cityId = Long.parseLong(args[0]);
 
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             AddressService addressService = AlternativeAddressServiceFactory.create(emf);
 

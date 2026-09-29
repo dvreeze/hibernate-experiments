@@ -39,10 +39,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 abstract class AbstractFilmServiceH2Test {
 
-    static {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-    }
-
     private static EntityManagerFactory emf;
 
     protected abstract FilmService filmService(EntityManagerFactory emf);

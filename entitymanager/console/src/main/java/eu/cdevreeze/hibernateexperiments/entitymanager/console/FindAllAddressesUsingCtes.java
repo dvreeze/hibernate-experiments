@@ -28,8 +28,6 @@ import jakarta.persistence.EntityManagerFactory;
 public class FindAllAddressesUsingCtes {
 
     static void main(String... args) {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             AddressService addressService = AlternativeAddressServiceFactory.create(emf);
 

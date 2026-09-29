@@ -42,10 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 abstract class AbstractActorServiceH2Test {
 
-    static {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-    }
-
     private static EntityManagerFactory emf;
 
     protected abstract ActorService actorService(EntityManagerFactory emf);

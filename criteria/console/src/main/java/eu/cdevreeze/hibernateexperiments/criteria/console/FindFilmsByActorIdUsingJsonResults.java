@@ -31,8 +31,6 @@ import tools.jackson.datatype.guava.GuavaModule;
 public class FindFilmsByActorIdUsingJsonResults {
 
     static void main(String... args) {
-        System.setProperty("hibernate.query.hql.json_functions_enabled", "true");
-
         JsonMapper jsonMapper = JsonMapper.builder()
                 .addModule(new GuavaModule())
                 .build();
