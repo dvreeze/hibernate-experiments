@@ -50,7 +50,8 @@ public class EntityManagerFactories {
                 .managedClass(FilmEntity.class)
                 .managedClass(FilmActorEntity.class)
                 .managedClass(FilmCategoryEntity.class)
-                .managedClass(LanguageEntity.class);
+                .managedClass(LanguageEntity.class)
+                .managedClass(MyEntityListener.class); // Needed
         Preconditions.checkState(
                 persistenceConfig.defaultToOneFetchType() == FetchType.LAZY,
                 "By all means, the default to-one fetch type must be set to LAZY"

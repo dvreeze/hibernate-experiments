@@ -34,6 +34,8 @@ module eu.cdevreeze.hibernateexperiments.emrepository.service {
     requires org.hibernate.orm.core;
     requires tools.jackson.databind;
     requires tools.jackson.datatype.guava;
+    requires org.slf4j;
+    requires ch.qos.logback.classic;
 
     exports eu.cdevreeze.hibernateexperiments.emrepository.bootstrap;
     exports eu.cdevreeze.hibernateexperiments.emrepository.service;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.hibernateexperiments.entitymanager.entity;
+package eu.cdevreeze.hibernateexperiments.emrepository.entity;
 
 import jakarta.persistence.*;
 import org.slf4j.Logger;
