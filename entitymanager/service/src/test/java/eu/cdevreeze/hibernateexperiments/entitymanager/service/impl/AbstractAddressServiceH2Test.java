@@ -177,6 +177,7 @@ abstract class AbstractAddressServiceH2Test {
                 .managedClass(ActorEntity.class)
                 .managedClass(FilmCategoryEntity.class)
                 .managedClass(CategoryEntity.class)
+                .managedClass(MyEntityListener.class) // Needed
                 .createEntityManagerFactory();
     }
 

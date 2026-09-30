@@ -126,6 +126,7 @@ abstract class AbstractFilmServiceH2Test {
                 .managedClass(FilmCategoryEntity.class)
                 .managedClass(LanguageEntity.class)
                 .managedClass(FilmEntity.class)
+                .managedClass(MyEntityListener.class) // Needed
                 .createEntityManagerFactory();
     }
 
