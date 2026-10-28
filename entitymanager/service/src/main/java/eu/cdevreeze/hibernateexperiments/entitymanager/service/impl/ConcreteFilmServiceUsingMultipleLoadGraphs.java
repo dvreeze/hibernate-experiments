@@ -27,6 +27,7 @@ import eu.cdevreeze.hibernateexperiments.entitymanager.service.FilmService;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.FindMultipleOption;
 
 /**
  * Concrete {@link FilmService} implementation that uses multiple load graphs in order to prevent
@@ -49,7 +50,12 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
             List<FilmEntity> filmEntities = findAllFilms(entityManager);
 
             // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/ for the general idea
-            entityManager.getMultiple(getFilmCategoriesEntityGraph(), filmEntities.stream().map(FilmEntity::getId).toList());
+            // Also see https://docs.hibernate.org/orm/8.0/migration-guide/#multiid-session-check-default
+            entityManager.getMultiple(
+                    getFilmCategoriesEntityGraph(),
+                    filmEntities.stream().map(FilmEntity::getId).toList(),
+                    FindMultipleOption.SessionCheckMode.DISABLED
+            );
 
             return filmEntities
                     .stream()
@@ -67,7 +73,12 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
                     .toList();
 
             // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/ for the general idea
-            entityManager.getMultiple(getFilmCategoriesEntityGraph(), filmEntities.stream().map(FilmEntity::getId).toList());
+            // Also see https://docs.hibernate.org/orm/8.0/migration-guide/#multiid-session-check-default
+            entityManager.getMultiple(
+                    getFilmCategoriesEntityGraph(),
+                    filmEntities.stream().map(FilmEntity::getId).toList(),
+                    FindMultipleOption.SessionCheckMode.DISABLED
+            );
 
             return filmEntities
                     .stream()
@@ -83,7 +94,12 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
             List<FilmEntity> filmEntities = findFilmsByActorId(actorId, entityManager);
 
             // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/ for the general idea
-            entityManager.getMultiple(getFilmCategoriesEntityGraph(), filmEntities.stream().map(FilmEntity::getId).toList());
+            // Also see https://docs.hibernate.org/orm/8.0/migration-guide/#multiid-session-check-default
+            entityManager.getMultiple(
+                    getFilmCategoriesEntityGraph(),
+                    filmEntities.stream().map(FilmEntity::getId).toList(),
+                    FindMultipleOption.SessionCheckMode.DISABLED
+            );
 
             return filmEntities
                     .stream()
