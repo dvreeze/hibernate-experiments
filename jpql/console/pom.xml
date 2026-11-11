@@ -38,6 +38,20 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <!-- See https://ik.am/entries/900/en -->
+            <plugin>
+                <groupId>am.ik.maven</groupId>
+                <artifactId>nullability-maven-plugin</artifactId>
+                <version>0.4.0</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>configure</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
