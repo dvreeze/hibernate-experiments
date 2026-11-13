@@ -96,7 +96,7 @@
                         <path>
                             <groupId>org.hibernate.orm</groupId>
                             <artifactId>hibernate-processor</artifactId>
-                            <version>8.0.0.Beta4</version>
+                            <version>8.0.0.CR1</version>
                         </path>
                     </annotationProcessorPaths>
                     <!-- This setting is required for the hibernate-processor dependencies to
