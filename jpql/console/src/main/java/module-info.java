@@ -24,8 +24,6 @@ module eu.cdevreeze.hibernateexperiments.jpql.console {
     requires jakarta.persistence;
     requires org.jspecify;
     requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
-    requires com.google.common;
 
     exports eu.cdevreeze.hibernateexperiments.jpql.console;
 }

@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmActorEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmCategoryEntity_;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
@@ -43,7 +42,7 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             List<FilmEntity> filmEntities = findAllFilms(entityAgent);
@@ -62,7 +61,7 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -93,7 +92,7 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             List<FilmEntity> filmEntities = findFilmsByActorId(actorId, entityAgent);
@@ -112,11 +111,11 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
-    private ImmutableList<FilmEntity> findAllFilms(EntityAgent entityAgent) {
+    private List<FilmEntity> findAllFilms(EntityAgent entityAgent) {
         String qlString = "select f from Film f order by f.id";
 
         // This sets the load graph, not the fetch graph
@@ -124,7 +123,7 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
         return entityAgent.createQuery(qlString, getFilmActorsEntityGraph())
                 .getResultList() // works better than getResultStream (no duplicates)
                 .stream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private Optional<FilmEntity> findFilm(long filmId, EntityAgent entityAgent) {
@@ -139,7 +138,7 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityAgent entityAgent) {
+    private List<FilmEntity> findFilmsByActorId(long actorId, EntityAgent entityAgent) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
         // This sets the load graph, not the fetch graph
@@ -148,7 +147,7 @@ public final class ConcreteFilmServiceUsingMultipleLoadGraphs implements FilmSer
                 .setParameter(1, actorId)
                 .getResultList() // works better than getResultStream (no duplicates)
                 .stream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {

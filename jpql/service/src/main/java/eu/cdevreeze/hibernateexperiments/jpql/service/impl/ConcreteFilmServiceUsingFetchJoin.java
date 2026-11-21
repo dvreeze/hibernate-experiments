@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.jpql.model.Film;
 import eu.cdevreeze.hibernateexperiments.jpql.service.FilmService;
@@ -38,7 +37,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = """
@@ -55,7 +54,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -83,7 +82,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String qlString = """
@@ -103,7 +102,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }

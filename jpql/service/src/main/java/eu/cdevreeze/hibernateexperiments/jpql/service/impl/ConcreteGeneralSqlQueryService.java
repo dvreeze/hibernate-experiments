@@ -16,12 +16,13 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.service.impl;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.service.GeneralSqlQueryService;
 import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.TypedQuery;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -38,7 +39,7 @@ public final class ConcreteGeneralSqlQueryService implements GeneralSqlQueryServ
     }
 
     @Override
-    public <T> ImmutableList<T> executeSqlQuery(String qlString, Class<T> resultClass, ImmutableList<Object> args) {
+    public <T> List<T> executeSqlQuery(String qlString, Class<T> resultClass, List<Object> args) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             TypedQuery<T> query = entityAgent.createNativeQuery(qlString, resultClass);
@@ -46,7 +47,8 @@ public final class ConcreteGeneralSqlQueryService implements GeneralSqlQueryServ
             IntStream.range(0, args.size()).forEach(idx -> query.setParameter(1 + idx, args.get(idx)));
 
             return query.getResultList() // works better than getResultStream (no duplicates)
-                    .stream().collect(ImmutableList.toImmutableList());
+                    .stream()
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }

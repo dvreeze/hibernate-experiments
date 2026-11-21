@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.console;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.jpql.bootstrap.EntityManagerFactories;
 import eu.cdevreeze.hibernateexperiments.jpql.service.GeneralQueryService;
 import eu.cdevreeze.hibernateexperiments.jpql.service.factory.GeneralQueryServiceFactory;
@@ -45,7 +44,7 @@ public class ExecuteJpqlQuery {
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             GeneralQueryService queryService = GeneralQueryServiceFactory.create(emf);
 
-            List<?> results = queryService.executeQuery(jpqlQuery, clazz, ImmutableList.of());
+            List<?> results = queryService.executeQuery(jpqlQuery, clazz, List.of());
 
             results.forEach(IO::println);
         }

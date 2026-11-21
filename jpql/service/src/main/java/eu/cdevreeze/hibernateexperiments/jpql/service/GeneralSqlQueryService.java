@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.hibernateexperiments.jpql.service;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 /**
  * General native SQL query service.
@@ -29,6 +29,8 @@ public interface GeneralSqlQueryService {
      * Executes the given native SQL query, using the passed query arguments. The query string must use
      * positional parameters corresponding to the passed query arguments. Each element in the result collection
      * is a row as collection of columns.
+     *
+     * @return Immutable list of elements of type {@link T}.
      */
-    <T> ImmutableList<T> executeSqlQuery(String qlString, Class<T> resultClass, ImmutableList<Object> args);
+    <T> List<T> executeSqlQuery(String qlString, Class<T> resultClass, List<Object> args);
 }
