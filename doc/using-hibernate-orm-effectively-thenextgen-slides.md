@@ -417,8 +417,7 @@ Methods to add an actor etc. (keeping the Film and FilmActor entities mutually c
 ```java
 public interface FilmService {
 
-    // Returns Guava ImmutableList of mutable entities (so not very useful here)
-    ImmutableList<FilmEntity> findFilmsByActorId(long actorId);
+    List<FilmEntity> findFilmsByActorId(long actorId);
 }
 
 public final class NaiveFilmService implements FilmService {
@@ -428,7 +427,7 @@ public final class NaiveFilmService implements FilmService {
     public NaiveFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<FilmEntity> findFilmsByActorId(long actorId) {
+    public List<FilmEntity> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
             String qlString =
                     "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
@@ -436,7 +435,7 @@ public final class NaiveFilmService implements FilmService {
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
-                    .collect(ImmutableList.toImmutableList());
+                    .toList();
         });
     }
 }
@@ -459,7 +458,7 @@ For now, keep in mind that all entity associations are lazy, and that the JPQL q
 ```java
 FilmService filmService = new NaiveFilmService(emf);
 
-ImmutableList<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
+List<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
 
 // Outside any transaction/Session:
 FilmCategoryEntity firstFilmCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
@@ -476,7 +475,7 @@ Question: what happens when trying to run the code above?
 ```java
 FilmService filmService = new NaiveFilmService(emf);
 
-ImmutableList<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
+List<FilmEntity> filmsOfActor = filmService.findFilmsByActorId(1L); // Assume the result is not empty
 
 // Outside any transaction/Session:
 FilmCategoryEntity firstFilmCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
@@ -583,10 +582,10 @@ public record Film(
         BigDecimal replacementCost,
         @Nullable String rating,
         Instant lastUpdate,
-        @Nullable ImmutableList<String> specialFeatures,
+        @Nullable List<String> specialFeatures, // use List.copyOf in constructor
         String fullText,
-        ImmutableList<Actor> actors,
-        ImmutableList<Category> categories
+        List<Actor> actors, // use List.copyOf in constructor
+        List<Category> categories // use List.copyOf in constructor
 ) {
 
     public Optional<String> descriptionOption() { return Optional.ofNullable(description); }
@@ -684,11 +683,11 @@ public class FilmEntity {
                 requireNonNull(filmActors).stream()
                         .map(FilmActorEntity::getActor)
                         .map(ActorEntity::toModelObject)
-                        .collect(ImmutableList.toImmutableList()),
+                        .toList(),
                 requireNonNull(filmCategories).stream()
                         .map(FilmCategoryEntity::getCategory)
                         .map(CategoryEntity::toModelObject)
-                        .collect(ImmutableList.toImmutableList())
+                        .toList()
         );
     }
 }
@@ -711,8 +710,7 @@ Let's now have the `FilmService` interface return immutable `Film` DTOs. This Ja
 ```java
 public interface FilmService {
 
-    // Returning immutable Guava List of immutable Film DTOs
-    ImmutableList<Film> findFilmsByActorId(long actorId);
+    List<Film> findFilmsByActorId(long actorId);
 }
 ```
 
@@ -734,7 +732,7 @@ public final class InefficientFilmService implements FilmService {
     public InefficientFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
             String qlString =
                     "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
@@ -743,7 +741,7 @@ public final class InefficientFilmService implements FilmService {
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }
@@ -819,7 +817,7 @@ public final class ConcreteFilmService implements FilmService {
     public ConcreteFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
             String qlString =
                     "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
@@ -828,7 +826,7 @@ public final class ConcreteFilmService implements FilmService {
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -865,7 +863,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
     public ConcreteFilmServiceUsingFetchJoin(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
             String qlString = """
                     select f from Film f
@@ -883,7 +881,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
                     .setParameter(1, actorId)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }
@@ -919,16 +917,16 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     public ConcreteFilmServiceUsingSeparateQueries(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(entityManager -> {
-            java.util.List<FilmEntity> filmEntities =
+            List<FilmEntity> filmEntities =
                     findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
 
             // See https://vladmihalcea.com/spring-data-jpa-multiplebagfetchexception/
             findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityManager);
 
             return filmEntities.stream().map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -947,7 +945,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     // Continued ...
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(
+    private List<FilmEntity> findFilmsByActorId(
             long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         String qlString =
                 "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
@@ -955,7 +953,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return entityManager.createQuery(qlString, eg)
                 .setParameter(1, actorId)
                 .getResultList().stream() // not getResultStream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
@@ -1042,12 +1040,12 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     public ConcreteFilmServiceUsingSeparateQueries(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> { // Here we have no persistence context
-            java.util.List<FilmEntity> filmEntities =
+            List<FilmEntity> filmEntities =
                     findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityAgent);
 
-            java.util.Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
+            Map<Integer, FilmEntity> filmEntityWithCategoriesMap =
                     findFilmsByActorId(actorId, getFilmCategoriesEntityGraph(), entityAgent)
                             .stream()
                             .collect(Collectors.toMap(FilmEntity::getId, Function.identity()));
@@ -1055,11 +1053,11 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             filmEntities.forEach(filmEntity -> filmEntity.setFilmCategories(
                     Optional.ofNullable(filmEntityWithCategoriesMap.get(filmEntity.getId()))
                             .map(FilmEntity::getFilmCategories)
-                            .orElse(java.util.Set.of())
+                            .orElse(Set.of())
             ));
 
             return filmEntities.stream().map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -1078,7 +1076,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
 
     // Continued ...
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(
+    private List<FilmEntity> findFilmsByActorId(
             long actorId, EntityGraph<FilmEntity> eg, EntityAgent entityAgent) {
         String qlString =
                 "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
@@ -1086,7 +1084,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return entityAgent.createQuery(qlString, eg)
                 .setParameter(1, actorId)
                 .getResultList().stream() // not getResultStream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {
@@ -1141,7 +1139,7 @@ public final class AlternativeFilmService implements FilmService {
     public AlternativeFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
             JpaCriteriaQuery<String> cq = cb.createQuery(QL_STRING, String.class); // Nice!
@@ -1157,7 +1155,7 @@ public final class AlternativeFilmService implements FilmService {
 
             return statelessSession.createQuery(cq).getResultList().stream() // not getResultStream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -1244,7 +1242,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
     public ConcreteFilmServiceUsingFetchJoin(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
             CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
@@ -1263,7 +1261,7 @@ public final class ConcreteFilmServiceUsingFetchJoin implements FilmService {
             return entityAgent.createQuery(cq)
                     .getResultList().stream() // not getResultStream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }
@@ -1333,13 +1331,13 @@ public final class ConcreteFilmService implements FilmService {
     public ConcreteFilmService(EntityManagerFactory emf) { this.emf = emf; }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             FilmRepository filmRepository = new _FilmRepository(entityAgent); // generated
             return filmRepository.findFilmsByActorId((int) actorId)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }
