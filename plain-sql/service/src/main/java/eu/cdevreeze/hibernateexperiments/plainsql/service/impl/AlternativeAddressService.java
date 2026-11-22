@@ -19,10 +19,8 @@ package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 import module eu.cdevreeze.hibernateexperiments.plainsql.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Alternative {@link AddressService} implementation that uses CTEs (and JSON result sets) internally.
@@ -34,9 +32,7 @@ public final class AlternativeAddressService implements AddressService {
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
 
-    private final JsonMapper jsonMapper = JsonMapper.builder()
-            .addModule(new GuavaModule())
-            .build();
+    private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     private final EntityManagerFactory emf;
 
@@ -95,7 +91,7 @@ public final class AlternativeAddressService implements AddressService {
     }
 
     @Override
-    public ImmutableList<Address> findByCityId(long cityId) {
+    public List<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
@@ -140,12 +136,12 @@ public final class AlternativeAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findByCountryId(long countryId) {
+    public List<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
@@ -190,12 +186,12 @@ public final class AlternativeAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findAll() {
+    public List<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
@@ -238,12 +234,12 @@ public final class AlternativeAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, Address.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<City> findCitiesByCountryId(long countryId) {
+    public List<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
@@ -270,12 +266,12 @@ public final class AlternativeAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, City.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Country> findAllCountries() {
+    public List<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // Just for fun, using CTE (common table expression); by the way, Hibernate HQL supports CTEs too!
@@ -294,7 +290,7 @@ public final class AlternativeAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, Country.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }

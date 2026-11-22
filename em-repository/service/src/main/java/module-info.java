@@ -22,7 +22,6 @@
  * @author Chris de Vreeze
  */
 module eu.cdevreeze.hibernateexperiments.emrepository.service {
-    requires com.google.common;
     requires org.jspecify;
     requires jakarta.annotation;
     requires jakarta.persistence;
@@ -33,7 +32,6 @@ module eu.cdevreeze.hibernateexperiments.emrepository.service {
     // Otherwise it would make no sense to open the entity package to Hibernate for reflection
     requires org.hibernate.orm.core;
     requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
     requires org.slf4j;
     requires ch.qos.logback.classic;
 

@@ -21,7 +21,6 @@
  * @author Chris de Vreeze
  */
 module eu.cdevreeze.hibernateexperiments.criteria.model {
-    requires com.google.common;
     requires org.jspecify;
 
     exports eu.cdevreeze.hibernateexperiments.criteria.model;

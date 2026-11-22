@@ -17,11 +17,12 @@
 package eu.cdevreeze.hibernateexperiments.entitymanager.service;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Actor;
 
 /**
  * Abstract {@link Actor}-related service API.
+ * <p>
+ * The query method must return immutable collections.
  *
  * @author Chris de Vreeze
  */
@@ -29,7 +30,7 @@ public interface ActorService {
 
     Optional<Actor> findById(long id);
 
-    ImmutableList<Actor> findByFilmId(long filmId);
+    List<Actor> findByFilmId(long filmId);
 
-    ImmutableList<Actor> findAll();
+    List<Actor> findAll();
 }

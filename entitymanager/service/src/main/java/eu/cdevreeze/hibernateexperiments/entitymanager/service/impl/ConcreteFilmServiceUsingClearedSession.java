@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmActorEntity_;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmCategoryEntity_;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
@@ -42,7 +41,7 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             entityManager.addOption(FlushModeType.EXPLICIT); // strictly not needed, but does not hurt
@@ -51,11 +50,11 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            ImmutableList<Film> result = entityManager.createQuery(qlString, getEntityGraph())
+            List<Film> result = entityManager.createQuery(qlString, getEntityGraph())
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
             entityManager.clear();
             return result;
         });
@@ -83,7 +82,7 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             entityManager.addOption(FlushModeType.EXPLICIT); // strictly not needed, but does not hurt
@@ -92,12 +91,12 @@ public final class ConcreteFilmServiceUsingClearedSession implements FilmService
 
             // This sets the load graph, not the fetch graph
             // Yet that makes no difference here since we configured lazy fetching for all entity associations
-            ImmutableList<Film> result = entityManager.createQuery(qlString, getEntityGraph())
+            List<Film> result = entityManager.createQuery(qlString, getEntityGraph())
                     .setParameter(1, actorId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
             entityManager.clear();
             return result;
         });

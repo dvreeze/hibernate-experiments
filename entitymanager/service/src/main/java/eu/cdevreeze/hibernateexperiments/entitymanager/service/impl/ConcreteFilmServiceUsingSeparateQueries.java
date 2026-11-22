@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmActorEntity_;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmCategoryEntity_;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
@@ -43,7 +42,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findAllFilms(getFilmActorsEntityGraph(), entityManager);
@@ -54,7 +53,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -77,7 +76,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
@@ -88,11 +87,11 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
-    private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityManager entityManager) {
+    private List<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         String qlString = "select f from Film f order by f.id";
 
         // This sets the load graph, not the fetch graph
@@ -100,7 +99,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
         return entityManager.createQuery(qlString, eg)
                 .getResultList() // works better than getResultStream (no duplicates)
                 .stream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private Optional<FilmEntity> findFilm(long filmId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
@@ -115,7 +114,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
+    private List<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
 
         // This sets the load graph, not the fetch graph
@@ -124,7 +123,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                 .setParameter(1, actorId)
                 .getResultList() // works better than getResultStream (no duplicates)
                 .stream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {

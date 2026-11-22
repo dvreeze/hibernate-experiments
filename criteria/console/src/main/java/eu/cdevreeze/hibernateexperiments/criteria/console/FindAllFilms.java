@@ -20,7 +20,6 @@ import module eu.cdevreeze.hibernateexperiments.criteria.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Program finding all films with actors and categories in the database.
@@ -30,9 +29,7 @@ import tools.jackson.datatype.guava.GuavaModule;
 public class FindAllFilms {
 
     static void main(String... args) {
-        JsonMapper jsonMapper = JsonMapper.builder()
-                .addModule(new GuavaModule())
-                .build();
+        JsonMapper jsonMapper = JsonMapper.builder().build();
 
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = FilmServiceFactory.create(emf);

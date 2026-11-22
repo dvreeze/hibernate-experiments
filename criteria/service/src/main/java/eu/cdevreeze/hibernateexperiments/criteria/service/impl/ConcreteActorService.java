@@ -19,7 +19,6 @@ package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 import module eu.cdevreeze.hibernateexperiments.criteria.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.service.ActorService;
 import org.hibernate.jpa.SpecHints;
@@ -60,7 +59,7 @@ public final class ConcreteActorService implements ActorService {
     }
 
     @Override
-    public ImmutableList<Actor> findByFilmId(long filmId) {
+    public List<Actor> findByFilmId(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             // This shows that JPQL/Criteria is essentially an elegant object-oriented SQL dialect
@@ -82,12 +81,12 @@ public final class ConcreteActorService implements ActorService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(ActorEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Actor> findAll() {
+    public List<Actor> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -103,7 +102,7 @@ public final class ConcreteActorService implements ActorService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(ActorEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

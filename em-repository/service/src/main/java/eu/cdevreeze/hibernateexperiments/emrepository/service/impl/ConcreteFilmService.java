@@ -19,7 +19,6 @@ package eu.cdevreeze.hibernateexperiments.emrepository.service.impl;
 import module eu.cdevreeze.hibernateexperiments.emrepository.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo.FilmRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo._FilmRepository;
@@ -39,14 +38,14 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             FilmRepository filmRepository = new _FilmRepository(entityManager);
             return filmRepository.findAllFilms()
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -60,14 +59,14 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             FilmRepository filmRepository = new _FilmRepository(entityManager);
             return filmRepository.findFilmsByActorId((int) actorId)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }

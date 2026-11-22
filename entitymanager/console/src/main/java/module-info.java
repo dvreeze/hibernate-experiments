@@ -24,10 +24,8 @@ module eu.cdevreeze.hibernateexperiments.entitymanager.console {
     requires jakarta.persistence;
     requires org.jspecify;
     requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
     // For programmatic debugging
     requires jdk.jdi;
-    requires com.google.common;
 
     exports eu.cdevreeze.hibernateexperiments.entitymanager.console;
 }

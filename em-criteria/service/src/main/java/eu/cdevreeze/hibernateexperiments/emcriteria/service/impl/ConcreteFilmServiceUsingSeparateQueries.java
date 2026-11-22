@@ -18,7 +18,6 @@ package eu.cdevreeze.hibernateexperiments.emcriteria.service.impl;
 
 import module java.base;
 import module org.hibernate.orm.core;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emcriteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.emcriteria.model.Film;
 import eu.cdevreeze.hibernateexperiments.emcriteria.service.FilmService;
@@ -27,6 +26,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.criteria.*;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -44,7 +44,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findAllFilms(getFilmActorsEntityGraph(), entityManager);
@@ -55,7 +55,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -78,7 +78,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             java.util.List<FilmEntity> filmEntities = findFilmsByActorId(actorId, getFilmActorsEntityGraph(), entityManager);
@@ -89,11 +89,11 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
             return filmEntities
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
-    private ImmutableList<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityManager entityManager) {
+    private List<FilmEntity> findAllFilms(EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
 
@@ -107,7 +107,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                 .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg) // Not type-safe
                 .getResultList() // works better than getResultStream (no duplicates)
                 .stream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private Optional<FilmEntity> findFilm(long filmId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
@@ -127,7 +127,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                 .min(Comparator.comparingLong(FilmEntity::getId));
     }
 
-    private ImmutableList<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
+    private List<FilmEntity> findFilmsByActorId(long actorId, EntityGraph<FilmEntity> eg, EntityManager entityManager) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<FilmEntity> cq = cb.createQuery(FilmEntity.class);
 
@@ -143,7 +143,7 @@ public final class ConcreteFilmServiceUsingSeparateQueries implements FilmServic
                 .setHint(SpecHints.HINT_SPEC_LOAD_GRAPH, eg) // Not type-safe
                 .getResultList() // works better than getResultStream (no duplicates)
                 .stream()
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
     }
 
     private EntityGraph<FilmEntity> getFilmActorsEntityGraph() {

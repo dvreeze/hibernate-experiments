@@ -19,12 +19,12 @@ package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 import module jakarta.persistence;
 import module java.base;
 import module org.hibernate.orm.core;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
 import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
 import jakarta.persistence.criteria.JoinType;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -41,7 +41,7 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -58,7 +58,7 @@ public final class ConcreteFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -83,7 +83,7 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -102,7 +102,7 @@ public final class ConcreteFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(FilmEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

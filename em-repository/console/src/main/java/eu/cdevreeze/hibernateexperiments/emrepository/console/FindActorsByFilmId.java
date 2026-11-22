@@ -18,10 +18,6 @@ package eu.cdevreeze.hibernateexperiments.emrepository.console;
 
 import module eu.cdevreeze.hibernateexperiments.emrepository.service;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.emrepository.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.emrepository.model.Actor;
-import eu.cdevreeze.hibernateexperiments.emrepository.service.ActorService;
-import eu.cdevreeze.hibernateexperiments.emrepository.service.factory.ActorServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 
 /**

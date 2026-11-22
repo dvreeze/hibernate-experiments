@@ -16,14 +16,15 @@
 
 package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Actor;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Category;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
 import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
 import jakarta.persistence.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -93,7 +94,7 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testFindFilmsByActorId() {
-        ImmutableList<Film> films = filmService(emf).findFilmsByActorId(1);
+        List<Film> films = filmService(emf).findFilmsByActorId(1);
 
         assertEquals(1, films.size());
         assertEquals("Two wolves", films.getFirst().title());
@@ -106,7 +107,7 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testFindNoFilmsByActorId() {
-        ImmutableList<Film> films = filmService(emf).findFilmsByActorId(3);
+        List<Film> films = filmService(emf).findFilmsByActorId(3);
 
         assertEquals(0, films.size());
     }

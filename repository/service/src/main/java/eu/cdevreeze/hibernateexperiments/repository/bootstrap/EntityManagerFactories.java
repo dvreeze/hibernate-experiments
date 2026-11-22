@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.hibernateexperiments.repository.bootstrap;
 
-import com.google.common.base.Preconditions;
 import eu.cdevreeze.hibernateexperiments.repository.entity.*;
 import eu.cdevreeze.hibernateexperiments.repository.repo.ActorRepository;
 import eu.cdevreeze.hibernateexperiments.repository.repo.AddressRepository;
@@ -58,10 +57,9 @@ public class EntityManagerFactories {
                 .managedClass(FilmCategoryEntity.class)
                 .managedClass(LanguageEntity.class)
                 .managedClass(MyEntityListener.class); // Needed
-        Preconditions.checkState(
-                persistenceConfig.defaultToOneFetchType() == FetchType.LAZY,
-                "By all means, the default to-one fetch type must be set to LAZY"
-        );
+        if (persistenceConfig.defaultToOneFetchType() != FetchType.LAZY) {
+            throw new IllegalStateException("By all means, the default to-one fetch type must be set to LAZY");
+        }
         return persistenceConfig.createEntityManagerFactory();
     }
 }

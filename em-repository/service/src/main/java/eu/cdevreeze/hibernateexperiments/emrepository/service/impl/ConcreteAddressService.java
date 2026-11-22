@@ -19,13 +19,9 @@ package eu.cdevreeze.hibernateexperiments.emrepository.service.impl;
 import module eu.cdevreeze.hibernateexperiments.emrepository.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.AddressEntity;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.CountryEntity;
-import eu.cdevreeze.hibernateexperiments.emrepository.model.Address;
-import eu.cdevreeze.hibernateexperiments.emrepository.model.City;
-import eu.cdevreeze.hibernateexperiments.emrepository.model.Country;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo.AddressRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo._AddressRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.service.AddressService;
@@ -53,62 +49,62 @@ public final class ConcreteAddressService implements AddressService {
     }
 
     @Override
-    public ImmutableList<Address> findByCityId(long cityId) {
+    public List<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             AddressRepository addressRepository = new _AddressRepository(entityManager);
             return addressRepository.findByCityId((int) cityId)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findByCountryId(long countryId) {
+    public List<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             AddressRepository addressRepository = new _AddressRepository(entityManager);
             return addressRepository.findByCountryId((int) countryId)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findAll() {
+    public List<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             AddressRepository addressRepository = new _AddressRepository(entityManager);
             return addressRepository.findAllAddresses()
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<City> findCitiesByCountryId(long countryId) {
+    public List<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             AddressRepository addressRepository = new _AddressRepository(entityManager);
             return addressRepository.findCitiesByCountryId((int) countryId)
                     .stream()
                     .map(CityEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Country> findAllCountries() {
+    public List<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             AddressRepository addressRepository = new _AddressRepository(entityManager);
             return addressRepository.findAllCountries()
                     .stream()
                     .map(CountryEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

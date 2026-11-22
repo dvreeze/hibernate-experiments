@@ -16,22 +16,22 @@
 
 package eu.cdevreeze.hibernateexperiments.emrepository.service;
 
-import com.google.common.collect.ImmutableList;
+import module java.base;
 import eu.cdevreeze.hibernateexperiments.emrepository.model.Film;
-
-import java.util.Optional;
 
 /**
  * Abstract {@link Film}-related service API.
+ * <p>
+ * The query method must return immutable collections.
  *
  * @author Chris de Vreeze
  */
 public interface FilmService {
 
     // In reality this would return too many results
-    ImmutableList<Film> findAllFilms();
+    List<Film> findAllFilms();
 
     Optional<Film> findFilm(long filmId);
 
-    ImmutableList<Film> findFilmsByActorId(long actorId);
+    List<Film> findFilmsByActorId(long actorId);
 }

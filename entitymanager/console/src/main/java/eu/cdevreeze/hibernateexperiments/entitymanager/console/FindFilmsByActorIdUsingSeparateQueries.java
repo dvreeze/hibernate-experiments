@@ -20,7 +20,6 @@ import module eu.cdevreeze.hibernateexperiments.entitymanager.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Program finding the films with a given actor (as ID), returning it with actors and categories.
@@ -31,9 +30,7 @@ import tools.jackson.datatype.guava.GuavaModule;
 public class FindFilmsByActorIdUsingSeparateQueries {
 
     static void main(String... args) {
-        JsonMapper jsonMapper = JsonMapper.builder()
-                .addModule(new GuavaModule())
-                .build();
+        JsonMapper jsonMapper = JsonMapper.builder().build();
 
         Objects.checkIndex(0, args.length);
         long actorId = Long.parseLong(args[0]);

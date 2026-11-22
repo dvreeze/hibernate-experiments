@@ -18,13 +18,8 @@ package eu.cdevreeze.hibernateexperiments.emrepository.console;
 
 import module eu.cdevreeze.hibernateexperiments.emrepository.service;
 import module java.base;
-import eu.cdevreeze.hibernateexperiments.emrepository.bootstrap.EntityManagerFactories;
-import eu.cdevreeze.hibernateexperiments.emrepository.model.Film;
-import eu.cdevreeze.hibernateexperiments.emrepository.service.FilmService;
-import eu.cdevreeze.hibernateexperiments.emrepository.service.factory.FilmServiceFactory;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Program finding the film with a given ID, returning it with actors and categories.
@@ -34,9 +29,7 @@ import tools.jackson.datatype.guava.GuavaModule;
 public class FindFilm {
 
     static void main(String... args) {
-        JsonMapper jsonMapper = JsonMapper.builder()
-                .addModule(new GuavaModule())
-                .build();
+        JsonMapper jsonMapper = JsonMapper.builder().build();
 
         Objects.checkIndex(0, args.length);
         long filmId = Long.parseLong(args[0]);

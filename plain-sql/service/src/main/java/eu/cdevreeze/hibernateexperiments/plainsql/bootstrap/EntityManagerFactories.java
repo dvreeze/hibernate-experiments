@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.bootstrap;
 
-import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
 
 /**
@@ -42,10 +41,9 @@ public class EntityManagerFactories {
                 .property("hibernate.connection.provider_class", "AgroalConnectionProvider")
                 .schemaManagementDatabaseAction(SchemaManagementAction.VALIDATE);
         // No difference here, given that there are no entities
-        Preconditions.checkState(
-                persistenceConfig.defaultToOneFetchType() == FetchType.LAZY,
-                "By all means, the default to-one fetch type must be set to LAZY"
-        );
+        if (persistenceConfig.defaultToOneFetchType() != FetchType.LAZY) {
+            throw new IllegalStateException("By all means, the default to-one fetch type must be set to LAZY");
+        }
         return persistenceConfig.createEntityManagerFactory();
     }
 }

@@ -16,13 +16,14 @@
 
 package eu.cdevreeze.hibernateexperiments.emrepository.service.impl;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emrepository.entity.*;
 import eu.cdevreeze.hibernateexperiments.emrepository.model.Actor;
 import eu.cdevreeze.hibernateexperiments.emrepository.repo.ActorRepository;
 import eu.cdevreeze.hibernateexperiments.emrepository.service.ActorService;
 import jakarta.persistence.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -84,7 +85,7 @@ abstract class AbstractActorServiceH2Test {
 
     @Test
     void testFindActorsByFilmId() {
-        ImmutableList<Actor> actors = actorService(emf).findByFilmId(1);
+        List<Actor> actors = actorService(emf).findByFilmId(1);
 
         assertEquals(2, actors.size());
         assertEquals(

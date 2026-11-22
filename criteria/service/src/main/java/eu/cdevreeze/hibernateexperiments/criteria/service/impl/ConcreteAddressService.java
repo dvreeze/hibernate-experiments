@@ -19,7 +19,6 @@ package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 import module eu.cdevreeze.hibernateexperiments.criteria.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.service.AddressService;
 import org.hibernate.jpa.SpecHints;
@@ -60,7 +59,7 @@ public final class ConcreteAddressService implements AddressService {
     }
 
     @Override
-    public ImmutableList<Address> findByCityId(long cityId) {
+    public List<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -77,12 +76,12 @@ public final class ConcreteAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findByCountryId(long countryId) {
+    public List<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -99,12 +98,12 @@ public final class ConcreteAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findAll() {
+    public List<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -120,12 +119,12 @@ public final class ConcreteAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<City> findCitiesByCountryId(long countryId) {
+    public List<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -142,12 +141,12 @@ public final class ConcreteAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(CityEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Country> findAllCountries() {
+    public List<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             CriteriaBuilder cb = entityAgent.getCriteriaBuilder();
@@ -163,7 +162,7 @@ public final class ConcreteAddressService implements AddressService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(CountryEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

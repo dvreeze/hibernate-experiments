@@ -19,7 +19,6 @@ package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 import module eu.cdevreeze.hibernateexperiments.plainsql.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.AddressService;
 
 import static jakarta.persistence.sql.ResultSetMapping.column;
@@ -65,7 +64,7 @@ public final class ConcreteAddressService implements AddressService {
     }
 
     @Override
-    public ImmutableList<Address> findByCityId(long cityId) {
+    public List<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = """
@@ -86,12 +85,12 @@ public final class ConcreteAddressService implements AddressService {
                     .setParameter(1, cityId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findByCountryId(long countryId) {
+    public List<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = """
@@ -112,12 +111,12 @@ public final class ConcreteAddressService implements AddressService {
                     .setParameter(1, countryId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findAll() {
+    public List<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = """
@@ -136,12 +135,12 @@ public final class ConcreteAddressService implements AddressService {
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<City> findCitiesByCountryId(long countryId) {
+    public List<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = """
@@ -159,12 +158,12 @@ public final class ConcreteAddressService implements AddressService {
                     .setParameter(1, countryId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Country> findAllCountries() {
+    public List<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = "select country_id, country, last_update as co_last_update from country";
@@ -174,7 +173,7 @@ public final class ConcreteAddressService implements AddressService {
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

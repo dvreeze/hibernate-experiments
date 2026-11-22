@@ -19,7 +19,6 @@ package eu.cdevreeze.hibernateexperiments.repository.service.impl;
 import module eu.cdevreeze.hibernateexperiments.repository.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.repository.entity.AddressEntity;
 import eu.cdevreeze.hibernateexperiments.repository.entity.CityEntity;
 import eu.cdevreeze.hibernateexperiments.repository.entity.CountryEntity;
@@ -50,62 +49,62 @@ public final class ConcreteAddressService implements AddressService {
     }
 
     @Override
-    public ImmutableList<Address> findByCityId(long cityId) {
+    public List<Address> findByCityId(long cityId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             AddressRepository addressRepository = new _AddressRepository(entityAgent);
             return addressRepository.findByCityId((int) cityId)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findByCountryId(long countryId) {
+    public List<Address> findByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             AddressRepository addressRepository = new _AddressRepository(entityAgent);
             return addressRepository.findByCountryId((int) countryId)
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Address> findAll() {
+    public List<Address> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             AddressRepository addressRepository = new _AddressRepository(entityAgent);
             return addressRepository.findAllAddresses()
                     .stream()
                     .map(AddressEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<City> findCitiesByCountryId(long countryId) {
+    public List<City> findCitiesByCountryId(long countryId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             AddressRepository addressRepository = new _AddressRepository(entityAgent);
             return addressRepository.findCitiesByCountryId((int) countryId)
                     .stream()
                     .map(CityEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Country> findAllCountries() {
+    public List<Country> findAllCountries() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             AddressRepository addressRepository = new _AddressRepository(entityAgent);
             return addressRepository.findAllCountries()
                     .stream()
                     .map(CountryEntity::toModelObject)
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

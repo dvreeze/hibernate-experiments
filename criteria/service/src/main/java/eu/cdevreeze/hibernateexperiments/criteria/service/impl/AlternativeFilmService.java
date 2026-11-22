@@ -19,13 +19,11 @@ package eu.cdevreeze.hibernateexperiments.criteria.service.impl;
 import module jakarta.persistence;
 import module java.base;
 import module org.hibernate.orm.core;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.entity.*;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Film;
 import eu.cdevreeze.hibernateexperiments.criteria.service.FilmService;
 import jakarta.persistence.criteria.JoinType;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 import java.util.List;
 import java.util.Map;
@@ -49,9 +47,7 @@ public final class AlternativeFilmService implements FilmService {
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
 
-    private final JsonMapper jsonMapper = JsonMapper.builder()
-            .addModule(new GuavaModule())
-            .build();
+    private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     private final EntityManagerFactory emf;
 
@@ -60,7 +56,7 @@ public final class AlternativeFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
@@ -71,7 +67,7 @@ public final class AlternativeFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -97,7 +93,7 @@ public final class AlternativeFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(StatelessSession.class, statelessSession -> {
             HibernateCriteriaBuilder cb = statelessSession.getCriteriaBuilder();
@@ -118,7 +114,7 @@ public final class AlternativeFilmService implements FilmService {
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
                     .map(v -> jsonMapper.readValue(v, Film.class))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

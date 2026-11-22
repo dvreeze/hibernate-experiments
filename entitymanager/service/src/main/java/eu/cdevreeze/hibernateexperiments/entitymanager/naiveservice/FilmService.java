@@ -16,10 +16,8 @@
 
 package eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice;
 
-import com.google.common.collect.ImmutableList;
+import module java.base;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
-
-import java.util.Optional;
 
 /**
  * Abstract {@link FilmEntity}-related service API.
@@ -29,9 +27,9 @@ import java.util.Optional;
 public interface FilmService {
 
     // In reality this would return too many results
-    ImmutableList<FilmEntity> findAllFilms();
+    List<FilmEntity> findAllFilms();
 
     Optional<FilmEntity> findFilm(long filmId);
 
-    ImmutableList<FilmEntity> findFilmsByActorId(long actorId);
+    List<FilmEntity> findFilmsByActorId(long actorId);
 }

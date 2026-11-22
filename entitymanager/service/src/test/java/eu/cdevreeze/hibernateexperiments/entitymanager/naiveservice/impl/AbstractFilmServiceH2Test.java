@@ -16,12 +16,13 @@
 
 package eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice.impl;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.*;
 import eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice.FilmService;
 import jakarta.persistence.*;
 import org.hibernate.LazyInitializationException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -83,7 +84,7 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testFindFilmsByActorId() {
-        ImmutableList<FilmEntity> films = filmService(emf).findFilmsByActorId(1);
+        List<FilmEntity> films = filmService(emf).findFilmsByActorId(1);
 
         assertEquals(1, films.size());
         assertEquals("Two wolves", films.getFirst().getTitle());
@@ -93,14 +94,14 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testFindNoFilmsByActorId() {
-        ImmutableList<FilmEntity> films = filmService(emf).findFilmsByActorId(3);
+        List<FilmEntity> films = filmService(emf).findFilmsByActorId(3);
 
         assertEquals(0, films.size());
     }
 
     @Test
     void testLazyInitializationExceptionOnFilmActor() {
-        ImmutableList<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
+        List<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
         assertThrows(LazyInitializationException.class, () -> {
             // Outside any transaction/Session:
             var firstActor = filmsOfActor.getFirst().getFilmActors().iterator().next();
@@ -110,7 +111,7 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testLazyInitializationExceptionOnFilmCategory() {
-        ImmutableList<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
+        List<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
         assertThrows(LazyInitializationException.class, () -> {
             // Outside any transaction/Session:
             var firstCategory = filmsOfActor.getFirst().getFilmCategories().iterator().next();
@@ -120,7 +121,7 @@ abstract class AbstractFilmServiceH2Test {
 
     @Test
     void testLazyInitializationExceptionOnFilmLanguage() {
-        ImmutableList<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
+        List<FilmEntity> filmsOfActor = filmService(emf).findFilmsByActorId(1);
         assertThrows(LazyInitializationException.class, () -> {
             // Outside any transaction/Session:
             var language = filmsOfActor.getFirst().getLanguage().getName();

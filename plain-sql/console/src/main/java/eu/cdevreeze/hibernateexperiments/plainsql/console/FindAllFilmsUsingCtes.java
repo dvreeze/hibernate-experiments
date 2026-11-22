@@ -20,7 +20,6 @@ import module eu.cdevreeze.hibernateexperiments.plainsql.service;
 import module java.base;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
 
 /**
  * Program finding all films in the database, using CTEs in the implementation.
@@ -30,9 +29,7 @@ import tools.jackson.datatype.guava.GuavaModule;
 public class FindAllFilmsUsingCtes {
 
     static void main(String... args) {
-        JsonMapper jsonMapper = JsonMapper.builder()
-                .addModule(new GuavaModule())
-                .build();
+        JsonMapper jsonMapper = JsonMapper.builder().build();
 
         try (EntityManagerFactory emf = EntityManagerFactories.createEntityManagerFactory("pagila")) {
             FilmService filmService = AlternativeFilmServiceFactory.create(emf);

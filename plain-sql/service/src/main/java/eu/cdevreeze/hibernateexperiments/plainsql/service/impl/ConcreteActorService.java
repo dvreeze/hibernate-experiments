@@ -19,7 +19,6 @@ package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 import module eu.cdevreeze.hibernateexperiments.plainsql.model;
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.ActorService;
 
 import static jakarta.persistence.sql.ResultSetMapping.column;
@@ -59,7 +58,7 @@ public final class ConcreteActorService implements ActorService {
     }
 
     @Override
-    public ImmutableList<Actor> findByFilmId(long filmId) {
+    public List<Actor> findByFilmId(long filmId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = """
@@ -75,12 +74,12 @@ public final class ConcreteActorService implements ActorService {
                     .setParameter(1, filmId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
     @Override
-    public ImmutableList<Actor> findAll() {
+    public List<Actor> findAll() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             String sqlString = """
@@ -93,7 +92,7 @@ public final class ConcreteActorService implements ActorService {
             return entityAgent.createNativeQuery(sqlString, rsMapping)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 

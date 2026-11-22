@@ -16,15 +16,12 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 
-import com.google.common.collect.ImmutableList;
+import module java.base;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Film;
 import eu.cdevreeze.hibernateexperiments.plainsql.service.FilmService;
 import jakarta.persistence.EntityAgent;
 import jakarta.persistence.EntityManagerFactory;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.datatype.guava.GuavaModule;
-
-import java.util.Optional;
 
 /**
  * Alternative {@link FilmService} implementation.
@@ -40,9 +37,7 @@ public final class AlternativeFilmService implements FilmService {
     // For nested JSON results with JSON objects and nested arrays, see https://forums.oracle.com/ords/apexds/post/complex-nested-json-structure-8286
     // This is interesting for queries returning films and their actors
 
-    private final JsonMapper jsonMapper = JsonMapper.builder()
-            .addModule(new GuavaModule())
-            .build();
+    private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     private final EntityManagerFactory emf;
 
@@ -51,14 +46,14 @@ public final class AlternativeFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent ->
                 entityAgent.createNativeQuery(SQL_STRING, String.class)
                         .getResultList() // works better than getResultStream (no duplicates)
                         .stream()
                         .map(v -> jsonMapper.readValue(v, Film.class))
-                        .collect(ImmutableList.toImmutableList())
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf))
         );
     }
 
@@ -79,7 +74,7 @@ public final class AlternativeFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // Not ideal, because SQL string composition using string concatenation is error-prone
         String sqlString = SQL_STRING.strip() + """
                 where f.film_id in (
@@ -96,7 +91,7 @@ public final class AlternativeFilmService implements FilmService {
                         .getResultList() // works better than getResultStream (no duplicates)
                         .stream()
                         .map(v -> jsonMapper.readValue(v, Film.class))
-                        .collect(ImmutableList.toImmutableList())
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf))
         );
     }
 

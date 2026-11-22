@@ -24,7 +24,6 @@ module eu.cdevreeze.hibernateexperiments.criteria.console {
     requires jakarta.persistence;
     requires org.jspecify;
     requires tools.jackson.databind;
-    requires tools.jackson.datatype.guava;
 
     exports eu.cdevreeze.hibernateexperiments.criteria.console;
 }

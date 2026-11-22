@@ -18,7 +18,6 @@ package eu.cdevreeze.hibernateexperiments.emcriteria.entity;
 
 import module jakarta.persistence;
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.emcriteria.model.Film;
 import jakarta.persistence.Entity;
 
@@ -217,16 +216,16 @@ public class FilmEntity {
                 requireNonNull(replacementCost),
                 rating,
                 requireNonNull(lastUpdate),
-                ImmutableList.of(),
+                List.of(),
                 "",
                 requireNonNull(filmActors).stream()
                         .map(FilmActorEntity::getActor)
                         .map(ActorEntity::toModelObject)
-                        .collect(ImmutableList.toImmutableList()),
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf)),
                 requireNonNull(filmCategories).stream()
                         .map(FilmCategoryEntity::getCategory)
                         .map(CategoryEntity::toModelObject)
-                        .collect(ImmutableList.toImmutableList())
+                        .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf))
         );
     }
 }

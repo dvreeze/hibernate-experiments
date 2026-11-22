@@ -17,13 +17,14 @@
 package eu.cdevreeze.hibernateexperiments.criteria.service;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Address;
 import eu.cdevreeze.hibernateexperiments.criteria.model.City;
 import eu.cdevreeze.hibernateexperiments.criteria.model.Country;
 
 /**
  * Abstract {@link Address}-related service API.
+ * <p>
+ * The query method must return immutable collections.
  *
  * @author Chris de Vreeze
  */
@@ -31,16 +32,16 @@ public interface AddressService {
 
     Optional<Address> findById(long id);
 
-    ImmutableList<Address> findByCityId(long cityId);
+    List<Address> findByCityId(long cityId);
 
-    ImmutableList<Address> findByCountryId(long countryId);
+    List<Address> findByCountryId(long countryId);
 
     // In reality this would return too many results
-    ImmutableList<Address> findAll();
+    List<Address> findAll();
 
-    ImmutableList<City> findCitiesByCountryId(long countryId);
+    List<City> findCitiesByCountryId(long countryId);
 
-    ImmutableList<Country> findAllCountries();
+    List<Country> findAllCountries();
 
     Address add(Address.NewAddress address);
 }

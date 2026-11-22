@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice.impl;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.FilmEntity;
 import eu.cdevreeze.hibernateexperiments.entitymanager.naiveservice.FilmService;
 import jakarta.persistence.EntityManagerFactory;
@@ -36,7 +35,7 @@ public final class NaiveFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<FilmEntity> findAllFilms() {
+    public List<FilmEntity> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f order by f.id";
@@ -44,7 +43,7 @@ public final class NaiveFilmService implements FilmService {
             return entityManager.createQuery(qlString, FilmEntity.class)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 
@@ -63,7 +62,7 @@ public final class NaiveFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<FilmEntity> findFilmsByActorId(long actorId) {
+    public List<FilmEntity> findFilmsByActorId(long actorId) {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(entityManager -> {
             String qlString = "select f from Film f left join f.filmActors fa where fa.actor.id = ?1 order by f.id";
@@ -72,7 +71,7 @@ public final class NaiveFilmService implements FilmService {
                     .setParameter(1, actorId)
                     .getResultList() // works better than getResultStream (no duplicates)
                     .stream()
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         });
     }
 }

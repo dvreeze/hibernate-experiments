@@ -17,7 +17,6 @@
 package eu.cdevreeze.hibernateexperiments.repository.model;
 
 import module java.base;
-import com.google.common.collect.ImmutableList;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -38,11 +37,18 @@ public record Film(
         BigDecimal replacementCost,
         @Nullable String rating,
         Instant lastUpdate,
-        @Nullable ImmutableList<String> specialFeatures,
+        @Nullable List<String> specialFeatures,
         String fullText,
-        ImmutableList<Actor> actors,
-        ImmutableList<Category> categories
+        List<Actor> actors,
+        List<Category> categories
 ) {
+
+    public Film {
+        // Ensuring collection-valued fields are immutable as well
+        specialFeatures = specialFeatures == null ? null : List.copyOf(specialFeatures);
+        actors = List.copyOf(actors);
+        categories = List.copyOf(categories);
+    }
 
     public Optional<String> descriptionOption() {
         return Optional.ofNullable(description);
@@ -64,7 +70,7 @@ public record Film(
         return Optional.ofNullable(rating);
     }
 
-    public Optional<ImmutableList<String>> specialFeaturesOption() {
+    public Optional<List<String>> specialFeaturesOption() {
         return Optional.ofNullable(specialFeatures);
     }
 }

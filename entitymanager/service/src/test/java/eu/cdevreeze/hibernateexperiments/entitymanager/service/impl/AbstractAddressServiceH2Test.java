@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.hibernateexperiments.entitymanager.service.impl;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.entitymanager.entity.*;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.Address;
 import eu.cdevreeze.hibernateexperiments.entitymanager.model.City;
@@ -88,7 +87,7 @@ abstract class AbstractAddressServiceH2Test {
 
     @Test
     void testFindAddressesByCityId() {
-        ImmutableList<Address> addresses = addressService(emf).findByCityId(235);
+        List<Address> addresses = addressService(emf).findByCityId(235);
 
         assertEquals(1, addresses.size());
         assertEquals("810 Palghat (Palakkad) Boulevard", addresses.getFirst().address1());
@@ -101,10 +100,10 @@ abstract class AbstractAddressServiceH2Test {
 
     @Test
     void testFindAddressesByCountryId() {
-        ImmutableList<Address> addresses = addressService(emf).findByCountryId(80)
+        List<Address> addresses = addressService(emf).findByCountryId(80)
                 .stream()
                 .filter(a -> a.district().equals("Jaroslavl"))
-                .collect(ImmutableList.toImmutableList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
 
         assertEquals(1, addresses.size());
         assertEquals("810 Palghat (Palakkad) Boulevard", addresses.getFirst().address1());

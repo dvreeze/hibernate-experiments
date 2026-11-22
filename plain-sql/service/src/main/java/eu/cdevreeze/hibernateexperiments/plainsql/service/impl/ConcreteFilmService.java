@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.hibernateexperiments.plainsql.service.impl;
 
-import com.google.common.collect.ImmutableList;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Actor;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Category;
 import eu.cdevreeze.hibernateexperiments.plainsql.model.Film;
@@ -73,7 +72,7 @@ public final class ConcreteFilmService implements FilmService {
             @Nullable Instant categoryLastUpdate
     ) {
 
-        public static ImmutableList<Film> convertToFilms(List<FilmRow> rows) {
+        public static List<Film> convertToFilms(List<FilmRow> rows) {
             return rows
                     .stream()
                     .collect(Collectors.groupingBy(FilmRow::filmId))
@@ -104,7 +103,7 @@ public final class ConcreteFilmService implements FilmService {
                             grp.getFirst().replacementCost(),
                             grp.getFirst().rating(),
                             grp.getFirst().lastUpdate(),
-                            ImmutableList.of(),
+                            List.of(),
                             "",
                             grp.stream()
                                     .filter(row -> row.actorId() != null)
@@ -116,7 +115,7 @@ public final class ConcreteFilmService implements FilmService {
                                     ))
                                     .distinct()
                                     .sorted(Comparator.comparing(Actor::id))
-                                    .collect(ImmutableList.toImmutableList()),
+                                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf)),
                             grp.stream()
                                     .filter(row -> row.categoryId() != null)
                                     .map(row -> new Category(
@@ -126,10 +125,10 @@ public final class ConcreteFilmService implements FilmService {
                                     ))
                                     .distinct()
                                     .sorted(Comparator.comparing(Category::id))
-                                    .collect(ImmutableList.toImmutableList())
+                                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf))
                     ))
                     .sorted(Comparator.comparing(Film::id))
-                    .collect(ImmutableList.toImmutableList());
+                    .collect(Collectors.collectingAndThen(Collectors.toList(), List::copyOf));
         }
     }
 
@@ -140,7 +139,7 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findAllFilms() {
+    public List<Film> findAllFilms() {
         // This starts a new transaction in our case of resource-local transactions
         return emf.callInTransaction(EntityAgent.class, entityAgent -> {
             ResultSetMapping<FilmRow> rsMapping = getFilmRowResultMapping();
@@ -169,7 +168,7 @@ public final class ConcreteFilmService implements FilmService {
     }
 
     @Override
-    public ImmutableList<Film> findFilmsByActorId(long actorId) {
+    public List<Film> findFilmsByActorId(long actorId) {
         // Not ideal, because SQL string composition using string concatenation is error-prone
         String sqlString = SQL_STRING.strip() + " " + """
                 where f.film_id in (
