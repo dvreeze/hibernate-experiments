@@ -39,15 +39,15 @@ public record Film(
         Instant lastUpdate,
         @Nullable List<String> specialFeatures,
         String fullText,
-        @Nullable List<Actor> actors,
-        @Nullable List<Category> categories
+        List<Actor> actors,
+        List<Category> categories
 ) {
 
     public Film {
         // Ensuring collection-valued fields are immutable as well
         specialFeatures = specialFeatures == null ? null : List.copyOf(specialFeatures);
-        actors = actors == null ? List.of() : List.copyOf(actors);
-        categories = categories == null ? List.of() : List.copyOf(categories);
+        actors = List.copyOf(actors);
+        categories = List.copyOf(categories);
     }
 
     public Optional<String> descriptionOption() {
